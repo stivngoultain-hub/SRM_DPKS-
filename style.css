@@ -1,233 +1,279 @@
-:root {
-    --srm-dark-blue: #095987; 
-    --srm-cyan: #1796cd; 
-    --srm-green: #38a141; 
-    --srm-orange: #eb5923;
-    --bg-color: #e6f2ff; /* خلفية زرقاء فاتحة هادئة ومريحة للنظر */
-    --card-bg: #ffffff;  /* بطاقات بيضاء نقية وبارزة */
-    --text-dark: #1e293b; 
-    --text-muted: #64748b; 
-    --border-color: #cbd5e1;
-}
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SRM DPKS - STEP Kelaa des Sraghna</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- شاشة الافتتاحية -->
+    <div id="splash-screen">
+        <img src="splash.png" alt="SRM Splash" class="splash-img">
+        <div class="loader"></div>
+    </div>
 
-* { 
-    box-sizing: border-box; 
-    margin: 0; 
-    padding: 0; 
-    font-family: 'Segoe UI', system-ui, sans-serif; 
-    -webkit-tap-highlight-color: transparent; 
-}
+    <!-- الترويسة البارزة والمميزة -->
+    <header class="app-header">
+        <div class="logo-container">
+            <img src="logo.png" alt="Logo SRM DPKS" class="app-logo">
+        </div>
+        <h1 class="app-title">SRM DPKS</h1>
+        <p class="app-subtitle">Exploitation STEP - El Kelaa des Sraghna</p>
+    </header>
 
-body { 
-    background-color: var(--bg-color); 
-    color: var(--text-dark); 
-    padding-bottom: 50px; 
-}
+    <!-- شريط التنقل -->
+    <nav class="app-nav">
+        <button class="nav-item active" data-target="tab-saisie"><i class="fa-solid fa-pen-to-square"></i> Saisie</button>
+        <button class="nav-item" data-target="tab-synthese"><i class="fa-solid fa-file-excel"></i> Excel</button>
+        <button class="nav-item" data-target="tab-pv"><i class="fa-solid fa-recycle"></i> PV Évacuation</button>
+        <button class="nav-item" data-target="tab-finance"><i class="fa-solid fa-file-invoice-dollar"></i> Attachement</button>
+    </nav>
 
-.text-blue { color: var(--srm-dark-blue); } 
-.text-cyan { color: var(--srm-cyan); } 
-.text-green { color: var(--srm-green); } 
-.text-orange { color: var(--srm-orange); } 
+    <main class="tabs-container">
+        <!-- ================= TAB 1: SAISIE JOURNALIÈRE ================= -->
+        <div id="tab-saisie" class="tab-pane active">
+            <form id="stepForm">
+                <div class="global-info-card">
+                    <div class="input-group">
+                        <label>Date d'exploitation</label>
+                        <input type="date" id="date_exp" required>
+                    </div>
+                    <div class="form-grid mt-15">
+                        <div class="input-group">
+                            <label>Météo (Automatique)</label>
+                            <select id="meteo">
+                                <option value="Ensoleillé">Ensoleillé ☀️</option>
+                                <option value="Nuageux">Nuageux ⛅</option>
+                                <option value="Pluvieux">Pluvieux 🌧️</option>
+                            </select>
+                        </div>
+                        <div class="input-group"><label>Tª Ambiance (°C)</label><input type="number" id="t_amb" step="0.1" placeholder="25"></div>
+                        <div class="input-group full-width"><label>Pluviométrie (mm)</label><input type="number" id="pluvio" step="0.1" placeholder="0"></div>
+                    </div>
+                </div>
 
-.bg-blue { background-color: var(--srm-dark-blue); } 
-.bg-cyan { background-color: var(--srm-cyan); } 
-.bg-green { background-color: var(--srm-green); } 
-.bg-orange { background-color: var(--srm-orange); } 
+                <!-- 0. Débits 24H -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-blue"><i class="fa-solid fa-clock"></i></div><span>DÉBITS TRAITÉS (24H)</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="table-responsive">
+                            <table class="hourly-table">
+                                <thead><tr><th>HEURE</th><th>ENTRÉE (m³)</th><th>SORTIE (m³)</th></tr></thead>
+                                <tbody id="hourly-tbody"></tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td><strong>TOTAL</strong></td>
+                                        <td><input type="number" id="vol_entree" readonly class="readonly-input"></td>
+                                        <td><input type="number" id="vol_sortie" readonly class="readonly-input"></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
-.text-center { text-align: center; } 
-.text-muted { color: var(--text-muted); } 
-.mt-10 { margin-top: 10px; } 
-.mt-15 { margin-top: 15px; } 
-.mt-20 { margin-top: 20px; } 
-.mb-10 { margin-bottom: 10px; } 
-.mb-12 { margin-bottom: 12px; } 
-.mb-15 { margin-bottom: 15px; } 
-.mb-20 { margin-bottom: 20px; } 
-.w-100 { width: 100%; } 
-.p-15 { padding: 15px; } 
-.p-20 { padding: 22px; }
+                <!-- 1. Entrée STEP -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-cyan"><i class="fa-solid fa-arrow-right-to-bracket"></i></div><span>1. ENTRÉE DE LA STEP</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
+                            <div class="input-group"><label>H. Prélèvement</label><input type="time" id="e_hp"></div>
+                            <div class="input-group"><label>H. Analyse</label><input type="time" id="e_ha"></div>
+                            <div class="input-group"><label>pH</label><input type="number" id="e_ph" step="0.01"></div>
+                            <div class="input-group"><label>Température (ºC)</label><input type="number" id="e_temp" step="0.1"></div>
+                            <div class="input-group"><label>O2 dissous</label><input type="number" id="e_o2" step="0.01"></div>
+                            <div class="input-group"><label>Cond. (ms/cm)</label><input type="number" id="e_cond" step="0.001"></div>
+                            <div class="input-group"><label>MES (mg/l)</label><input type="number" id="e_mes" step="0.1" class="cctp-check" data-max="482.1"></div>
+                            <div class="input-group"><label>DBO5 (mgO2/l)</label><input type="number" id="e_dbo5" step="0.1" class="cctp-check" data-max="535.7"></div>
+                            <div class="input-group"><label>DCO TOTAL</label><input type="number" id="e_dco" step="0.1" class="cctp-check" data-max="1071.4"></div>
+                            <div class="input-group"><label>UVT (%)</label><input type="number" id="e_uvt" step="0.1"></div>
+                        </div>
+                    </div>
+                </div>
 
-/* Splash */
-#splash-screen { 
-    position: fixed; 
-    inset: 0; 
-    background: #e6f2ff; 
-    z-index: 9999; 
-    display: flex; 
-    flex-direction: column; 
-    justify-content: center; 
-    align-items: center; 
-    transition: 0.5s; 
-}
-.splash-img { width: 85%; max-width: 320px; animation: pulse 2s infinite; }
-.loader { width: 45px; height: 45px; border: 4px solid #cbd5e1; border-top: 4px solid var(--srm-orange); border-radius: 50%; animation: spin 1s linear infinite; margin-top: 20px; }
-@keyframes spin { 100% { transform: rotate(360deg); } } 
-@keyframes pulse { 50% { transform: scale(1.05); } }
-.hidden-splash { opacity: 0; visibility: hidden; }
+                <!-- 2. Lits Bactériens -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-green"><i class="fa-solid fa-microbes"></i></div><span>2. LITS BACTÉRIENS</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
+                            <div class="input-group"><label>H. Prélèvement</label><input type="time" id="l_hp"></div>
+                            <div class="input-group"><label>H. Analyse</label><input type="time" id="l_ha"></div>
+                            <div class="input-group"><label>pH</label><input type="number" id="l_ph" step="0.01"></div>
+                            <div class="input-group"><label>Température (ºC)</label><input type="number" id="l_temp" step="0.1"></div>
+                            <div class="input-group"><label>O2 dissous</label><input type="number" id="l_o2" step="0.01"></div>
+                            <div class="input-group"><label>Cond. (mS)</label><input type="number" id="l_cond" step="0.001"></div>
+                            <div class="input-group"><label>MES (mg/l)</label><input type="number" id="l_mes" step="0.1" class="cctp-check" data-max="246.6"></div>
+                            <div class="input-group"><label>DBO5 (mgO2/l)</label><input type="number" id="l_dbo5" step="0.1" class="cctp-check" data-max="180.6"></div>
+                            <div class="input-group"><label>DCO TOTAL</label><input type="number" id="l_dco" step="0.1" class="cctp-check" data-max="361.2"></div>
+                            <div class="input-group"><label>UVT (%)</label><input type="number" id="l_uvt" step="0.1"></div>
+                        </div>
+                    </div>
+                </div>
 
-/* Header & Nav */
-.app-header { 
-    background: #ffffff; 
-    padding: 22px 15px; 
-    text-align: center; 
-    box-shadow: 0 4px 20px rgba(9, 89, 135, 0.1); 
-    border-bottom: 4px solid var(--srm-cyan); 
-}
-.app-logo { height: 65px; object-fit: contain; } 
-.app-title { font-size: 1.25rem; color: var(--srm-dark-blue); margin-top: 10px; font-weight: 800; }
+                <!-- 3. Parshall -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-blue"><i class="fa-solid fa-water"></i></div><span>3. PARSHALL SORTIE</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
+                            <div class="input-group"><label>H. Prélèvement</label><input type="time" id="p_hp"></div>
+                            <div class="input-group"><label>H. Analyse</label><input type="time" id="p_ha"></div>
+                            <div class="input-group"><label>pH</label><input type="number" id="p_ph" step="0.01"></div>
+                            <div class="input-group"><label>Temp (ºC)</label><input type="number" id="p_temp" step="0.1"></div>
+                            <div class="input-group"><label>O2 dissous</label><input type="number" id="p_o2" step="0.01"></div>
+                            <div class="input-group"><label>Cond. (mS)</label><input type="number" id="p_cond" step="0.001"></div>
+                            <div class="input-group"><label>MES (mg/l)</label><input type="number" id="p_mes" step="0.1" class="cctp-check" data-max="75"></div>
+                            <div class="input-group"><label>DBO5 (mg/l)</label><input type="number" id="p_dbo5" step="0.1" class="cctp-check" data-max="50"></div>
+                            <div class="input-group"><label>DCO TOTAL</label><input type="number" id="p_dco" step="0.1" class="cctp-check" data-max="150"></div>
+                            <div class="input-group"><label>UVT (%)</label><input type="number" id="p_uvt" step="0.1"></div>
+                        </div>
+                    </div>
+                </div>
 
-.app-nav { 
-    display: flex; 
-    background: #ffffff; 
-    overflow-x: auto; 
-    box-shadow: 0 3px 10px rgba(0,0,0,0.05); 
-    margin-bottom: 22px; 
-    border-bottom: 1px solid var(--border-color);
-}
-.nav-item { 
-    flex: 1; 
-    min-width: 95px; 
-    padding: 15px 8px; 
-    border: none; 
-    background: transparent; 
-    font-size: 0.85rem; 
-    font-weight: 700; 
-    color: var(--text-muted); 
-    cursor: pointer; 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    gap: 8px; 
-}
-.nav-item.active { 
-    color: var(--srm-dark-blue); 
-    background: #f0f9ff; 
-    border-bottom: 4px solid var(--srm-orange); 
-}
-.nav-item i { font-size: 1.2rem; }
+                <!-- 4. Tertiaire -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-cyan"><i class="fa-solid fa-filter"></i></div><span>4. TERTIAIRE</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
+                            <div class="input-group"><label>H. Prélèvement</label><input type="time" id="t_hp"></div>
+                            <div class="input-group"><label>H. Analyse</label><input type="time" id="t_ha"></div>
+                            <div class="input-group"><label>pH</label><input type="number" id="t_ph" step="0.01"></div>
+                            <div class="input-group"><label>Temp (ºC)</label><input type="number" id="t_temp" step="0.1"></div>
+                            <div class="input-group"><label>O2 dissous</label><input type="number" id="t_o2" step="0.01"></div>
+                            <div class="input-group"><label>Cond. (mS)</label><input type="number" id="t_cond" step="0.001"></div>
+                            <div class="input-group"><label>UFC C1</label><input type="number" id="t_ufc1" step="0.1" class="cctp-check" data-max="1000"></div>
+                            <div class="input-group"><label>UFC C2</label><input type="number" id="t_ufc2" step="0.1"></div>
+                            <div class="input-group"><label>Nématodes</label><input type="number" id="t_nem" step="0.1" class="cctp-check" data-max="0"></div>
+                            <div class="input-group"><label>UVT (%)</label><input type="number" id="t_uvt" step="0.1"></div>
+                        </div>
+                    </div>
+                </div>
 
-/* Layout & Modern Cards (بطاقات ملونة ومستوحاة من الشعار) */
-.tabs-container { padding: 0 16px; } 
-.tab-pane { display: none; animation: fadeIn 0.3s ease; } 
-.tab-pane.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+                <!-- 5. Boues -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-orange"><i class="fa-solid fa-cubes-stacked"></i></div><span>5. QUALITÉ DES BOUES</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
+                            <div class="input-group"><label>H. Prélèvement</label><input type="time" id="b_hp"></div>
+                            <div class="input-group"><label>H. Analyse</label><input type="time" id="b_ha"></div>
+                            <div class="input-group"><label>pH</label><input type="number" id="b_ph" step="0.01"></div>
+                            <div class="input-group"><label>Temp (ºC)</label><input type="number" id="b_temp" step="0.1"></div>
+                            <div class="input-group"><label>O2 dissous</label><input type="number" id="b_o2" step="0.01"></div>
+                            <div class="input-group"><label>Cond. (mS)</label><input type="number" id="b_cond" step="0.001"></div>
+                            <div class="input-group"><label>MES (mg/l)</label><input type="number" id="b_mes" step="0.1"></div>
+                            <div class="input-group"><label>MVS (mg/l)</label><input type="number" id="b_mvs" step="0.1"></div>
+                            <div class="input-group"><label>Siccité (%)</label><input type="number" id="b_siccite" step="0.1"></div>
+                            <div class="input-group"><label>Lieu Prélèvement</label><input type="text" id="b_lieu"></div>
+                        </div>
+                    </div>
+                </div>
 
-.modern-card { 
-    background: var(--card-bg); 
-    border-radius: 20px; 
-    box-shadow: 0 6px 20px rgba(9, 89, 135, 0.08); 
-    margin-bottom: 20px; 
-    overflow: hidden; 
-    border: 1.5px solid var(--border-color); 
-}
+                <!-- 6. Consommations & Déchets -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-green"><i class="fa-solid fa-bolt"></i></div><span>6. CONSO. & DÉCHETS</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
+                            <div class="input-group full-width"><label class="text-orange">Conso. Énergie (kWh)</label><input type="number" id="cons_nrj" step="0.1"></div>
+                            <div class="input-group"><label class="text-cyan">Taux de Conso.</label><input type="number" id="taux_nrj" readonly class="readonly-input"></div>
+                            <div class="input-group"><label>Heures fnct GE</label><input type="number" id="h_ge" step="0.1"></div>
+                            
+                            <div class="input-group full-width mt-15"><h4 class="text-green">Gestion des Déchets (m³)</h4></div>
+                            <div class="input-group"><label>Bassin Purgé</label><input type="text" id="bass_purge"></div>
+                            <div class="input-group"><label>Boues Purgés</label><input type="number" id="v_boue_p" step="0.1"></div>
+                            <div class="input-group"><label>Boues Sèches</label><input type="number" id="v_boue_s" step="0.1"></div>
+                            <div class="input-group"><label>Boues Évacués</label><input type="number" id="v_boue_e" step="0.1"></div>
+                            <div class="input-group"><label>Déchets DG</label><input type="number" id="v_dg" step="0.1"></div>
+                            <div class="input-group"><label>Déchets DF</label><input type="number" id="v_df" step="0.1"></div>
+                            <div class="input-group"><label>Sables Évacués</label><input type="number" id="v_sables" step="0.1"></div>
+                            <div class="input-group"><label>Graisses</label><input type="number" id="v_graisses" step="0.1"></div>
+                        </div>
+                    </div>
+                </div>
 
-/* تلوين حواف أو تفاصيل البطاقات بناءً على الهوية البصرية */
-.modern-card:nth-of-type(1) { border-left: 6px solid var(--srm-dark-blue); }
-.modern-card:nth-of-type(2) { border-left: 6px solid var(--srm-cyan); }
-.modern-card:nth-of-type(3) { border-left: 6px solid var(--srm-green); }
-.modern-card:nth-of-type(4) { border-left: 6px solid var(--srm-orange); }
-.modern-card:nth-of-type(5) { border-left: 6px solid var(--srm-dark-blue); }
-.modern-card:nth-of-type(6) { border-left: 6px solid var(--srm-green); }
+                <div class="form-actions-padding mt-20">
+                    <button type="submit" class="btn-primary w-100"><i class="fa-solid fa-floppy-disk"></i> Enregistrer la fiche</button>
+                </div>
+            </form>
+        </div>
 
-.global-info-card { 
-    background: linear-gradient(135deg, #ffffff, #f0f9ff); 
-    padding: 22px; 
-    border-radius: 20px; 
-    margin-bottom: 20px; 
-    border: 2px solid var(--srm-cyan);
-    box-shadow: 0 4px 15px rgba(9, 89, 135, 0.08);
-}
+        <!-- ================= TAB 2: EXCEL ================= -->
+        <div id="tab-synthese" class="tab-pane">
+            <div class="modern-card p-20">
+                <h3 class="text-cyan text-center mb-15"><i class="fa-solid fa-file-excel"></i> Exportation Excel</h3>
+                <p class="text-center text-muted mb-15">Génère le rapport mensuel de la STEP sous format Excel.</p>
+                <input type="month" id="exportMonth" class="mb-15 w-100">
+                <button type="button" id="btnExportExcel" class="btn-secondary w-100"><i class="fa-solid fa-download"></i> Télécharger le Fichier Excel</button>
+            </div>
+        </div>
 
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; } 
-.full-width { grid-column: span 2; }
+        <!-- ================= TAB 3: PV EVACUATION ================= -->
+        <div id="tab-pv" class="tab-pane">
+            <div class="modern-card p-20 document-view">
+                <h3 class="text-center text-cyan">PV D'ÉVACUATION DES DÉCHETS</h3>
+                <p class="text-center text-muted mb-15">STEP EL KELAA DE SRAGHNA</p>
+                <hr class="mb-15">
+                <p><strong>Représentants SRM DPKS :</strong></p>
+                <ul class="waste-list mt-10">
+                    <li>Mr. Said AIT ALI (Tech. d'exploitation)</li>
+                    <li>Mr. Abdelilah Chouki (Tech. de maintenance)</li>
+                    <li>Mr. Abdelkader (Tech. Laboratoire)</li>
+                </ul>
+                <hr class="mt-15 mb-15">
+                <ul class="waste-list mt-10">
+                    <li>Boues évacuées : <b id="pv_boues" class="text-orange">0</b> m³</li>
+                    <li>Déchets DG : <b id="pv_dg" class="text-orange">0</b> m³</li>
+                    <li>Déchets DF : <b id="pv_df" class="text-orange">0</b> m³</li>
+                    <li>Sables évacués : <b id="pv_sables" class="text-orange">0</b> m³</li>
+                    <li>Graisses évacuées : <b id="pv_graisses" class="text-orange">0</b> m³</li>
+                </ul>
+            </div>
+        </div>
 
-.input-group label { 
-    font-size: 0.8rem; 
-    font-weight: 800; 
-    color: var(--srm-dark-blue); 
-    display: block; 
-    margin-bottom: 7px; 
-    text-transform: uppercase; 
-    letter-spacing: 0.4px;
-}
+        <!-- ================= TAB 4: ATTACHEMENT ================= -->
+        <div id="tab-finance" class="tab-pane">
+            <div class="modern-card p-20">
+                <h3 class="text-center text-green mb-15"><i class="fa-solid fa-file-invoice-dollar"></i> ATTACHEMENT FINANCIER</h3>
+                <p class="text-center text-muted mb-15">Saisie des montants mensuels (en MAD)</p>
+                
+                <form id="financeForm">
+                    <div class="input-group mb-12"><label>Chef d'exploitation</label><input type="number" id="fin_chef" class="fin-input" step="0.01" placeholder="0.00"></div>
+                    <div class="input-group mb-12"><label>Laborantin</label><input type="number" id="fin_labo" class="fin-input" step="0.01" placeholder="0.00"></div>
+                    <div class="input-group mb-12"><label>Tech. électromécanicien</label><input type="number" id="fin_electro" class="fin-input" step="0.01" placeholder="0.00"></div>
+                    <div class="input-group mb-20"><label>Evacuation des boues</label><input type="number" id="fin_boues" class="fin-input" step="0.01" placeholder="0.00"></div>
 
-input, select { 
-    width: 100%; 
-    padding: 13px 14px; 
-    background-color: #f8fafc; 
-    border: 2px solid var(--border-color); 
-    border-radius: 12px; 
-    font-size: 1rem; 
-    color: var(--text-dark); 
-    font-weight: 500;
-}
-input:focus, select:focus { 
-    outline: none; 
-    background-color: #fff; 
-    border-color: var(--srm-cyan); 
-    box-shadow: 0 0 0 4px rgba(23, 150, 205, 0.15); 
-}
-
-.readonly-input { background: #f1f5f9; color: var(--srm-orange); font-weight: bold; }
-.exceed-cctp { color: #dc2626 !important; border-color: #dc2626 !important; background: #fef2f2 !important; }
-
-/* Tables */
-.table-responsive { overflow-x: auto; }
-.hourly-table { width: 100%; text-align: center; border-collapse: collapse; font-size: 0.9rem; }
-.hourly-table th { background: var(--srm-dark-blue); color: #fff; padding: 12px; font-weight: 700; }
-.hourly-table td { padding: 8px; border-bottom: 1px solid #e2e8f0; }
-.hourly-table input { padding: 10px; text-align: center; background: #fff; }
-
-/* Accordion */
-.accordion-header { 
-    width: 100%; 
-    padding: 20px 22px; 
-    background: linear-gradient(to right, #ffffff, #f8fafc); 
-    border: none; 
-    display: flex; 
-    align-items: center; 
-    justify-content: space-between; 
-    cursor: pointer; 
-}
-.header-title { display: flex; align-items: center; gap: 15px; } 
-.header-title span { font-weight: 800; color: var(--srm-dark-blue); font-size: 1.05rem; }
-
-.icon-box { 
-    width: 44px; 
-    height: 44px; 
-    border-radius: 12px; 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    color: #fff; 
-    font-size: 1.15rem; 
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
-}
-
-.accordion-content { 
-    display: none; 
-    padding: 22px; 
-    border-top: 2px solid var(--border-color); 
-    background: #ffffff; 
-} 
-.accordion-content.active { display: block; }
-
-.arrow { transition: transform 0.3s; color: var(--text-muted); font-size: 1.1rem; } 
-.accordion-header.active-header .arrow { transform: rotate(180deg); color: var(--srm-cyan); }
-
-/* Buttons */
-.btn-primary, .btn-secondary { 
-    padding: 16px; 
-    border: none; 
-    border-radius: 14px; 
-    font-weight: 800; 
-    font-size: 1.05rem; 
-    color: #fff; 
-    cursor: pointer; 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    gap: 10px; 
-}
-.btn-primary { background: var(--srm-green); box-shadow: 0 6px 16px rgba(56, 161, 65, 0.3); } 
-.btn-secondary { background: var(--srm-dark-blue); box-shadow: 0 6px 16px rgba(9, 89, 135, 0.3); }
+                    <div class="global-info-card mt-15">
+                        <div class="input-group mb-12"><label>TOTAL HT (MAD)</label><input type="text" id="fin_total_ht" readonly class="readonly-input" value="0.00"></div>
+                        <div class="input-group mb-12"><label>TVA (20%) (MAD)</label><input type="text" id="fin_tva" readonly class="readonly-input" value="0.00"></div>
+                        <div class="input-group"><label class="text-cyan font-bold">TOTAL TTC (MAD)</label><input type="text" id="fin_total_ttc" readonly class="readonly-input text-cyan" value="0.00"></div>
+                    </div>
+                    <button type="button" id="btnSaveFinance" class="btn-primary w-100 mt-20"><i class="fa-solid fa-floppy-disk"></i> Enregistrer l'attachement</button>
+                </form>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
