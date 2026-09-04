@@ -1,19 +1,22 @@
 :root {
-    /* الألوان المستوحاة بدقة من صورتك المرفقة */
-    --srm-dark-blue: #1c3d5a; /* لون النصوص الرئيسية الداكن */
-    --srm-teal: #358898;      /* لون الظل الصلب والزر في صورتك */
-    --srm-red: #ea5348;       /* لون الزر الأحمر في صورتك */
+    /* الألوان الرئيسية للظلال والأزرار (مستوحاة من صورتك) */
+    --srm-dark-blue: #1c3d5a; 
+    --srm-teal: #358898;      
+    --srm-red: #ea5348;       
     --srm-green: #38a141;     
     --srm-orange: #eb5923;    
     
-    /* خلفيات نظيفة ومسطحة */
-    --bg-color: #f4f7fa;      /* لون الخلفية الفاتح المريح للعين */
-    --card-bg: #ffffff;       /* لون البطاقات الأبيض الناصع */
+    /* ألوان البطاقات (خلفيات ملونة مسطحة ومريحة للعين) */
+    --card-blue: #e8f1f8;     /* أزرق فاتح جداً */
+    --card-teal: #e3f2f5;     /* أزرق مخضر فاتح */
+    --card-green: #eaf5eb;    /* أخضر فاتح */
+    --card-orange: #fcece5;   /* برتقالي فاتح */
+    --card-yellow: #fff9e6;   /* أصفر باهت للبطاقات العامة */
     
-    /* ألوان النصوص والحدود */
+    --bg-color: #f4f7fa;      /* لون خلفية التطبيق */
     --text-dark: #1c3d5a;
-    --text-muted: #64748b;
-    --border-color: #e2e8f0;
+    --text-muted: #526075;
+    --border-color: #cbd5e1;
 }
 
 * { 
@@ -56,12 +59,12 @@ body {
 @keyframes spin { 100% { transform: rotate(360deg); } } 
 .hidden-splash { opacity: 0; visibility: hidden; pointer-events: none; }
 
-/* الترويسة العلوية - مسطحة ونظيفة */
+/* الترويسة العلوية */
 .app-header { 
     background: #ffffff; 
     padding: 20px 15px; 
     text-align: center; 
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 2px solid var(--srm-dark-blue);
     margin-bottom: 20px;
 }
 .app-title { 
@@ -88,46 +91,51 @@ body {
 }
 .nav-item { 
     flex: 1; min-width: 90px; padding: 12px 8px; 
-    border: 1px solid var(--border-color); 
+    border: 1px solid var(--srm-dark-blue); 
     background: #ffffff; 
     border-radius: 10px;
-    font-size: 0.85rem; font-weight: 700; color: var(--text-muted); cursor: pointer; 
+    font-size: 0.85rem; font-weight: 700; color: var(--srm-dark-blue); cursor: pointer; 
     display: flex; flex-direction: column; align-items: center; gap: 6px; 
+    /* ظل صلب خفيف للأزرار */
+    box-shadow: 2px 2px 0px var(--srm-dark-blue);
     transition: 0.2s;
 }
 .nav-item.active { 
     color: #ffffff; 
     background: var(--srm-dark-blue); 
-    border-color: var(--srm-dark-blue);
+    box-shadow: 0px 0px 0px transparent;
+    transform: translateY(2px) translateX(2px);
 }
 .nav-item i { font-size: 1.2rem; }
 
-/* ====== السر في هذا التصميم: البطاقات ذات الظل الصلب ====== */
+/* ====== البطاقات الملونة مع الظل الصلب ====== */
 .tabs-container { padding: 0 16px; } 
 .tab-pane { display: none; } 
 .tab-pane.active { display: block; }
 
 .modern-card, .global-info-card, .document-view { 
-    background: var(--card-bg); 
     border-radius: 12px; 
-    border: 1px solid var(--border-color); 
-    /* الظل الصلب المتطابق مع صورتك تماماً (Shadow Offset) */
-    box-shadow: 5px 5px 0px var(--srm-teal); 
+    border: 1px solid var(--srm-dark-blue); 
     margin-bottom: 25px; 
     overflow: hidden; 
 }
 
-/* توزيع ألوان الظلال الصلبة على البطاقات لتمييزها */
-.modern-card:nth-of-type(1) { box-shadow: 5px 5px 0px var(--srm-dark-blue); }
-.modern-card:nth-of-type(2) { box-shadow: 5px 5px 0px var(--srm-teal); }
-.modern-card:nth-of-type(3) { box-shadow: 5px 5px 0px var(--srm-green); }
-.modern-card:nth-of-type(4) { box-shadow: 5px 5px 0px var(--srm-orange); }
-.modern-card:nth-of-type(5) { box-shadow: 5px 5px 0px var(--srm-dark-blue); }
-.modern-card:nth-of-type(6) { box-shadow: 5px 5px 0px var(--srm-green); }
+/* 1. بطاقة المعلومات العامة */
+.global-info-card { 
+    background-color: var(--card-yellow); 
+    box-shadow: 5px 5px 0px var(--srm-dark-blue);
+    padding: 22px; 
+}
+/* 2. الأكورديونات (إعطاء لون خلفية وظل لكل بطاقة) */
+.modern-card:nth-of-type(1) { background-color: var(--card-teal); box-shadow: 5px 5px 0px var(--srm-teal); }
+.modern-card:nth-of-type(2) { background-color: var(--card-blue); box-shadow: 5px 5px 0px var(--srm-dark-blue); }
+.modern-card:nth-of-type(3) { background-color: var(--card-green); box-shadow: 5px 5px 0px var(--srm-green); }
+.modern-card:nth-of-type(4) { background-color: var(--card-teal); box-shadow: 5px 5px 0px var(--srm-teal); }
+.modern-card:nth-of-type(5) { background-color: var(--card-blue); box-shadow: 5px 5px 0px var(--srm-dark-blue); }
+.modern-card:nth-of-type(6) { background-color: var(--card-orange); box-shadow: 5px 5px 0px var(--srm-orange); }
+.modern-card:nth-of-type(7) { background-color: var(--card-green); box-shadow: 5px 5px 0px var(--srm-green); }
 
-.global-info-card { padding: 22px; }
-
-/* الحقول (Inputs) نظيفة ومسطحة */
+/* الحقول (Inputs) - بيضاء لكي تبرز فوق البطاقة الملونة */
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; } 
 .full-width { grid-column: span 2; }
 
@@ -137,27 +145,28 @@ body {
 }
 input, select { 
     width: 100%; padding: 12px 14px; 
-    background-color: #f8fafc; 
-    border: 1px solid var(--border-color); 
+    background-color: #ffffff; 
+    border: 1px solid var(--srm-dark-blue); 
     border-radius: 8px; font-size: 1rem; color: var(--text-dark); font-weight: 600;
 }
 input:focus, select:focus { 
-    outline: none; background-color: #ffffff; 
+    outline: none; 
     border-color: var(--srm-teal); 
+    box-shadow: 0 0 0 3px rgba(53, 136, 152, 0.2);
 }
-.readonly-input { background: #f1f5f9; color: var(--srm-orange); font-weight: bold; border-style: dashed; }
-.exceed-cctp { color: #dc2626 !important; background: #fef2f2 !important; border-color: #fca5a5 !important; }
+.readonly-input { background: rgba(255,255,255,0.6); color: var(--srm-orange); font-weight: bold; border-style: dashed; }
+.exceed-cctp { color: #dc2626 !important; background: #fef2f2 !important; border-color: #ea5348 !important; }
 
 /* الجداول */
 .table-responsive { overflow-x: auto; }
 .hourly-table { width: 100%; text-align: center; border-collapse: collapse; font-size: 0.9rem; }
-.hourly-table th { background: #f8fafc; color: var(--srm-dark-blue); padding: 12px; font-weight: 700; border-bottom: 2px solid var(--border-color); }
-.hourly-table td { padding: 8px; border-bottom: 1px solid var(--border-color); }
+.hourly-table th { background: rgba(255,255,255,0.5); color: var(--srm-dark-blue); padding: 12px; font-weight: 700; border-bottom: 1px solid var(--srm-dark-blue); }
+.hourly-table td { padding: 8px; border-bottom: 1px solid rgba(28, 61, 90, 0.1); }
 .hourly-table input { padding: 10px; text-align: center; background: #ffffff; border: 1px solid var(--border-color); }
 
-/* الأكورديون والقوائم */
+/* الأكورديون والقوائم (جعل الخلفية شفافة لتأخذ لون البطاقة) */
 .accordion-header { 
-    width: 100%; padding: 20px 22px; background: #ffffff; 
+    width: 100%; padding: 20px 22px; background: transparent; 
     border: none; display: flex; align-items: center; justify-content: space-between; cursor: pointer; 
 }
 .header-title { display: flex; align-items: center; gap: 15px; } 
@@ -176,28 +185,37 @@ input:focus, select:focus {
 
 .accordion-content { 
     display: none; padding: 22px; 
-    border-top: 1px solid var(--border-color); 
-    background: #ffffff; 
+    border-top: 1px dashed var(--srm-dark-blue); 
+    background: transparent; 
 } 
 .accordion-content.active { display: block; }
-.arrow { transition: transform 0.3s; color: var(--text-muted); font-size: 1.1rem; } 
-.accordion-header.active-header .arrow { transform: rotate(180deg); color: var(--srm-teal); }
+.arrow { transition: transform 0.3s; color: var(--srm-dark-blue); font-size: 1.1rem; } 
+.accordion-header.active-header .arrow { transform: rotate(180deg); }
 
-/* ====== الأزرار (أزرار مسطحة مثل الصورة تماماً) ====== */
+/* ====== الأزرار (أزرار مسطحة بظل صلب مثل البطاقات) ====== */
 .btn-primary, .btn-secondary { 
-    padding: 16px; border: none; border-radius: 8px; 
+    padding: 16px; border: 1px solid var(--srm-dark-blue); border-radius: 8px; 
     font-weight: bold; font-size: 1.05rem; color: #fff; cursor: pointer; 
     display: flex; justify-content: center; align-items: center; gap: 10px; 
+    transition: 0.1s;
 }
-/* الزر الأزرق المخضر (مثل زر طباعة الوصل) */
-.btn-primary { background-color: var(--srm-teal); } 
-/* الزر الأحمر (مثل زر إلغاء العملية) */
-.btn-secondary { background-color: var(--srm-red); }
+.btn-primary { 
+    background-color: var(--srm-teal); 
+    box-shadow: 4px 4px 0px var(--srm-dark-blue);
+} 
+.btn-secondary { 
+    background-color: var(--srm-red); 
+    box-shadow: 4px 4px 0px var(--srm-dark-blue);
+}
 
-/* تفاعل الضغط على الزر */
-.btn-primary:active, .btn-secondary:active { transform: translateY(2px); }
+/* تفاعل الضغط على الزر (الزر يغوص لأسفل) */
+.btn-primary:active, .btn-secondary:active { 
+    transform: translateY(4px) translateX(4px); 
+    box-shadow: 0px 0px 0px transparent;
+}
 
-/* عرض المستندات */
+/* عرض المستندات (علامة التبويب الخاصة بالـ PV والـ Finance) */
+.document-view { background-color: #ffffff; padding: 22px; box-shadow: 5px 5px 0px var(--srm-teal); }
 .document-view hr { border-color: var(--border-color); margin: 15px 0; }
 .waste-list { list-style: none; line-height: 1.8; }
-.waste-list li { background: #f8fafc; padding: 10px 15px; border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--border-color); }
+.waste-list li { background: var(--card-blue); padding: 10px 15px; border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--srm-dark-blue); }
