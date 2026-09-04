@@ -6,19 +6,22 @@
     <title>SRM DPKS - STEP Kelaa des Sraghna</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <!-- تمت إضافة ?v=2 لكسر الكاش في Acode -->
+    <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
     <!-- شاشة الافتتاحية -->
     <div id="splash-screen">
-        <img src="splash.png" alt="SRM Splash" class="splash-img">
+        <!-- إجبار الحجم من داخل الـ HTML بشكل صارم -->
+        <img src="splash.png" alt="SRM Splash" width="160" height="160" style="width: 160px !important; max-width: 160px !important; height: 160px !important; max-height: 160px !important; object-fit: contain !important; display: block !important; margin: 0 auto;" class="splash-img">
         <div class="loader"></div>
     </div>
 
     <!-- الترويسة -->
     <header class="app-header">
-        <div class="logo-container">
-            <img src="logo.png" alt="Logo SRM DPKS" class="app-logo">
+        <div class="logo-container" style="text-align: center; margin-bottom: 10px; width: 100%; display: flex; justify-content: center;">
+            <!-- إجبار الحجم من داخل الـ HTML بشكل صارم -->
+            <img src="logo.png" alt="Logo SRM DPKS" width="180" height="60" style="width: 180px !important; max-width: 180px !important; height: auto !important; max-height: 60px !important; object-fit: contain !important; display: block !important; margin: 0 auto;" class="app-logo">
         </div>
         <h1 class="app-title">SRM DPKS</h1>
         <p class="app-subtitle">Exploitation STEP - El Kelaa des Sraghna</p>
