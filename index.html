@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SRM - STEP Kelaa des Sraghna</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- مكتبة تصدير الإكسيل الحقيقية SheetJS -->
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- شاشة الافتتاحية -->
+    <div id="splash-screen">
+        <img src="1000303671.jpg" alt="SRM Splash" class="splash-img">
+        <div class="loader"></div>
+    </div>
+
+    <!-- الترويسة -->
+    <header class="app-header">
+        <div class="logo-container">
+            <img src="1000303672.jpg" alt="Logo SRM" class="app-logo">
+        </div>
+        <h2 class="app-title">Exploitation STEP - El Kelaa</h2>
+    </header>
+
+    <!-- شريط التنقل -->
+    <nav class="app-nav">
+        <button class="nav-item active" data-target="tab-saisie"><i class="fa-solid fa-pen-to-square"></i> Saisie</button>
+        <button class="nav-item" data-target="tab-synthese"><i class="fa-solid fa-file-excel"></i> Excel</button>
+        <button class="nav-item" data-target="tab-pv"><i class="fa-solid fa-recycle"></i> PV Évacuation</button>
+        <button class="nav-item" data-target="tab-finance"><i class="fa-solid fa-file-invoice-dollar"></i> Attachement</button>
+    </nav>
+
+    <main class="tabs-container">
+        <!-- ================= TAB 1: SAISIE JOURNALIÈRE ================= -->
+        <div id="tab-saisie" class="tab-pane active">
+            <form id="stepForm">
+                <div class="global-info-card">
+                    <div class="input-group">
+                        <label>Date d'exploitation</label>
+                        <input type="date" id="date_exp" required>
+                    </div>
+                    <div class="form-grid mt-10">
+                        <div class="input-group">
+                            <label>Météo</label>
+                            <select id="meteo"><option>Ensoleillé</option><option>Nuageux</option><option>Pluvieux</option></select>
+                        </div>
+                        <div class="input-group"><label>Tª Ambiance (°C)</label><input type="number" id="t_amb" step="0.1"></div>
+                        <div class="input-group full-width"><label>Pluviométrie (mm)</label><input type="number" id="pluvio" step="0.1"></div>
+                    </div>
+                </div>
+
+                <!-- 0. Débits 24H -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-blue"><i class="fa-solid fa-clock"></i></div><span>DÉBITS TRAITÉS (24H)</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="table-responsive">
+                            <table class="hourly-table">
+                                <thead><tr><th>HEURE</th><th>ENTRÉE (m³)</th><th>SORTIE (m³)</th></tr></thead>
+                                <tbody id="hourly-tbody"></tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td><strong>TOTAL</strong></td>
+                                        <td><input type="number" id="vol_entree" readonly class="readonly-input"></td>
+                                        <td><input type="number" id="vol_sortie" readonly class="readonly-input"></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 1. Entrée STEP -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-cyan"><i class="fa-solid fa-arrow-right-to-bracket"></i></div><span>1. ENTRÉE DE LA STEP</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
+                            <div class="input-group"><label>H. Prélèvement</label><input type="time" id="e_hp"></div>
+                            <div class="input-group"><label>H. Analyse</label><input type="time" id="e_ha"></div>
+                            <div class="input-group"><label>pH</label><input type="number" id="e_ph" step="0.01"></div>
+                            <div class="input-group"><label>Température (ºC)</label><input type="number" id="e_temp" step="0.1"></div>
+                            <div class="input-group"><label>O2 dissous</label><input type="number" id="e_o2" step="0.01"></div>
+                            <div class="input-group"><label>Cond. (ms/cm)</label><input type="number" id="e_cond" step="0.001"></div>
+                            <div class="input-group"><label>MES (mg/l)</label><input type="number" id="e_mes" step="0.1" class="cctp-check" data-max="482.1"></div>
+                            <div class="input-group"><label>DBO5 (mgO2/l)</label><input type="number" id="e_dbo5" step="0.1" class="cctp-check" data-max="535.7"></div>
+                            <div class="input-group"><label>DCO TOTAL</label><input type="number" id="e_dco" step="0.1" class="cctp-check" data-max="1071.4"></div>
+                            <div class="input-group"><label>UVT (%)</label><input type="number" id="e_uvt" step="0.1"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Lits Bactériens -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-green"><i class="fa-solid fa-microbes"></i></div><span>2. LITS BACTÉRIENS</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
+                            <div class="input-group"><label>H. Prélèvement</label><input type="time" id="l_hp"></div>
+                            <div class="input-group"><label>H. Analyse</label><input type="time" id="l_ha"></div>
+                            <div class="input-group"><label>pH</label><input type="number" id="l_ph" step="0.01"></div>
+                            <div class="input-group"><label>Température (ºC)</label><input type="number" id="l_temp" step="0.1"></div>
+                            <div class="input-group"><label>O2 dissous</label><input type="number" id="l_o2" step="0.01"></div>
+                            <div class="input-group"><label>Cond. (mS)</label><input type="number" id="l_cond" step="0.001"></div>
+                            <div class="input-group"><label>MES (mg/l)</label><input type="number" id="l_mes" step="0.1" class="cctp-check" data-max="246.6"></div>
+                            <div class="input-group"><label>DBO5 (mgO2/l)</label><input type="number" id="l_dbo5" step="0.1" class="cctp-check" data-max="180.6"></div>
+                            <div class="input-group"><label>DCO TOTAL</label><input type="number" id="l_dco" step="0.1" class="cctp-check" data-max="361.2"></div>
+                            <div class="input-group"><label>UVT (%)</label><input type="number" id="l_uvt" step="0.1"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Parshall -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-blue"><i class="fa-solid fa-water"></i></div><span>3. PARSHALL SORTIE</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
+                            <div class="input-group"><label>H. Prélèvement</label><input type="time" id="p_hp"></div>
+                            <div class="input-group"><label>H. Analyse</label><input type="time" id="p_ha"></div>
+                            <div class="input-group"><label>pH</label><input type="number" id="p_ph" step="0.01"></div>
+                            <div class="input-group"><label>Temp (ºC)</label><input type="number" id="p_temp" step="0.1"></div>
+                            <div class="input-group"><label>O2 dissous</label><input type="number" id="p_o2" step="0.01"></div>
+                            <div class="input-group"><label>Cond. (mS)</label><input type="number" id="p_cond" step="0.001"></div>
+                            <div class="input-group"><label>MES (mg/l)</label><input type="number" id="p_mes" step="0.1" class="cctp-check" data-max="75"></div>
+                            <div class="input-group"><label>DBO5 (mg/l)</label><input type="number" id="p_dbo5" step="0.1" class="cctp-check" data-max="50"></div>
+                            <div class="input-group"><label>DCO TOTAL</label><input type="number" id="p_dco" step="0.1" class="cctp-check" data-max="150"></div>
+                            <div class="input-group"><label>UVT (%)</label><input type="number" id="p_uvt" step="0.1"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Tertiaire -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-cyan"><i class="fa-solid fa-filter"></i></div><span>4. TERTIAIRE</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
+                            <div class="input-group"><label>H. Prélèvement</label><input type="time" id="t_hp"></div>
+                            <div class="input-group"><label>H. Analyse</label><input type="time" id="t_ha"></div>
+                            <div class="input-group"><label>pH</label><input type="number" id="t_ph" step="0.01"></div>
+                            <div class="input-group"><label>Temp (ºC)</label><input type="number" id="t_temp" step="0.1"></div>
+                            <div class="input-group"><label>O2 dissous</label><input type="number" id="t_o2" step="0.01"></div>
+                            <div class="input-group"><label>Cond. (mS)</label><input type="number" id="t_cond" step="0.001"></div>
+                            <div class="input-group"><label>UFC C1</label><input type="number" id="t_ufc1" step="0.1" class="cctp-check" data-max="1000"></div>
+                            <div class="input-group"><label>UFC C2</label><input type="number" id="t_ufc2" step="0.1"></div>
+                            <div class="input-group"><label>Nématodes</label><input type="number" id="t_nem" step="0.1" class="cctp-check" data-max="0"></div>
+                            <div class="input-group"><label>UVT (%)</label><input type="number" id="t_uvt" step="0.1"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Boues -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-orange"><i class="fa-solid fa-cubes-stacked"></i></div><span>5. QUALITÉ DES BOUES</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
+                            <div class="input-group"><label>H. Prélèvement</label><input type="time" id="b_hp"></div>
+                            <div class="input-group"><label>H. Analyse</label><input type="time" id="b_ha"></div>
+                            <div class="input-group"><label>pH</label><input type="number" id="b_ph" step="0.01"></div>
+                            <div class="input-group"><label>Temp (ºC)</label><input type="number" id="b_temp" step="0.1"></div>
+                            <div class="input-group"><label>O2 dissous</label><input type="number" id="b_o2" step="0.01"></div>
+                            <div class="input-group"><label>Cond. (mS)</label><input type="number" id="b_cond" step="0.001"></div>
+                            <div class="input-group"><label>MES (mg/l)</label><input type="number" id="b_mes" step="0.1"></div>
+                            <div class="input-group"><label>MVS (mg/l)</label><input type="number" id="b_mvs" step="0.1"></div>
+                            <div class="input-group"><label>Siccité (%)</label><input type="number" id="b_siccite" step="0.1"></div>
+                            <div class="input-group"><label>Lieu Prélèvement</label><input type="text" id="b_lieu"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Consommations & Déchets -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-green"><i class="fa-solid fa-bolt"></i></div><span>6. CONSO. & DÉCHETS</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
+                            <div class="input-group full-width"><label class="text-orange">Conso. Énergie (kWh)</label><input type="number" id="cons_nrj" step="0.1"></div>
+                            <div class="input-group"><label class="text-blue">Taux de Conso.</label><input type="number" id="taux_nrj" readonly class="readonly-input"></div>
+                            <div class="input-group"><label>Heures fnct GE</label><input type="number" id="h_ge" step="0.1"></div>
+                            
+                            <div class="input-group full-width mt-10"><h4 class="text-green">Gestion des Déchets (m³)</h4></div>
+                            <div class="input-group"><label>Bassin Purgé</label><input type="text" id="bass_purge"></div>
+                            <div class="input-group"><label>Boues Purgés</label><input type="number" id="v_boue_p" step="0.1"></div>
+                            <div class="input-group"><label>Boues Sèches</label><input type="number" id="v_boue_s" step="0.1"></div>
+                            <div class="input-group"><label>Boues Évacués</label><input type="number" id="v_boue_e" step="0.1"></div>
+                            <div class="input-group"><label>Déchets DG</label><input type="number" id="v_dg" step="0.1"></div>
+                            <div class="input-group"><label>Déchets DF</label><input type="number" id="v_df" step="0.1"></div>
+                            <div class="input-group"><label>Sables Évacués</label><input type="number" id="v_sables" step="0.1"></div>
+                            <div class="input-group"><label>Graisses</label><input type="number" id="v_graisses" step="0.1"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions-padding mt-15">
+                    <button type="submit" class="btn-primary w-100"><i class="fa-solid fa-floppy-disk"></i> Enregistrer la fiche</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ================= TAB 2: EXCEL ================= -->
+        <div id="tab-synthese" class="tab-pane">
+            <div class="modern-card p-15">
+                <h3 class="text-blue text-center mb-10"><i class="fa-solid fa-file-excel"></i> Exportation Excel</h3>
+                <p class="text-center text-muted mb-15">Génère le rapport mensuel de la STEP sous format Excel.</p>
+                <input type="month" id="exportMonth" class="mb-10 w-100">
+                <button type="button" id="btnExportExcel" class="btn-secondary w-100"><i class="fa-solid fa-download"></i> Télécharger le Fichier Excel</button>
+            </div>
+        </div>
+
+        <!-- ================= TAB 3: PV EVACUATION ================= -->
+        <div id="tab-pv" class="tab-pane">
+            <div class="modern-card p-15 document-view">
+                <h3 class="text-center text-blue">PV D'ÉVACUATION DES DÉCHETS</h3>
+                <p class="text-center text-muted mb-15">STEP EL KELAA DE SRAGHNA</p>
+                <hr class="mb-15">
+                <p><strong>Représentants SRM :</strong></p>
+                <ul>
+                    <li>Mr. Said AIT ALI (Tech. d'exploitation)</li>
+                    <li>Mr. Abdelilah Chouki (Tech. de maintenance)</li>
+                    <li>Mr. Abdelkader (Tech. Laboratoire)</li>
+                </ul>
+                <hr class="mt-15 mb-15">
+                <ul class="waste-list mt-10">
+                    <li>Boues évacuées : <b id="pv_boues" class="text-orange">0</b> m³</li>
+                    <li>Déchets DG : <b id="pv_dg" class="text-orange">0</b> m³</li>
+                    <li>Déchets DF : <b id="pv_df" class="text-orange">0</b> m³</li>
+                    <li>Sables évacués : <b id="pv_sables" class="text-orange">0</b> m³</li>
+                    <li>Graisses évacuées : <b id="pv_graisses" class="text-orange">0</b> m³</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ================= TAB 4: ATTACHEMENT (تفاعلي يبدأ من الصفر) ================= -->
+        <div id="tab-finance" class="tab-pane">
+            <div class="modern-card p-15">
+                <h3 class="text-center text-green mb-10"><i class="fa-solid fa-file-invoice-dollar"></i> ATTACHEMENT FINANCIER</h3>
+                <p class="text-center text-muted mb-15">Saisie des montants mensuels (en MAD)</p>
+                
+                <form id="financeForm">
+                    <div class="input-group mb-10"><label>Chef d'exploitation</label><input type="number" id="fin_chef" class="fin-input" step="0.01" placeholder="0.00"></div>
+                    <div class="input-group mb-10"><label>Laborantin</label><input type="number" id="fin_labo" class="fin-input" step="0.01" placeholder="0.00"></div>
+                    <div class="input-group mb-10"><label>Tech. électromécanicien</label><input type="number" id="fin_electro" class="fin-input" step="0.01" placeholder="0.00"></div>
+                    <div class="input-group mb-15"><label>Evacuation des boues</label><input type="number" id="fin_boues" class="fin-input" step="0.01" placeholder="0.00"></div>
+
+                    <div class="global-info-card mt-15">
+                        <div class="input-group mb-10"><label>TOTAL HT (MAD)</label><input type="text" id="fin_total_ht" readonly class="readonly-input" value="0.00"></div>
+                        <div class="input-group mb-10"><label>TVA (20%) (MAD)</label><input type="text" id="fin_tva" readonly class="readonly-input" value="0.00"></div>
+                        <div class="input-group"><label class="text-blue font-bold">TOTAL TTC (MAD)</label><input type="text" id="fin_total_ttc" readonly class="readonly-input text-blue" value="0.00"></div>
+                    </div>
+                    <button type="button" id="btnSaveFinance" class="btn-primary w-100 mt-15"><i class="fa-solid fa-floppy-disk"></i> Enregistrer l'attachement</button>
+                </form>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
