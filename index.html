@@ -196,7 +196,7 @@
                     <div class="accordion-content">
                         <div class="form-grid">
                             <div class="input-group full-width"><label class="text-orange">Conso. Énergie (kWh)</label><input type="number" id="cons_nrj" step="0.1"></div>
-                            <div class="input-group"><label class="text-blue">Taux de Conso.</label><input type="number" id="taux_nrj" readonly class="readonly-input"></div>
+                            <div class="input-group"><label class="text-cyan">Taux de Conso.</label><input type="number" id="taux_nrj" readonly class="readonly-input"></div>
                             <div class="input-group"><label>Heures fnct GE</label><input type="number" id="h_ge" step="0.1"></div>
                             
                             <div class="input-group full-width mt-15"><h4 class="text-green">Gestion des Déchets (m³)</h4></div>
@@ -221,7 +221,7 @@
         <!-- ================= TAB 2: EXCEL ================= -->
         <div id="tab-synthese" class="tab-pane">
             <div class="modern-card p-20">
-                <h3 class="text-blue text-center mb-15"><i class="fa-solid fa-file-excel"></i> Exportation Excel</h3>
+                <h3 class="text-cyan text-center mb-15"><i class="fa-solid fa-file-excel"></i> Exportation Excel</h3>
                 <p class="text-center text-muted mb-15">Génère le rapport mensuel de la STEP sous format Excel.</p>
                 <input type="month" id="exportMonth" class="mb-15 w-100">
                 <button type="button" id="btnExportExcel" class="btn-secondary w-100"><i class="fa-solid fa-download"></i> Télécharger le Fichier Excel</button>
@@ -231,11 +231,11 @@
         <!-- ================= TAB 3: PV EVACUATION ================= -->
         <div id="tab-pv" class="tab-pane">
             <div class="modern-card p-20 document-view">
-                <h3 class="text-center text-blue">PV D'ÉVACUATION DES DÉCHETS</h3>
+                <h3 class="text-center text-cyan">PV D'ÉVACUATION DES DÉCHETS</h3>
                 <p class="text-center text-muted mb-15">STEP EL KELAA DE SRAGHNA</p>
                 <hr class="mb-15">
                 <p><strong>Représentants SRM DPKS :</strong></p>
-                <ul>
+                <ul class="waste-list mt-10">
                     <li>Mr. Said AIT ALI (Tech. d'exploitation)</li>
                     <li>Mr. Abdelilah Chouki (Tech. de maintenance)</li>
                     <li>Mr. Abdelkader (Tech. Laboratoire)</li>
@@ -266,7 +266,7 @@
                     <div class="global-info-card mt-15">
                         <div class="input-group mb-12"><label>TOTAL HT (MAD)</label><input type="text" id="fin_total_ht" readonly class="readonly-input" value="0.00"></div>
                         <div class="input-group mb-12"><label>TVA (20%) (MAD)</label><input type="text" id="fin_tva" readonly class="readonly-input" value="0.00"></div>
-                        <div class="input-group"><label class="text-blue font-bold">TOTAL TTC (MAD)</label><input type="text" id="fin_total_ttc" readonly class="readonly-input text-blue" value="0.00"></div>
+                        <div class="input-group"><label class="text-cyan font-bold">TOTAL TTC (MAD)</label><input type="text" id="fin_total_ttc" readonly class="readonly-input text-cyan" value="0.00"></div>
                     </div>
                     <button type="button" id="btnSaveFinance" class="btn-primary w-100 mt-20"><i class="fa-solid fa-floppy-disk"></i> Enregistrer l'attachement</button>
                 </form>
