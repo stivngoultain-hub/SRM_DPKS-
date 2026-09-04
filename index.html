@@ -40,7 +40,7 @@
                         <label>Date d'exploitation</label>
                         <input type="date" id="date_exp" required>
                     </div>
-                    <div class="form-grid mt-10">
+                    <div class="form-grid mt-15">
                         <div class="input-group">
                             <label>Météo (Automatique)</label>
                             <select id="meteo">
@@ -199,7 +199,7 @@
                             <div class="input-group"><label class="text-blue">Taux de Conso.</label><input type="number" id="taux_nrj" readonly class="readonly-input"></div>
                             <div class="input-group"><label>Heures fnct GE</label><input type="number" id="h_ge" step="0.1"></div>
                             
-                            <div class="input-group full-width mt-10"><h4 class="text-green">Gestion des Déchets (m³)</h4></div>
+                            <div class="input-group full-width mt-15"><h4 class="text-green">Gestion des Déchets (m³)</h4></div>
                             <div class="input-group"><label>Bassin Purgé</label><input type="text" id="bass_purge"></div>
                             <div class="input-group"><label>Boues Purgés</label><input type="number" id="v_boue_p" step="0.1"></div>
                             <div class="input-group"><label>Boues Sèches</label><input type="number" id="v_boue_s" step="0.1"></div>
@@ -212,7 +212,7 @@
                     </div>
                 </div>
 
-                <div class="form-actions-padding mt-15">
+                <div class="form-actions-padding mt-20">
                     <button type="submit" class="btn-primary w-100"><i class="fa-solid fa-floppy-disk"></i> Enregistrer la fiche</button>
                 </div>
             </form>
@@ -220,17 +220,17 @@
 
         <!-- ================= TAB 2: EXCEL ================= -->
         <div id="tab-synthese" class="tab-pane">
-            <div class="modern-card p-15">
-                <h3 class="text-blue text-center mb-10"><i class="fa-solid fa-file-excel"></i> Exportation Excel</h3>
+            <div class="modern-card p-20">
+                <h3 class="text-blue text-center mb-15"><i class="fa-solid fa-file-excel"></i> Exportation Excel</h3>
                 <p class="text-center text-muted mb-15">Génère le rapport mensuel de la STEP sous format Excel.</p>
-                <input type="month" id="exportMonth" class="mb-10 w-100">
+                <input type="month" id="exportMonth" class="mb-15 w-100">
                 <button type="button" id="btnExportExcel" class="btn-secondary w-100"><i class="fa-solid fa-download"></i> Télécharger le Fichier Excel</button>
             </div>
         </div>
 
         <!-- ================= TAB 3: PV EVACUATION ================= -->
         <div id="tab-pv" class="tab-pane">
-            <div class="modern-card p-15 document-view">
+            <div class="modern-card p-20 document-view">
                 <h3 class="text-center text-blue">PV D'ÉVACUATION DES DÉCHETS</h3>
                 <p class="text-center text-muted mb-15">STEP EL KELAA DE SRAGHNA</p>
                 <hr class="mb-15">
@@ -253,22 +253,22 @@
 
         <!-- ================= TAB 4: ATTACHEMENT ================= -->
         <div id="tab-finance" class="tab-pane">
-            <div class="modern-card p-15">
-                <h3 class="text-center text-green mb-10"><i class="fa-solid fa-file-invoice-dollar"></i> ATTACHEMENT FINANCIER</h3>
+            <div class="modern-card p-20">
+                <h3 class="text-center text-green mb-15"><i class="fa-solid fa-file-invoice-dollar"></i> ATTACHEMENT FINANCIER</h3>
                 <p class="text-center text-muted mb-15">Saisie des montants mensuels (en MAD)</p>
                 
                 <form id="financeForm">
-                    <div class="input-group mb-10"><label>Chef d'exploitation</label><input type="number" id="fin_chef" class="fin-input" step="0.01" placeholder="0.00"></div>
-                    <div class="input-group mb-10"><label>Laborantin</label><input type="number" id="fin_labo" class="fin-input" step="0.01" placeholder="0.00"></div>
-                    <div class="input-group mb-10"><label>Tech. électromécanicien</label><input type="number" id="fin_electro" class="fin-input" step="0.01" placeholder="0.00"></div>
-                    <div class="input-group mb-15"><label>Evacuation des boues</label><input type="number" id="fin_boues" class="fin-input" step="0.01" placeholder="0.00"></div>
+                    <div class="input-group mb-12"><label>Chef d'exploitation</label><input type="number" id="fin_chef" class="fin-input" step="0.01" placeholder="0.00"></div>
+                    <div class="input-group mb-12"><label>Laborantin</label><input type="number" id="fin_labo" class="fin-input" step="0.01" placeholder="0.00"></div>
+                    <div class="input-group mb-12"><label>Tech. électromécanicien</label><input type="number" id="fin_electro" class="fin-input" step="0.01" placeholder="0.00"></div>
+                    <div class="input-group mb-20"><label>Evacuation des boues</label><input type="number" id="fin_boues" class="fin-input" step="0.01" placeholder="0.00"></div>
 
                     <div class="global-info-card mt-15">
-                        <div class="input-group mb-10"><label>TOTAL HT (MAD)</label><input type="text" id="fin_total_ht" readonly class="readonly-input" value="0.00"></div>
-                        <div class="input-group mb-10"><label>TVA (20%) (MAD)</label><input type="text" id="fin_tva" readonly class="readonly-input" value="0.00"></div>
+                        <div class="input-group mb-12"><label>TOTAL HT (MAD)</label><input type="text" id="fin_total_ht" readonly class="readonly-input" value="0.00"></div>
+                        <div class="input-group mb-12"><label>TVA (20%) (MAD)</label><input type="text" id="fin_tva" readonly class="readonly-input" value="0.00"></div>
                         <div class="input-group"><label class="text-blue font-bold">TOTAL TTC (MAD)</label><input type="text" id="fin_total_ttc" readonly class="readonly-input text-blue" value="0.00"></div>
                     </div>
-                    <button type="button" id="btnSaveFinance" class="btn-primary w-100 mt-15"><i class="fa-solid fa-floppy-disk"></i> Enregistrer l'attachement</button>
+                    <button type="button" id="btnSaveFinance" class="btn-primary w-100 mt-20"><i class="fa-solid fa-floppy-disk"></i> Enregistrer l'attachement</button>
                 </form>
             </div>
         </div>
