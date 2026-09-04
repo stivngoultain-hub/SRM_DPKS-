@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SRM - STEP Kelaa des Sraghna</title>
+    <title>SRM DPKS - STEP Kelaa des Sraghna</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="style.css">
@@ -18,7 +18,7 @@
     <!-- الترويسة -->
     <header class="app-header">
         <div class="logo-container">
-            <img src="logo.png" alt="Logo SRM" class="app-logo">
+            <img src="logo.png" alt="Logo SRM DPKS" class="app-logo">
         </div>
         <h2 class="app-title">Exploitation STEP - El Kelaa</h2>
     </header>
@@ -42,11 +42,15 @@
                     </div>
                     <div class="form-grid mt-10">
                         <div class="input-group">
-                            <label>Météo</label>
-                            <select id="meteo"><option>Ensoleillé</option><option>Nuageux</option><option>Pluvieux</option></select>
+                            <label>Météo (Automatique)</label>
+                            <select id="meteo">
+                                <option value="Ensoleillé">Ensoleillé ☀️</option>
+                                <option value="Nuageux">Nuageux ⛅</option>
+                                <option value="Pluvieux">Pluvieux 🌧️</option>
+                            </select>
                         </div>
-                        <div class="input-group"><label>Tª Ambiance (°C)</label><input type="number" id="t_amb" step="0.1"></div>
-                        <div class="input-group full-width"><label>Pluviométrie (mm)</label><input type="number" id="pluvio" step="0.1"></div>
+                        <div class="input-group"><label>Tª Ambiance (°C)</label><input type="number" id="t_amb" step="0.1" placeholder="25"></div>
+                        <div class="input-group full-width"><label>Pluviométrie (mm)</label><input type="number" id="pluvio" step="0.1" placeholder="0"></div>
                     </div>
                 </div>
 
@@ -230,7 +234,7 @@
                 <h3 class="text-center text-blue">PV D'ÉVACUATION DES DÉCHETS</h3>
                 <p class="text-center text-muted mb-15">STEP EL KELAA DE SRAGHNA</p>
                 <hr class="mb-15">
-                <p><strong>Représentants SRM :</strong></p>
+                <p><strong>Représentants SRM DPKS :</strong></p>
                 <ul>
                     <li>Mr. Said AIT ALI (Tech. d'exploitation)</li>
                     <li>Mr. Abdelilah Chouki (Tech. de maintenance)</li>
