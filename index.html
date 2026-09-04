@@ -6,28 +6,22 @@
     <title>SRM DPKS - STEP Kelaa des Sraghna</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-    <!-- تمت إضافة ?v=2 لكسر الكاش في Acode -->
-    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
-    <!-- شاشة الافتتاحية -->
     <div id="splash-screen">
-        <!-- إجبار الحجم من داخل الـ HTML بشكل صارم -->
-        <img src="splash.png" alt="SRM Splash" width="160" height="160" style="width: 160px !important; max-width: 160px !important; height: 160px !important; max-height: 160px !important; object-fit: contain !important; display: block !important; margin: 0 auto;" class="splash-img">
+        <img src="splash.png" alt="SRM Splash" class="splash-img">
         <div class="loader"></div>
     </div>
 
-    <!-- الترويسة -->
     <header class="app-header">
-        <div class="logo-container" style="text-align: center; margin-bottom: 10px; width: 100%; display: flex; justify-content: center;">
-            <!-- إجبار الحجم من داخل الـ HTML بشكل صارم -->
-            <img src="logo.png" alt="Logo SRM DPKS" width="180" height="60" style="width: 180px !important; max-width: 180px !important; height: auto !important; max-height: 60px !important; object-fit: contain !important; display: block !important; margin: 0 auto;" class="app-logo">
+        <div class="logo-container">
+            <img src="logo.png" alt="Logo SRM DPKS" class="app-logo">
         </div>
         <h1 class="app-title">SRM DPKS</h1>
         <p class="app-subtitle">Exploitation STEP - El Kelaa des Sraghna</p>
     </header>
 
-    <!-- شريط التنقل -->
     <nav class="app-nav">
         <button class="nav-item active" data-target="tab-saisie"><i class="fa-solid fa-pen-to-square"></i> Saisie</button>
         <button class="nav-item" data-target="tab-synthese"><i class="fa-solid fa-file-excel"></i> Excel</button>
@@ -46,22 +40,22 @@
                     </div>
                     <div class="form-grid mt-15">
                         <div class="input-group">
-                            <label>Météo (Automatique)</label>
+                            <label>Météo</label>
                             <select id="meteo">
                                 <option value="Ensoleillé">Ensoleillé ☀️</option>
                                 <option value="Nuageux">Nuageux ⛅</option>
                                 <option value="Pluvieux">Pluvieux 🌧️</option>
                             </select>
                         </div>
-                        <div class="input-group"><label>Tª Ambiance (°C)</label><input type="number" id="t_amb" step="0.1" placeholder="25"></div>
-                        <div class="input-group full-width"><label>Pluviométrie (mm)</label><input type="number" id="pluvio" step="0.1" placeholder="0"></div>
+                        <div class="input-group"><label>Tª Ambiance (°C)</label><input type="number" id="t_amb" step="0.1"></div>
+                        <div class="input-group full-width"><label>Pluviométrie (mm)</label><input type="number" id="pluvio" step="0.1"></div>
                     </div>
                 </div>
 
-                <!-- 0. Débits 24H -->
+                <!-- 0. Débits -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-blue"><i class="fa-solid fa-clock"></i></div><span>DÉBITS TRAITÉS (24H)</span></div>
+                        <div class="header-title"><div class="icon-box bg-blue"><i class="fa-solid fa-clock"></i></div><span>DÉBITS (24H)</span></div>
                         <i class="fa-solid fa-chevron-down arrow"></i>
                     </button>
                     <div class="accordion-content">
@@ -84,134 +78,153 @@
                 <!-- 1. Entrée STEP -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-cyan"><i class="fa-solid fa-arrow-right-to-bracket"></i></div><span>1. ENTRÉE DE LA STEP</span></div>
+                        <div class="header-title"><div class="icon-box bg-cyan"><i class="fa-solid fa-arrow-right-to-bracket"></i></div><span>1. ENTRÉE STEP</span></div>
                         <i class="fa-solid fa-chevron-down arrow"></i>
                     </button>
                     <div class="accordion-content">
                         <div class="form-grid">
-                            <div class="input-group"><label>H. Prélèvement</label><input type="time" id="e_hp"></div>
-                            <div class="input-group"><label>H. Analyse</label><input type="time" id="e_ha"></div>
                             <div class="input-group"><label>pH</label><input type="number" id="e_ph" step="0.01"></div>
                             <div class="input-group"><label>Température (ºC)</label><input type="number" id="e_temp" step="0.1"></div>
-                            <div class="input-group"><label>O2 dissous</label><input type="number" id="e_o2" step="0.01"></div>
-                            <div class="input-group"><label>Cond. (ms/cm)</label><input type="number" id="e_cond" step="0.001"></div>
                             <div class="input-group"><label>MES (mg/l)</label><input type="number" id="e_mes" step="0.1" class="cctp-check" data-max="482.1"></div>
-                            <div class="input-group"><label>DBO5 (mgO2/l)</label><input type="number" id="e_dbo5" step="0.1" class="cctp-check" data-max="535.7"></div>
-                            <div class="input-group"><label>DCO TOTAL</label><input type="number" id="e_dco" step="0.1" class="cctp-check" data-max="1071.4"></div>
-                            <div class="input-group"><label>UVT (%)</label><input type="number" id="e_uvt" step="0.1"></div>
+                            <div class="input-group"><label>DBO5 (mg/l)</label><input type="number" id="e_dbo5" step="0.1" class="cctp-check" data-max="535.7"></div>
+                            <div class="input-group"><label>DCO (mg/l)</label><input type="number" id="e_dco" step="0.1" class="cctp-check" data-max="1071.4"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 2. Lits Bactériens -->
+                <!-- NEW: 2. Prétraitement -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-green"><i class="fa-solid fa-microbes"></i></div><span>2. LITS BACTÉRIENS</span></div>
+                        <div class="header-title"><div class="icon-box bg-orange"><i class="fa-solid fa-gear"></i></div><span>2. PRÉTRAITEMENT</span></div>
                         <i class="fa-solid fa-chevron-down arrow"></i>
                     </button>
                     <div class="accordion-content">
                         <div class="form-grid">
-                            <div class="input-group"><label>H. Prélèvement</label><input type="time" id="l_hp"></div>
-                            <div class="input-group"><label>H. Analyse</label><input type="time" id="l_ha"></div>
+                            <div class="input-group">
+                                <label>Dégrilleur 1</label>
+                                <select id="deg1"><option value="Auto">Auto</option><option value="Manuel">Manuel</option><option value="Arrêt">En Panne</option></select>
+                            </div>
+                            <div class="input-group">
+                                <label>Dégrilleur 2</label>
+                                <select id="deg2"><option value="Auto">Auto</option><option value="Manuel">Manuel</option><option value="Arrêt">En Panne</option></select>
+                            </div>
+                            <div class="input-group full-width">
+                                <label>Pont Racleur (Heures de marche)</label>
+                                <input type="number" id="pont_racleur" step="0.1">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Lits Bactériens -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-green"><i class="fa-solid fa-microbes"></i></div><span>3. LITS BACTÉRIENS</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
                             <div class="input-group"><label>pH</label><input type="number" id="l_ph" step="0.01"></div>
                             <div class="input-group"><label>Température (ºC)</label><input type="number" id="l_temp" step="0.1"></div>
-                            <div class="input-group"><label>O2 dissous</label><input type="number" id="l_o2" step="0.01"></div>
-                            <div class="input-group"><label>Cond. (mS)</label><input type="number" id="l_cond" step="0.001"></div>
-                            <div class="input-group"><label>MES (mg/l)</label><input type="number" id="l_mes" step="0.1" class="cctp-check" data-max="246.6"></div>
-                            <div class="input-group"><label>DBO5 (mgO2/l)</label><input type="number" id="l_dbo5" step="0.1" class="cctp-check" data-max="180.6"></div>
-                            <div class="input-group"><label>DCO TOTAL</label><input type="number" id="l_dco" step="0.1" class="cctp-check" data-max="361.2"></div>
-                            <div class="input-group"><label>UVT (%)</label><input type="number" id="l_uvt" step="0.1"></div>
+                            <div class="input-group"><label>MES (mg/l)</label><input type="number" id="l_mes" step="0.1"></div>
+                            <div class="input-group"><label>DBO5 (mg/l)</label><input type="number" id="l_dbo5" step="0.1"></div>
+                            <div class="input-group"><label>DCO (mg/l)</label><input type="number" id="l_dco" step="0.1"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 3. Parshall -->
+                <!-- NEW: 4. Décanteur Secondaire -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-blue"><i class="fa-solid fa-water"></i></div><span>3. PARSHALL SORTIE</span></div>
+                        <div class="header-title"><div class="icon-box bg-blue"><i class="fa-solid fa-water"></i></div><span>4. DÉCANTEUR SEC.</span></div>
                         <i class="fa-solid fa-chevron-down arrow"></i>
                     </button>
                     <div class="accordion-content">
                         <div class="form-grid">
-                            <div class="input-group"><label>H. Prélèvement</label><input type="time" id="p_hp"></div>
-                            <div class="input-group"><label>H. Analyse</label><input type="time" id="p_ha"></div>
+                            <div class="input-group"><label>Niveau Voile Boue (m)</label><input type="number" id="voile_boue" step="0.01"></div>
+                            <div class="input-group"><label>Taux Recirculation (%)</label><input type="number" id="taux_recirc" step="1"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Parshall Sortie -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-cyan"><i class="fa-solid fa-flag-checkered"></i></div><span>5. PARSHALL SORTIE</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
                             <div class="input-group"><label>pH</label><input type="number" id="p_ph" step="0.01"></div>
                             <div class="input-group"><label>Temp (ºC)</label><input type="number" id="p_temp" step="0.1"></div>
-                            <div class="input-group"><label>O2 dissous</label><input type="number" id="p_o2" step="0.01"></div>
-                            <div class="input-group"><label>Cond. (mS)</label><input type="number" id="p_cond" step="0.001"></div>
                             <div class="input-group"><label>MES (mg/l)</label><input type="number" id="p_mes" step="0.1" class="cctp-check" data-max="75"></div>
                             <div class="input-group"><label>DBO5 (mg/l)</label><input type="number" id="p_dbo5" step="0.1" class="cctp-check" data-max="50"></div>
-                            <div class="input-group"><label>DCO TOTAL</label><input type="number" id="p_dco" step="0.1" class="cctp-check" data-max="150"></div>
-                            <div class="input-group"><label>UVT (%)</label><input type="number" id="p_uvt" step="0.1"></div>
+                            <div class="input-group"><label>DCO (mg/l)</label><input type="number" id="p_dco" step="0.1" class="cctp-check" data-max="150"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 4. Tertiaire -->
+                <!-- NEW: 6. Équipements -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-cyan"><i class="fa-solid fa-filter"></i></div><span>4. TERTIAIRE</span></div>
+                        <div class="header-title"><div class="icon-box bg-orange"><i class="fa-solid fa-plug"></i></div><span>6. ÉQUIPEMENTS</span></div>
                         <i class="fa-solid fa-chevron-down arrow"></i>
                     </button>
                     <div class="accordion-content">
                         <div class="form-grid">
-                            <div class="input-group"><label>H. Prélèvement</label><input type="time" id="t_hp"></div>
-                            <div class="input-group"><label>H. Analyse</label><input type="time" id="t_ha"></div>
-                            <div class="input-group"><label>pH</label><input type="number" id="t_ph" step="0.01"></div>
-                            <div class="input-group"><label>Temp (ºC)</label><input type="number" id="t_temp" step="0.1"></div>
-                            <div class="input-group"><label>O2 dissous</label><input type="number" id="t_o2" step="0.01"></div>
-                            <div class="input-group"><label>Cond. (mS)</label><input type="number" id="t_cond" step="0.001"></div>
-                            <div class="input-group"><label>UFC C1</label><input type="number" id="t_ufc1" step="0.1" class="cctp-check" data-max="1000"></div>
-                            <div class="input-group"><label>UFC C2</label><input type="number" id="t_ufc2" step="0.1"></div>
-                            <div class="input-group"><label>Nématodes</label><input type="number" id="t_nem" step="0.1" class="cctp-check" data-max="0"></div>
-                            <div class="input-group"><label>UVT (%)</label><input type="number" id="t_uvt" step="0.1"></div>
+                            <div class="input-group"><label>Pompes Relevage (H)</label><input type="number" id="h_pompe_rel" step="0.1"></div>
+                            <div class="input-group"><label>État Relevage</label><select id="etat_pompe_rel"><option value="Marche">En Marche</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Pompes Recirc. (H)</label><input type="number" id="h_pompe_rec" step="0.1"></div>
+                            <div class="input-group"><label>État Recirculation</label><select id="etat_pompe_rec"><option value="Marche">En Marche</option><option value="Panne">En Panne</option></select></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 5. Boues -->
+                <!-- 7. Consommations & Réactifs -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-orange"><i class="fa-solid fa-cubes-stacked"></i></div><span>5. QUALITÉ DES BOUES</span></div>
+                        <div class="header-title"><div class="icon-box bg-green"><i class="fa-solid fa-flask"></i></div><span>7. CONSO. & RÉACTIFS</span></div>
                         <i class="fa-solid fa-chevron-down arrow"></i>
                     </button>
                     <div class="accordion-content">
                         <div class="form-grid">
-                            <div class="input-group"><label>H. Prélèvement</label><input type="time" id="b_hp"></div>
-                            <div class="input-group"><label>H. Analyse</label><input type="time" id="b_ha"></div>
-                            <div class="input-group"><label>pH</label><input type="number" id="b_ph" step="0.01"></div>
-                            <div class="input-group"><label>Temp (ºC)</label><input type="number" id="b_temp" step="0.1"></div>
-                            <div class="input-group"><label>O2 dissous</label><input type="number" id="b_o2" step="0.01"></div>
-                            <div class="input-group"><label>Cond. (mS)</label><input type="number" id="b_cond" step="0.001"></div>
-                            <div class="input-group"><label>MES (mg/l)</label><input type="number" id="b_mes" step="0.1"></div>
-                            <div class="input-group"><label>MVS (mg/l)</label><input type="number" id="b_mvs" step="0.1"></div>
+                            <div class="input-group"><label class="text-orange">Énergie (kWh)</label><input type="number" id="cons_nrj" step="0.1"></div>
+                            <div class="input-group"><label class="text-cyan">Heures GE</label><input type="number" id="h_ge" step="0.1"></div>
+                            <!-- NEW: Réactifs -->
+                            <div class="input-group"><label>Polymère (Kg)</label><input type="number" id="poly_kg" step="0.1"></div>
+                            <div class="input-group"><label>Chlore/Javel (L)</label><input type="number" id="chlore_l" step="0.1"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 8. Qualité & Evacuation Boues -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-orange"><i class="fa-solid fa-cubes-stacked"></i></div><span>8. BOUES & DÉCHETS</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
                             <div class="input-group"><label>Siccité (%)</label><input type="number" id="b_siccite" step="0.1"></div>
-                            <div class="input-group"><label>Lieu Prélèvement</label><input type="text" id="b_lieu"></div>
+                            <div class="input-group"><label>Boues Évacuées (m³)</label><input type="number" id="v_boue_e" step="0.1"></div>
+                            <div class="input-group"><label>Déchets DG (m³)</label><input type="number" id="v_dg" step="0.1"></div>
+                            <div class="input-group"><label>Sables Évacués (m³)</label><input type="number" id="v_sables" step="0.1"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 6. Consommations & Déchets -->
+                <!-- NEW: 9. Observations -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-green"><i class="fa-solid fa-bolt"></i></div><span>6. CONSO. & DÉCHETS</span></div>
+                        <div class="header-title"><div class="icon-box bg-cyan"><i class="fa-solid fa-clipboard-list"></i></div><span>9. OBSERVATIONS</span></div>
                         <i class="fa-solid fa-chevron-down arrow"></i>
                     </button>
                     <div class="accordion-content">
-                        <div class="form-grid">
-                            <div class="input-group full-width"><label class="text-orange">Conso. Énergie (kWh)</label><input type="number" id="cons_nrj" step="0.1"></div>
-                            <div class="input-group"><label class="text-cyan">Taux de Conso.</label><input type="number" id="taux_nrj" readonly class="readonly-input"></div>
-                            <div class="input-group"><label>Heures fnct GE</label><input type="number" id="h_ge" step="0.1"></div>
-                            
-                            <div class="input-group full-width mt-15"><h4 class="text-green">Gestion des Déchets (m³)</h4></div>
-                            <div class="input-group"><label>Bassin Purgé</label><input type="text" id="bass_purge"></div>
-                            <div class="input-group"><label>Boues Purgés</label><input type="number" id="v_boue_p" step="0.1"></div>
-                            <div class="input-group"><label>Boues Sèches</label><input type="number" id="v_boue_s" step="0.1"></div>
-                            <div class="input-group"><label>Boues Évacués</label><input type="number" id="v_boue_e" step="0.1"></div>
-                            <div class="input-group"><label>Déchets DG</label><input type="number" id="v_dg" step="0.1"></div>
-                            <div class="input-group"><label>Déchets DF</label><input type="number" id="v_df" step="0.1"></div>
-                            <div class="input-group"><label>Sables Évacués</label><input type="number" id="v_sables" step="0.1"></div>
-                            <div class="input-group"><label>Graisses</label><input type="number" id="v_graisses" step="0.1"></div>
+                        <div class="form-grid" style="grid-template-columns: 1fr;">
+                            <div class="input-group">
+                                <label>Remarques / Pannes / Interventions</label>
+                                <textarea id="obs_text" rows="4" style="width: 100%; border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-bg); padding: 12px; color: var(--text-dark); font-weight: 600;" placeholder="RAS..."></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -224,11 +237,11 @@
 
         <!-- ================= TAB 2: EXCEL ================= -->
         <div id="tab-synthese" class="tab-pane">
-            <div class="modern-card p-20">
-                <h3 class="text-cyan text-center mb-15"><i class="fa-solid fa-file-excel"></i> Exportation Excel</h3>
-                <p class="text-center text-muted mb-15">Génère le rapport mensuel de la STEP sous format Excel.</p>
+            <div class="modern-card p-20" style="background: var(--card-teal);">
+                <h3 class="text-center mb-15"><i class="fa-solid fa-file-excel"></i> Exportation Excel</h3>
+                <p class="text-center mb-15">Génère le rapport complet de la STEP sous format Excel.</p>
                 <input type="month" id="exportMonth" class="mb-15 w-100">
-                <button type="button" id="btnExportExcel" class="btn-secondary w-100"><i class="fa-solid fa-download"></i> Télécharger le Fichier Excel</button>
+                <button type="button" id="btnExportExcel" class="btn-secondary w-100"><i class="fa-solid fa-download"></i> Télécharger le Fichier</button>
             </div>
         </div>
 
@@ -248,31 +261,29 @@
                 <ul class="waste-list mt-10">
                     <li>Boues évacuées : <b id="pv_boues" class="text-orange">0</b> m³</li>
                     <li>Déchets DG : <b id="pv_dg" class="text-orange">0</b> m³</li>
-                    <li>Déchets DF : <b id="pv_df" class="text-orange">0</b> m³</li>
                     <li>Sables évacués : <b id="pv_sables" class="text-orange">0</b> m³</li>
-                    <li>Graisses évacuées : <b id="pv_graisses" class="text-orange">0</b> m³</li>
                 </ul>
             </div>
         </div>
 
         <!-- ================= TAB 4: ATTACHEMENT ================= -->
         <div id="tab-finance" class="tab-pane">
-            <div class="modern-card p-20">
-                <h3 class="text-center text-green mb-15"><i class="fa-solid fa-file-invoice-dollar"></i> ATTACHEMENT FINANCIER</h3>
-                <p class="text-center text-muted mb-15">Saisie des montants mensuels (en MAD)</p>
+            <div class="modern-card p-20" style="background: var(--card-green);">
+                <h3 class="text-center mb-15"><i class="fa-solid fa-file-invoice-dollar"></i> ATTACHEMENT FINANCIER</h3>
+                <p class="text-center mb-15">Saisie des montants mensuels (en MAD)</p>
                 
                 <form id="financeForm">
-                    <div class="input-group mb-12"><label>Chef d'exploitation</label><input type="number" id="fin_chef" class="fin-input" step="0.01" placeholder="0.00"></div>
-                    <div class="input-group mb-12"><label>Laborantin</label><input type="number" id="fin_labo" class="fin-input" step="0.01" placeholder="0.00"></div>
-                    <div class="input-group mb-12"><label>Tech. électromécanicien</label><input type="number" id="fin_electro" class="fin-input" step="0.01" placeholder="0.00"></div>
-                    <div class="input-group mb-20"><label>Evacuation des boues</label><input type="number" id="fin_boues" class="fin-input" step="0.01" placeholder="0.00"></div>
+                    <div class="input-group mb-12"><label>Chef d'exploitation</label><input type="number" id="fin_chef" class="fin-input" step="0.01"></div>
+                    <div class="input-group mb-12"><label>Laborantin</label><input type="number" id="fin_labo" class="fin-input" step="0.01"></div>
+                    <div class="input-group mb-12"><label>Tech. électromécanicien</label><input type="number" id="fin_electro" class="fin-input" step="0.01"></div>
+                    <div class="input-group mb-20"><label>Evacuation des boues</label><input type="number" id="fin_boues" class="fin-input" step="0.01"></div>
 
-                    <div class="global-info-card mt-15">
-                        <div class="input-group mb-12"><label>TOTAL HT (MAD)</label><input type="text" id="fin_total_ht" readonly class="readonly-input" value="0.00"></div>
-                        <div class="input-group mb-12"><label>TVA (20%) (MAD)</label><input type="text" id="fin_tva" readonly class="readonly-input" value="0.00"></div>
-                        <div class="input-group"><label class="text-cyan font-bold">TOTAL TTC (MAD)</label><input type="text" id="fin_total_ttc" readonly class="readonly-input text-cyan" value="0.00"></div>
+                    <div class="global-info-card mt-15" style="box-shadow: none;">
+                        <div class="input-group mb-12"><label>TOTAL HT</label><input type="text" id="fin_total_ht" readonly class="readonly-input" value="0.00"></div>
+                        <div class="input-group mb-12"><label>TVA (20%)</label><input type="text" id="fin_tva" readonly class="readonly-input" value="0.00"></div>
+                        <div class="input-group"><label class="text-cyan font-bold">TOTAL TTC</label><input type="text" id="fin_total_ttc" readonly class="readonly-input" value="0.00"></div>
                     </div>
-                    <button type="button" id="btnSaveFinance" class="btn-primary w-100 mt-20"><i class="fa-solid fa-floppy-disk"></i> Enregistrer l'attachement</button>
+                    <button type="button" id="btnSaveFinance" class="btn-primary w-100 mt-20"><i class="fa-solid fa-floppy-disk"></i> Enregistrer</button>
                 </form>
             </div>
         </div>
