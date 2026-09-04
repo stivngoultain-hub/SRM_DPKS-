@@ -15,7 +15,42 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 3. توليد جدول 24 ساعة للتدفقات
+    // تعيين التاريخ الحالي
+    const todayStr = new Date().toISOString().split('T')[0];
+    document.getElementById('date_exp').value = todayStr;
+
+    // 3. جلب الطقس التلقائي لمدينة قلعة السراغنة لحظياً عبر Weather API مجاني بدون مفتاح
+    async function fetchAutoWeather() {
+        try {
+            // إحداثيات مدينة قلعة السراغنة (El Kelaa des Sraghna)
+            const lat = 32.0494;
+            const lon = -7.4083;
+            const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+            const data = await response.json();
+            
+            if(data && data.current_weather) {
+                const temp = data.current_weather.temperature;
+                const weatherCode = data.current_weather.weathercode;
+                
+                document.getElementById('t_amb').value = temp;
+
+                let meteoSelect = document.getElementById('meteo');
+                // رموز الطقس حسب المعيار العالمي WMO
+                if (weatherCode >= 50 && weatherCode <= 67) {
+                    meteoSelect.value = "Pluvieux";
+                } else if (weatherCode >= 1 && weatherCode <= 3) {
+                    meteoSelect.value = "Nuageux";
+                } else {
+                    meteoSelect.value = "Ensoleillé";
+                }
+            }
+        } catch (e) {
+            console.log("الطقس يعمل بالوضع المحلي الافتراضي لعدم توفر الاتصال اللحظي.");
+        }
+    }
+    fetchAutoWeather();
+
+    // 4. توليد جدول 24 ساعة للتدفقات
     const tbody = document.getElementById('hourly-tbody');
     for (let i = 0; i < 24; i++) {
         let h1 = (9 + i) % 24, h2 = (10 + i) % 24;
@@ -29,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `);
     }
 
-    // 4. الحسابات التلقائية (مجموع التدفق ومعدل الاستهلاك)
+    // 5. الحسابات التلقائية (مجموع التدفق ومعدل الاستهلاك)
     const calcTotals = () => {
         let sumE = 0, sumS = 0;
         document.querySelectorAll('.val-entree').forEach(i => sumE += Number(i.value) || 0);
@@ -43,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('hourly-tbody').addEventListener('input', calcTotals);
     document.getElementById('cons_nrj').addEventListener('input', calcTotals);
 
-    // 5. التحذير عند تجاوز معايير CCTP
+    // 6. التحذير عند تجاوز معايير CCTP
     document.querySelectorAll('.cctp-check').forEach(input => {
         input.addEventListener('input', function() {
             let max = parseFloat(this.getAttribute('data-max'));
@@ -52,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 6. الأكورديون (القوائم الطية)
+    // 7. الأكورديون (القوائم الطية)
     document.querySelectorAll('.accordion-header').forEach(h => {
         h.addEventListener('click', () => {
             h.nextElementSibling.classList.toggle('active');
@@ -60,8 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 7. حفظ البيانات اليومية
-    document.getElementById('date_exp').value = new Date().toISOString().split('T')[0];
+    // 8. حفظ البيانات اليومية
     document.getElementById('stepForm').addEventListener('submit', (e) => {
         e.preventDefault();
         const dateKey = document.getElementById('date_exp').value;
@@ -86,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alert(`✔ Fiche du ${dateKey} enregistrée avec succès !`);
     });
 
-    // 8. حساب PV Évacuation تلقائياً للشهر
+    // 9. حساب PV Évacuation تلقائياً للشهر
     function calculatePV() {
         const month = document.getElementById('date_exp').value.substring(0, 7);
         let tb=0, tdg=0, tdf=0, ts=0, tg=0;
@@ -105,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('pv_graisses').innerText = tg.toFixed(1);
     }
 
-    // 9. الحسابات المالية التفاعلية (Attachement)
+    // 10. الحسابات المالية التفاعلية (Attachement)
     const finInputs = document.querySelectorAll('.fin-input');
     const totalHtField = document.getElementById('fin_total_ht');
     const tvaField = document.getElementById('fin_tva');
@@ -131,14 +165,14 @@ document.addEventListener('DOMContentLoaded', () => {
         alert(`✔ Attachement financier du mois ${month} enregistré !`);
     });
 
-    // 10. التصدير الفعلي لملف Excel عبر SheetJS
+    // 11. التصدير الفعلي لملف Excel عبر SheetJS
     document.getElementById('btnExportExcel').addEventListener('click', () => {
         const month = document.getElementById('exportMonth').value;
         if(!month) return alert("Veuillez sélectionner un mois d'abord.");
         
         let wb = XLSX.utils.book_new();
         let recapData = [
-            ["DATE", "pH Entrée", "Temp Entrée", "MES Entrée", "DBO5 Entrée", "DCO Entrée", "Vol. Entrée (m³)", "Vol. Sortie (m³)", "Énergie (kWh)"]
+            ["DATE", "Météo", "Température (°C)", "pH Entrée", "MES Entrée", "DBO5 Entrée", "Vol. Entrée (m³)", "Vol. Sortie (m³)", "Énergie (kWh)"]
         ];
 
         for(let d=1; d<=31; d++) {
@@ -148,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if(item) {
                 let data = JSON.parse(item);
                 recapData.push([
-                    data.date, data.entree.ph, data.entree.temp, data.entree.mes, data.entree.dbo5, data.entree.dco,
+                    data.date, data.meteo, data.t_amb, data.entree.ph, data.entree.mes, data.entree.dbo5,
                     data.debits.tot_in, data.debits.tot_out, data.gestion.energie
                 ]);
             }
