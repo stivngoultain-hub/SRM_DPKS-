@@ -33,42 +33,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     fetchAutoWeather();
 
-    // حساب المجاميع في جدول 24 ساعة
-    const tbody = document.getElementById('hourly-tbody');
-    for (let i = 0; i < 24; i++) {
-        let h1 = (9 + i) % 24, h2 = (10 + i) % 24;
-        let timeStr = `${h1.toString().padStart(2,'0')}:00 - ${h2.toString().padStart(2,'0')}:00`;
-        tbody.insertAdjacentHTML('beforeend', `
-            <tr>
-                <td>${timeStr}</td>
-                <td><input type="number" class="val-entree" data-idx="${i}" step="0.1" placeholder="0"></td>
-                <td><input type="number" class="val-sortie" data-idx="${i}" step="0.1" placeholder="0"></td>
-            </tr>
-        `);
-    }
-
-    const calcTotals = () => {
-        let sumE = 0, sumS = 0;
-        document.querySelectorAll('.val-entree').forEach(i => sumE += Number(i.value) || 0);
-        document.querySelectorAll('.val-sortie').forEach(i => sumS += Number(i.value) || 0);
-        document.getElementById('vol_entree').value = sumE.toFixed(1);
-        document.getElementById('vol_sortie').value = sumS.toFixed(1);
-    };
-    document.getElementById('hourly-tbody').addEventListener('input', calcTotals);
-
-    // حساب آلي لـ Ratio و Rendement
+    // حساب آلي لـ Ratio 1j
     document.querySelectorAll('.exploit-input').forEach(input => {
         input.addEventListener('input', () => {
             let diffIn = parseFloat(document.getElementById('diff_in').value) || 0;
-            let diffOut = parseFloat(document.getElementById('diff_out').value) || 0;
             let diffNrj = parseFloat(document.getElementById('diff_nrj').value) || 0;
-
+            
             if (diffIn > 0) {
                 document.getElementById('ratio_1j').value = (diffNrj / diffIn).toFixed(3);
-                document.getElementById('rendement').value = (diffOut / diffIn).toFixed(2);
             } else {
                 document.getElementById('ratio_1j').value = '';
-                document.getElementById('rendement').value = '';
             }
         });
     });
@@ -109,9 +83,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // استخراج PDF مع حل نهائي لمشكلة الورقة البيضاء
     document.getElementById('btnGeneratePDF').addEventListener('click', () => {
         let equipName = document.getElementById('interv_equip').value;
-        if(!equipName) return alert("Veuillez saisir au moins le nom de l'équipement d'intervention !");
+        if(!equipName) return alert("Veuillez saisir au moins le nom de l'équipement d'intervention dans l'onglet 'Saisie' (Section 3) !");
 
         let now = new Date();
         let dateTimeStr = now.toLocaleDateString('fr-FR') + ' à ' + now.toLocaleTimeString('fr-FR');
@@ -145,33 +120,21 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        const container = document.getElementById('pdf-report-container');
         const element = document.getElementById('pdf-report-content');
-        container.style.display = 'block';
-
-        setTimeout(() => {
-            html2pdf().set({
-                margin: 0.2, 
-                filename: `Intervention_${equipName.replace(/[^a-z0-9]/gi, '_')}_${now.toISOString().split('T')[0]}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, windowWidth: element.scrollWidth, windowHeight: element.scrollHeight },
-                jsPDF: { unit: 'in', format: 'A4', orientation: 'portrait' }
-            }).from(element).save().then(() => { container.style.display = 'none'; })
-            .catch(err => { console.error("PDF Error: ", err); container.style.display = 'none'; });
-        }, 300); 
+        
+        // استخدام html2pdf مباشرة لأن الحاوية الآن موجودة ومبنية دائماً خارج الشاشة (left: -10000px)
+        html2pdf().set({
+            margin: 0.2, 
+            filename: `Intervention_${equipName.replace(/[^a-z0-9]/gi, '_')}_${now.toISOString().split('T')[0]}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'in', format: 'A4', orientation: 'portrait' }
+        }).from(element).save().catch(err => { console.error("PDF Error: ", err); });
     });
 
     document.getElementById('stepForm').addEventListener('submit', (e) => {
         e.preventDefault();
         const dateKey = document.getElementById('date_exp').value;
-        
-        let hourly = [];
-        for(let i=0; i<24; i++) {
-            hourly.push({
-                in: document.querySelector(`.val-entree[data-idx="${i}"]`).value,
-                out: document.querySelector(`.val-sortie[data-idx="${i}"]`).value
-            });
-        }
 
         const eqList = [ 'eq_dg_auto', 'eq_dg_man', 'eq_pr1', 'eq_pr2', 'eq_pr3', 'eq_pr4', 'eq_df1', 'eq_df2', 'eq_aero1', 'eq_aero2', 'eq_rac1', 'eq_rac2', 'eq_ps1', 'eq_ps2', 'eq_pg', 'eq_agi', 'eq_cg', 'eq_cs', 'eq_rad', 'eq_palb1', 'eq_palb2', 'eq_palb3', 'eq_palb4', 'eq_sp1', 'eq_sp2', 'eq_vent1', 'eq_vent2', 'eq_pont1', 'eq_pont2'];
         const instList = [ 'inst_us_dg', 'inst_poire_sr1', 'inst_poire_sr2', 'inst_poire_sr3', 'inst_poire_sr4', 'inst_us_df1', 'inst_us_df2', 'inst_poire_gr1', 'inst_poire_gr2', 'inst_poire_gr3', 'inst_us_salb', 'inst_poire_salb'];
@@ -189,10 +152,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 idx_in: document.getElementById('idx_in').value, diff_in: document.getElementById('diff_in').value,
                 idx_out: document.getElementById('idx_out').value, diff_out: document.getElementById('diff_out').value,
                 idx_nrj: document.getElementById('idx_nrj').value, diff_nrj: document.getElementById('diff_nrj').value,
-                ratio_1j: document.getElementById('ratio_1j').value, rendement: document.getElementById('rendement').value
+                ratio_1j: document.getElementById('ratio_1j').value
             },
             
-            debits: { hourly, tot_in: document.getElementById('vol_entree').value, tot_out: document.getElementById('vol_sortie').value },
             entree: { hp: document.getElementById('e_hp').value, ha: document.getElementById('e_ha').value, ph: document.getElementById('e_ph').value, temp: document.getElementById('e_temp').value, o2: document.getElementById('e_o2').value, cond: document.getElementById('e_cond').value, mes: document.getElementById('e_mes').value, dbo5: document.getElementById('e_dbo5').value, dco: document.getElementById('e_dco').value, uvt: document.getElementById('e_uvt').value },
             lits: { hp: document.getElementById('l_hp').value, ha: document.getElementById('l_ha').value, ph: document.getElementById('l_ph').value, temp: document.getElementById('l_temp').value, o2: document.getElementById('l_o2').value, cond: document.getElementById('l_cond').value, mes: document.getElementById('l_mes').value, dbo5: document.getElementById('l_dbo5').value, dco: document.getElementById('l_dco').value, uvt: document.getElementById('l_uvt').value },
             decanteur: { voile: document.getElementById('voile_boue').value, recirc: document.getElementById('taux_recirc').value },
@@ -200,8 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
             tertiaire: { hp: document.getElementById('t_hp').value, ha: document.getElementById('t_ha').value, ph: document.getElementById('t_ph').value, temp: document.getElementById('t_temp').value, o2: document.getElementById('t_o2').value, cond: document.getElementById('t_cond').value, ufc1: document.getElementById('t_ufc1').value, ufc2: document.getElementById('t_ufc2').value, nem: document.getElementById('t_nem').value, uvt: document.getElementById('t_uvt').value },
             boues: { hp: document.getElementById('b_hp').value, ha: document.getElementById('b_ha').value, ph: document.getElementById('b_ph').value, temp: document.getElementById('b_temp').value, o2: document.getElementById('b_o2').value, cond: document.getElementById('b_cond').value, mes: document.getElementById('b_mes').value, mvs: document.getElementById('b_mvs').value, siccite: document.getElementById('b_siccite').value, lieu: document.getElementById('b_lieu').value },
             gestion: { energie: document.getElementById('cons_nrj').value, h_ge: document.getElementById('h_ge').value, poly: document.getElementById('poly_kg').value, chlore: document.getElementById('chlore_l').value, bass: document.getElementById('bass_purge').value, bp: document.getElementById('v_boue_p').value, bs: document.getElementById('v_boue_s').value, be: document.getElementById('v_boue_e').value, dg: document.getElementById('v_dg').value, df: document.getElementById('v_df').value, sables: document.getElementById('v_sables').value, graisses: document.getElementById('v_graisses').value },
-            
-            extraction: { dg: document.getElementById('ext_dg').value, df: document.getElementById('ext_df').value, sable: document.getElementById('ext_sable').value, graisse: document.getElementById('ext_graisse').value, bp: document.getElementById('ext_bp').value },
             
             obs: document.getElementById('obs_text').value
         };
@@ -243,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let wb = XLSX.utils.book_new();
         let recapData = [
-            ["DATE", "Météo", "T(°C)", "Diff Vol In", "Diff Vol Out", "Diff Nrj", "Ratio 1j", "Rendement", "Ext. DG (m³)", "Ext. DF (m³)", "Ext. Sable", "Ext. Graisses", "Ext. BP", "Vol 24h In", "Vol 24h Out", "DCO In", "DBO5 In", "MES In", "DCO Out", "DBO5 Out", "MES Out", "Siccité (%)", "PANNES", "INTERVENTIONS", "OBSERVATIONS"]
+            ["DATE", "Météo", "T(°C)", "Diff Vol In", "Diff Vol Out", "Diff Nrj", "Ratio 1j", "DCO In", "DBO5 In", "MES In", "DCO Out", "DBO5 Out", "MES Out", "Siccité (%)", "PANNES", "INTERVENTIONS", "OBSERVATIONS"]
         ];
 
         for(let d=1; d<=31; d++) {
@@ -253,16 +213,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 let data = JSON.parse(item);
                 recapData.push([
                     data.date, data.meteo, data.t_amb, 
-                    data.exploitation?.diff_in, data.exploitation?.diff_out, data.exploitation?.diff_nrj, data.exploitation?.ratio_1j, data.exploitation?.rendement,
-                    data.extraction?.dg, data.extraction?.df, data.extraction?.sable, data.extraction?.graisse, data.extraction?.bp,
-                    data.debits.tot_in, data.debits.tot_out,
-                    data.entree.dco, data.entree.dbo5, data.entree.mes, data.parshall.dco, data.parshall.dbo5, data.parshall.mes,
-                    data.boues.siccite,
+                    data.exploitation?.diff_in, data.exploitation?.diff_out, data.exploitation?.diff_nrj, data.exploitation?.ratio_1j,
+                    data.entree?.dco, data.entree?.dbo5, data.entree?.mes, data.parshall?.dco, data.parshall?.dbo5, data.parshall?.mes,
+                    data.boues?.siccite,
                     data.pannesStr, (data.interventions?.equip ? data.interventions.equip : ""), data.obs
                 ]);
             }
         }
-        if(recapData.length === 1) return alert("Aucune donnée enregistrée.");
+        if(recapData.length === 1) return alert("Aucune donnée enregistrée pour ce mois.");
         let ws = XLSX.utils.aoa_to_sheet(recapData);
         XLSX.utils.book_append_sheet(wb, ws, "Rapport Mensuel");
         XLSX.writeFile(wb, `Rapport_STEP_${month}.xlsx`);
