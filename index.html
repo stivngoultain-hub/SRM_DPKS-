@@ -13,16 +13,16 @@
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
-    <link rel="stylesheet" href="style.css?v=23">
+    <link rel="stylesheet" href="style.css?v=24">
 </head>
 <body>
-    <!-- واجهة التحميل -->
+    <!-- واجهة التحميل (بخلفية جديدة متناسقة) -->
     <div id="splash-screen">
         <img src="launchericon-512x512.png" alt="SRM Splash" class="splash-img">
         <div class="loader"></div>
     </div>
 
-    <!-- واجهة تسجيل الدخول -->
+    <!-- واجهة تسجيل الدخول (بخلفية جديدة نظيفة) -->
     <div id="login-screen">
         <div class="login-card">
             <img src="80.png" alt="Logo SRM" class="login-logo">
@@ -500,7 +500,6 @@
     <!-- ================= حاوية الـ PDF الديناميكي ================= -->
     <div id="pdf-master-container" style="position: absolute; top: 0; left: 0; width: 850px; z-index: -9999; visibility: hidden; background: #ffffff;">
         <div id="pdf-dynamic-content" style="padding: 10px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #ffffff; color: #202124;">
-            <!-- سيتم حقن الكود هنا عبر الجافاسكربت -->
         </div>
     </div>
 
