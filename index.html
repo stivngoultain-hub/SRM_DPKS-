@@ -13,7 +13,7 @@
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
-    <link rel="stylesheet" href="style.css?v=21">
+    <link rel="stylesheet" href="style.css?v=23">
 </head>
 <body>
     <!-- واجهة التحميل -->
@@ -151,7 +151,7 @@
                     </div>
                 </div>
 
-                <!-- 3. INTERVENTIONS (مع الإضافات الجديدة) -->
+                <!-- 3. INTERVENTIONS -->
                 <div class="modern-card accordion-item" id="card-3">
                     <button type="button" class="accordion-header">
                         <div class="header-title"><div class="icon-box bg-red"><i class="fa-solid fa-screwdriver-wrench"></i></div><span class="text-red">3. INTERVENTIONS</span></div>
@@ -173,7 +173,6 @@
                                     <div class="input-group"><label>Date d'intervention</label><input type="date" class="int_date"></div>
                                     <div class="input-group"><label>Durée (Heures)</label><input type="number" class="int_duree" step="0.5" placeholder="Ex: 2.5"></div>
                                     
-                                    <!-- Étape de traitement (جديد) -->
                                     <div class="input-group">
                                         <label>Étape de traitement</label>
                                         <select class="int_etape">
@@ -184,7 +183,6 @@
                                         </select>
                                     </div>
 
-                                    <!-- Type de panne (جديد) -->
                                     <div class="input-group">
                                         <label>Type de panne</label>
                                         <select class="int_panne_type">
@@ -279,7 +277,7 @@
                     </div>
                 </div>
 
-                <!-- 7. PARSHALL SORTIE (تمت إعادة ترقيمها وتحديثها بعد حذف البطاقة السابقة) -->
+                <!-- 7. PARSHALL SORTIE -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
                         <div class="header-title"><div class="icon-box bg-green"><i class="fa-solid fa-flag-checkered"></i></div><span>7. PARSHALL SORTIE</span></div>
@@ -345,7 +343,7 @@
                     </div>
                 </div>
                 
-                <!-- 10. GESTION DES DÉCHETS (بعد التعديلات: إزالة Boues évacuées وتعديل اسم Sables) -->
+                <!-- 10. GESTION DES DÉCHETS -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
                         <div class="header-title"><div class="icon-box bg-blue"><i class="fa-solid fa-cubes-stacked"></i></div><span>10. GESTION DES DÉCHETS</span></div>
@@ -407,7 +405,7 @@
             </div>
         </div>
 
-        <!-- ================= TAB 3: PV EVACUATION (مع الحقول الجديدة القابلة للتعديل والحفظ) ================= -->
+        <!-- ================= TAB 3: PV EVACUATION ================= -->
         <div id="tab-pv" class="tab-pane">
             <div class="modern-card p-20 document-view">
                 <h3 class="text-center text-cyan mb-10">PV D'ÉVACUATION DES DÉCHETS</h3>
