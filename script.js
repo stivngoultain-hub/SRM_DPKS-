@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. نظام الحماية (Login System)
     const PIN_KEY = 'app_secure_pin';
     if (!localStorage.getItem(PIN_KEY)) {
-        localStorage.setItem(PIN_KEY, '1111'); // الرمز الافتراضي
+        localStorage.setItem(PIN_KEY, '1111');
     }
     
     setTimeout(() => { 
@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 3. إدارة التدخلات (Avant / Après)
+    // 3. إدارة التدخلات (مع الحقول الجديدة: Étape de traitement & Type de panne)
     let interventionPhotosMap = { "1": { avant: [], apres: [] } };
     let intCounter = 1;
 
@@ -129,6 +129,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="input-group"><label>Rôle</label><input type="text" class="int_role"></div>
                 <div class="input-group"><label>Date d'intervention</label><input type="date" class="int_date"></div>
                 <div class="input-group"><label>Durée (Heures)</label><input type="number" class="int_duree" step="0.5"></div>
+                
+                <div class="input-group">
+                    <label>Étape de traitement</label>
+                    <select class="int_etape">
+                        <option value="Prétraitement">Prétraitement</option>
+                        <option value="Traitement primaire">Traitement primaire</option>
+                        <option value="Traitement secondaire">Traitement secondaire</option>
+                        <option value="Traitement tertiaire">Traitement tertiaire</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>Type de panne</label>
+                    <select class="int_panne_type">
+                        <option value="Panne électrique">Panne électrique</option>
+                        <option value="Panne mécanique">Panne mécanique</option>
+                        <option value="Panne hydraulique">Panne hydraulique</option>
+                    </select>
+                </div>
+
                 <div class="input-group full-width"><label>Matériel utilisé</label><textarea class="int_materiel" rows="2"></textarea></div>
                 <div class="input-group full-width"><label>PDR utilisés</label><textarea class="int_pdr" rows="2"></textarea></div>
                 
@@ -180,7 +200,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ================== 4. نظام PDF (NotebookLM Style & logo.png القديم) ==================
+    // 4. حفظ بيانات النقل في PV Évacuation
+    document.getElementById('btnSavePVDetails').addEventListener('click', () => {
+        const pvData = {
+            societe: document.getElementById('pv_societe').value,
+            chauffeur: document.getElementById('pv_chauffeur').value,
+            matricule: document.getElementById('pv_matricule').value,
+            agrement: document.getElementById('pv_agrement').value,
+            ville: document.getElementById('pv_ville').value
+        };
+        localStorage.setItem('PV_Transport_Details', JSON.stringify(pvData));
+        alert("✔ Informations de transport enregistrées avec succès !");
+    });
+
+    // 5. نظام PDF وتلوين حالات المعدات (Vert, Orange, Rouge)
     function buildPdfContent(cardsToInclude) {
         let contentHTML = `
             <div style="border-bottom: 2px solid #e8eaed; padding-bottom: 12px; margin-bottom: 25px; display:flex; justify-content:space-between; align-items:flex-end;">
@@ -209,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h2 style="font-size: 15px; color: #1a73e8; border-bottom: 1px solid #e8eaed; padding-bottom: 6px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px;">${cardTitle}</h2>
             `;
 
-            if (cardNum === 3) {
+            if (cardNum === 3) { // البطاقة 3: Interventions
                 const blocks = card.querySelectorAll('.intervention-block');
                 if(blocks.length === 0) contentHTML += `<p style="font-size:13px; color:#80868b; font-style: italic;">Aucune intervention enregistrée.</p>`;
                 
@@ -220,6 +253,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     let role = block.querySelector('.int_role').value || '-';
                     let date = block.querySelector('.int_date').value || '-';
                     let duree = block.querySelector('.int_duree').value || '-';
+                    let etape = block.querySelector('.int_etape').value || '-';
+                    let panneType = block.querySelector('.int_panne_type').value || '-';
                     let mat = block.querySelector('.int_materiel').value || '-';
                     let pdr = block.querySelector('.int_pdr').value || '-';
 
@@ -229,6 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <table style="width:100%; font-size:13px; border-collapse: collapse; margin-bottom:10px; color:#3c4043;">
                                 <tr style="page-break-inside: avoid;"><td style="padding:6px 0; width:50%;"><b>Puissance :</b> ${puiss}</td><td style="padding:6px 0;"><b>Rôle :</b> ${role}</td></tr>
                                 <tr style="page-break-inside: avoid;"><td style="padding:6px 0;"><b>Date :</b> ${date}</td><td style="padding:6px 0;"><b>Durée :</b> ${duree} Heures</td></tr>
+                                <tr style="page-break-inside: avoid;"><td style="padding:6px 0;"><b>Étape de traitement :</b> ${etape}</td><td style="padding:6px 0;"><b>Type de panne :</b> ${panneType}</td></tr>
                                 <tr style="page-break-inside: avoid;"><td style="padding:8px 0; border-top:1px dashed #dadce0;" colspan="2"><b>Matériel utilisé :</b> ${mat}</td></tr>
                                 <tr style="page-break-inside: avoid;"><td style="padding:8px 0; border-top:1px dashed #dadce0;" colspan="2"><b>Pièces de rechange :</b> ${pdr}</td></tr>
                             </table>
@@ -252,11 +288,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     contentHTML += `</div>`;
                 });
             } 
-            else if (cardNum === 13) { 
+            else if (cardNum === 11) { // البطاقة 11: Observations
                 let obs = document.getElementById('obs_text').value || 'Aucune observation enregistrée.';
                 contentHTML += `<div style="font-size:13px; color:#3c4043; line-height:1.6; background:#f8f9fa; border-left: 3px solid #fbbc04; padding:12px; border-radius:4px;">${obs.replace(/\n/g, '<br>')}</div>`;
             }
             else {
+                // تلوين الحالات في البطاقة الأولى (Etat des équipements) بناءً على طلبك
                 contentHTML += `<table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #3c4043;"><tbody>`;
                 const inputs = card.querySelectorAll('input, select');
                 let count = 0;
@@ -265,10 +302,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     if(!label) return;
                     let val = input.value || '-';
                     
+                    let valStyle = "font-weight: 600;";
+                    if (cardNum === 1) {
+                        if (val === "Marche") {
+                            valStyle += " color: #2d8a35; background-color: #dff0e1; padding: 2px 6px; border-radius: 4px;"; // Vert
+                        } else if (val === "Arrêt") {
+                            valStyle += " color: #d94f1c; background-color: #fce6dc; padding: 2px 6px; border-radius: 4px;"; // Orange
+                        } else if (val === "Panne") {
+                            valStyle += " color: #ea5348; background-color: #f8e1e1; padding: 2px 6px; border-radius: 4px;"; // Rouge
+                        }
+                    }
+
                     if (count % 2 === 0) contentHTML += `<tr style="page-break-inside: avoid;">`;
                     contentHTML += `
                         <td style="padding: 8px 6px; border-bottom: 1px solid #f1f3f4; width: 25%; font-weight: 500; color:#5f6368; background: ${count%4 < 2 ? '#ffffff' : '#fafafa'};">${label}</td>
-                        <td style="padding: 8px 6px; border-bottom: 1px solid #f1f3f4; width: 25%; font-weight: 600; background: ${count%4 < 2 ? '#ffffff' : '#fafafa'};">${val}</td>
+                        <td style="padding: 8px 6px; border-bottom: 1px solid #f1f3f4; width: 25%; background: ${count%4 < 2 ? '#ffffff' : '#fafafa'};"><span style="${valStyle}">${val}</span></td>
                     `;
                     if (count % 2 === 1) contentHTML += `</tr>`;
                     count++;
@@ -315,7 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.getElementById('btnGenerateAllPDF').addEventListener('click', () => {
-        buildPdfContent([1,2,3,4,5,6,7,8,9,10,11,12,13]);
+        buildPdfContent([1,2,3,4,5,6,7,8,9,10,11]);
         let d = document.getElementById('date_exp').value;
         generatePDF(`Rapport_Complet_STEP_${d}.pdf`);
     });
@@ -330,7 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // ================== الحفظ (Enregistrement) ==================
+    // 6. الحفظ (Enregistrement)
     document.getElementById('stepForm').addEventListener('submit', (e) => {
         e.preventDefault();
         const dateKey = document.getElementById('date_exp').value;
@@ -343,6 +391,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 role: block.querySelector('.int_role').value,
                 date: block.querySelector('.int_date').value,
                 duree: block.querySelector('.int_duree').value,
+                etape: block.querySelector('.int_etape').value,
+                panneType: block.querySelector('.int_panne_type').value,
                 mat: block.querySelector('.int_materiel').value,
                 pdr: block.querySelector('.int_pdr').value
             });
@@ -360,7 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
             entree: { dco: document.getElementById('e_dco').value, dbo5: document.getElementById('e_dbo5').value, mes: document.getElementById('e_mes').value },
             parshall: { dco: document.getElementById('p_dco').value, dbo5: document.getElementById('p_dbo5').value, mes: document.getElementById('p_mes').value },
             boues: { siccite: document.getElementById('b_siccite').value },
-            gestion: { be: document.getElementById('v_boue_e').value, dg: document.getElementById('v_dg').value, df: document.getElementById('v_df').value, sables: document.getElementById('v_sables').value, graisses: document.getElementById('v_graisses').value },
+            gestion: { dg: document.getElementById('v_dg').value, df: document.getElementById('v_df').value, sables: document.getElementById('v_sables').value, graisses: document.getElementById('v_graisses').value },
             obs: document.getElementById('obs_text').value
         };
 
@@ -368,18 +418,32 @@ document.addEventListener('DOMContentLoaded', () => {
         alert(`✔ Fiche du ${dateKey} enregistrée avec succès !`);
     });
 
-    // ================== PV + Excel ==================
+    // 7. PV & Excel
     function calculatePV() {
         const month = document.getElementById('date_exp').value.substring(0, 7);
-        let tb=0, tdg=0, tdf=0, ts=0, tg=0;
+        let tdg=0, tdf=0, ts=0, tg=0;
+        
+        // استرجاع تفاصيل النقل المحفوظة إن وجدت
+        let savedPvData = localStorage.getItem('PV_Transport_Details');
+        if(savedPvData) {
+            let pvd = JSON.parse(savedPvData);
+            document.getElementById('pv_societe').value = pvd.societe || '';
+            document.getElementById('pv_chauffeur').value = pvd.chauffeur || '';
+            document.getElementById('pv_matricule').value = pvd.matricule || '';
+            document.getElementById('pv_agrement').value = pvd.agrement || '';
+            document.getElementById('pv_ville').value = pvd.ville || '';
+        }
+
         for(let i=0; i<localStorage.length; i++) {
             let k = localStorage.key(i);
             if(k.startsWith(`STEP_${month}`)) {
                 let d = JSON.parse(localStorage.getItem(k));
-                tb += Number(d.gestion?.be)||0; tdg += Number(d.gestion?.dg)||0; tdf += Number(d.gestion?.df)||0; ts += Number(d.gestion?.sables)||0; tg += Number(d.gestion?.graisses)||0;
+                tdg += Number(d.gestion?.dg)||0; 
+                tdf += Number(d.gestion?.df)||0; 
+                ts += Number(d.gestion?.sables)||0; 
+                tg += Number(d.gestion?.graisses)||0;
             }
         }
-        document.getElementById('pv_boues').innerText = tb.toFixed(1);
         document.getElementById('pv_dg').innerText = tdg.toFixed(1);
         document.getElementById('pv_df').innerText = tdf.toFixed(1);
         document.getElementById('pv_sables').innerText = ts.toFixed(1);
