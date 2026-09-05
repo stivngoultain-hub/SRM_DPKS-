@@ -62,20 +62,18 @@ body { background-color: var(--bg-color); color: var(--text-dark); padding-botto
 .modern-card, .global-info-card, .document-view { border-radius: 12px; border: 1px solid var(--srm-dark-blue); margin-bottom: 25px; overflow: hidden; }
 .global-info-card { background-color: var(--card-yellow); box-shadow: 5px 5px 0px var(--srm-dark-blue); padding: 22px; }
 
-/* Colors for cards */
+/* Colors for cards (تم إعادة ترتيبها بعد حذف البطاقتين 7 و 11) */
 .modern-card:nth-of-type(1) { background-color: var(--card-teal); box-shadow: 5px 5px 0px var(--srm-teal); }
 .modern-card:nth-of-type(2) { background-color: var(--card-blue); box-shadow: 5px 5px 0px var(--srm-dark-blue); }
 .modern-card:nth-of-type(3) { background-color: var(--card-red); box-shadow: 5px 5px 0px var(--srm-red); border-color: var(--srm-red); } 
 .modern-card:nth-of-type(4) { background-color: var(--card-teal); box-shadow: 5px 5px 0px var(--srm-teal); }
 .modern-card:nth-of-type(5) { background-color: var(--card-green); box-shadow: 5px 5px 0px var(--srm-green); }
 .modern-card:nth-of-type(6) { background-color: var(--card-blue); box-shadow: 5px 5px 0px var(--srm-dark-blue); }
-.modern-card:nth-of-type(7) { background-color: var(--card-orange); box-shadow: 5px 5px 0px var(--srm-orange); }
-.modern-card:nth-of-type(8) { background-color: var(--card-green); box-shadow: 5px 5px 0px var(--srm-green); }
-.modern-card:nth-of-type(9) { background-color: var(--card-teal); box-shadow: 5px 5px 0px var(--srm-teal); }
-.modern-card:nth-of-type(10) { background-color: var(--card-orange); box-shadow: 5px 5px 0px var(--srm-orange); }
-.modern-card:nth-of-type(11) { background-color: var(--card-teal); box-shadow: 5px 5px 0px var(--srm-teal); }
-.modern-card:nth-of-type(12) { background-color: var(--card-blue); box-shadow: 5px 5px 0px var(--srm-dark-blue); }
-.modern-card:nth-of-type(13) { background-color: var(--card-yellow); box-shadow: 5px 5px 0px var(--srm-dark-blue); }
+.modern-card:nth-of-type(7) { background-color: var(--card-green); box-shadow: 5px 5px 0px var(--srm-green); }
+.modern-card:nth-of-type(8) { background-color: var(--card-teal); box-shadow: 5px 5px 0px var(--srm-teal); }
+.modern-card:nth-of-type(9) { background-color: var(--card-orange); box-shadow: 5px 5px 0px var(--srm-orange); }
+.modern-card:nth-of-type(10) { background-color: var(--card-blue); box-shadow: 5px 5px 0px var(--srm-dark-blue); }
+.modern-card:nth-of-type(11) { background-color: var(--card-yellow); box-shadow: 5px 5px 0px var(--srm-dark-blue); }
 
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; } .full-width { grid-column: span 2; }
 .input-group label { font-size: 0.85rem; font-weight: 700; color: var(--srm-dark-blue); display: block; margin-bottom: 8px; }
