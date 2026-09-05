@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <link rel="stylesheet" href="style.css?v=10">
+    <link rel="stylesheet" href="style.css?v=11">
 </head>
 <body>
     <div id="splash-screen">
@@ -25,7 +25,7 @@
 
     <nav class="app-nav">
         <button class="nav-item active" data-target="tab-saisie"><i class="fa-solid fa-pen-to-square"></i> Saisie</button>
-        <button class="nav-item" data-target="tab-synthese"><i class="fa-solid fa-file-excel"></i> Excel</button>
+        <button class="nav-item" data-target="tab-synthese"><i class="fa-solid fa-file-export"></i> Rapports</button>
         <button class="nav-item" data-target="tab-pv"><i class="fa-solid fa-recycle"></i> PV Évacuation</button>
         <button class="nav-item" data-target="tab-finance"><i class="fa-solid fa-file-invoice-dollar"></i> Attachement</button>
     </nav>
@@ -146,15 +146,11 @@
                                 <input type="file" id="interv_photos" accept="image/*" multiple class="file-upload-input">
                                 <div id="photos_preview" class="photos-preview-container mt-10"></div>
                             </div>
-                            
-                            <div class="input-group full-width mt-10">
-                                <button type="button" id="btnGeneratePDF" class="btn-primary w-100" style="background-color: var(--srm-dark-blue); box-shadow: 4px 4px 0px var(--srm-teal);"><i class="fa-solid fa-file-pdf"></i> Générer Rapport d'Intervention (PDF)</button>
-                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- NEW: 4. DONNÉES D'EXPLOITATION -->
+                <!-- 4. DONNÉES D'EXPLOITATION -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
                         <div class="header-title"><div class="icon-box bg-teal"><i class="fa-solid fa-chart-line"></i></div><span>4. DONNÉES D'EXPLOITATION</span></div>
@@ -162,7 +158,7 @@
                     </button>
                     <div class="accordion-content">
                         <div class="form-grid">
-                            <div class="input-group"><label>Index débit d'entrée</label><input type="number" id="idx_in" step="0.1"></div>
+                            <div class="input-group"><label>Débit d'entrée</label><input type="number" id="idx_in" step="0.1"></div>
                             <div class="input-group"><label class="text-orange">Débit d'entrée (Différence)</label><input type="number" id="diff_in" step="0.1" class="exploit-input"></div>
                             
                             <div class="input-group"><label>Index débit de sortie</label><input type="number" id="idx_out" step="0.1"></div>
@@ -171,39 +167,15 @@
                             <div class="input-group"><label>Index Énergie électrique</label><input type="number" id="idx_nrj" step="0.1"></div>
                             <div class="input-group"><label class="text-green">Énergie élect. (Différence)</label><input type="number" id="diff_nrj" step="0.1" class="exploit-input"></div>
 
-                            <div class="input-group"><label>Ratio 1j (Énergie / Débit In)</label><input type="number" id="ratio_1j" readonly class="readonly-input"></div>
-                            <div class="input-group"><label>Rendement (Débit Out / In)</label><input type="number" id="rendement" readonly class="readonly-input"></div>
+                            <div class="input-group full-width"><label>Ratio 1j (Énergie / Débit In)</label><input type="number" id="ratio_1j" readonly class="readonly-input"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 5. DÉBITS -->
+                <!-- 5. ENTRÉE STEP -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-blue"><i class="fa-solid fa-clock"></i></div><span>5. DÉBITS (24H)</span></div>
-                        <i class="fa-solid fa-chevron-down arrow"></i>
-                    </button>
-                    <div class="accordion-content">
-                        <div class="table-responsive">
-                            <table class="hourly-table">
-                                <thead><tr><th>HEURE</th><th>ENTRÉE (m³)</th><th>SORTIE (m³)</th></tr></thead>
-                                <tbody id="hourly-tbody"></tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td><strong>TOTAL</strong></td>
-                                        <td><input type="number" id="vol_entree" readonly class="readonly-input"></td>
-                                        <td><input type="number" id="vol_sortie" readonly class="readonly-input"></td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 6. ENTRÉE STEP -->
-                <div class="modern-card accordion-item">
-                    <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-green"><i class="fa-solid fa-arrow-right-to-bracket"></i></div><span>6. ENTRÉE STEP</span></div>
+                        <div class="header-title"><div class="icon-box bg-green"><i class="fa-solid fa-arrow-right-to-bracket"></i></div><span>5. ENTRÉE STEP</span></div>
                         <i class="fa-solid fa-chevron-down arrow"></i>
                     </button>
                     <div class="accordion-content">
@@ -222,10 +194,10 @@
                     </div>
                 </div>
 
-                <!-- 7. LITS BACTÉRIENS -->
+                <!-- 6. LITS BACTÉRIENS -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-blue"><i class="fa-solid fa-microbes"></i></div><span>7. LITS BACTÉRIENS</span></div>
+                        <div class="header-title"><div class="icon-box bg-blue"><i class="fa-solid fa-microbes"></i></div><span>6. LITS BACTÉRIENS</span></div>
                         <i class="fa-solid fa-chevron-down arrow"></i>
                     </button>
                     <div class="accordion-content">
@@ -244,10 +216,10 @@
                     </div>
                 </div>
 
-                <!-- 8. DÉCANTEUR SECONDAIRE -->
+                <!-- 7. DÉCANTEUR SECONDAIRE -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-orange"><i class="fa-solid fa-water"></i></div><span>8. DÉCANTEUR SEC.</span></div>
+                        <div class="header-title"><div class="icon-box bg-orange"><i class="fa-solid fa-water"></i></div><span>7. DÉCANTEUR SEC.</span></div>
                         <i class="fa-solid fa-chevron-down arrow"></i>
                     </button>
                     <div class="accordion-content">
@@ -258,10 +230,10 @@
                     </div>
                 </div>
 
-                <!-- 9. PARSHALL SORTIE -->
+                <!-- 8. PARSHALL SORTIE -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-green"><i class="fa-solid fa-flag-checkered"></i></div><span>9. PARSHALL SORTIE</span></div>
+                        <div class="header-title"><div class="icon-box bg-green"><i class="fa-solid fa-flag-checkered"></i></div><span>8. PARSHALL SORTIE</span></div>
                         <i class="fa-solid fa-chevron-down arrow"></i>
                     </button>
                     <div class="accordion-content">
@@ -280,10 +252,10 @@
                     </div>
                 </div>
 
-                <!-- 10. TERTIAIRE -->
+                <!-- 9. TERTIAIRE -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-cyan"><i class="fa-solid fa-filter"></i></div><span>10. TERTIAIRE</span></div>
+                        <div class="header-title"><div class="icon-box bg-cyan"><i class="fa-solid fa-filter"></i></div><span>9. TERTIAIRE</span></div>
                         <i class="fa-solid fa-chevron-down arrow"></i>
                     </button>
                     <div class="accordion-content">
@@ -302,10 +274,10 @@
                     </div>
                 </div>
 
-                <!-- 11. QUALITÉ DES BOUES -->
+                <!-- 10. QUALITÉ DES BOUES -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-orange"><i class="fa-solid fa-vial"></i></div><span>11. QUALITÉ DES BOUES</span></div>
+                        <div class="header-title"><div class="icon-box bg-orange"><i class="fa-solid fa-vial"></i></div><span>10. QUALITÉ DES BOUES</span></div>
                         <i class="fa-solid fa-chevron-down arrow"></i>
                     </button>
                     <div class="accordion-content">
@@ -324,10 +296,10 @@
                     </div>
                 </div>
 
-                <!-- 12. CONSO. & RÉACTIFS -->
+                <!-- 11. CONSO. & RÉACTIFS -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-teal"><i class="fa-solid fa-bolt" style="color:var(--srm-teal)"></i></div><span style="color:var(--srm-teal)">12. CONSO. & RÉACTIFS</span></div>
+                        <div class="header-title"><div class="icon-box bg-teal"><i class="fa-solid fa-bolt" style="color:var(--srm-teal)"></i></div><span style="color:var(--srm-teal)">11. CONSO. & RÉACTIFS</span></div>
                         <i class="fa-solid fa-chevron-down arrow"></i>
                     </button>
                     <div class="accordion-content">
@@ -341,10 +313,10 @@
                     </div>
                 </div>
                 
-                <!-- 13. GESTION DES DÉCHETS -->
+                <!-- 12. GESTION DES DÉCHETS -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-blue"><i class="fa-solid fa-cubes-stacked"></i></div><span>13. GESTION DES DÉCHETS</span></div>
+                        <div class="header-title"><div class="icon-box bg-blue"><i class="fa-solid fa-cubes-stacked"></i></div><span>12. GESTION DES DÉCHETS</span></div>
                         <i class="fa-solid fa-chevron-down arrow"></i>
                     </button>
                     <div class="accordion-content">
@@ -361,27 +333,10 @@
                     </div>
                 </div>
 
-                <!-- NEW: 14. EXTRACTION (M3) -->
+                <!-- 13. OBSERVATIONS -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-red"><i class="fa-solid fa-truck-ramp-box"></i></div><span>14. EXTRACTION EN (M³)</span></div>
-                        <i class="fa-solid fa-chevron-down arrow"></i>
-                    </button>
-                    <div class="accordion-content">
-                        <div class="form-grid">
-                            <div class="input-group"><label>Déchets grossiers</label><input type="number" id="ext_dg" step="0.1"></div>
-                            <div class="input-group"><label>Déchets fins</label><input type="number" id="ext_df" step="0.1"></div>
-                            <div class="input-group"><label>Sable</label><input type="number" id="ext_sable" step="0.1"></div>
-                            <div class="input-group"><label>Graisses</label><input type="number" id="ext_graisse" step="0.1"></div>
-                            <div class="input-group"><label>Boues primaires</label><input type="number" id="ext_bp" step="0.1"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 15. OBSERVATIONS -->
-                <div class="modern-card accordion-item">
-                    <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-yellow"><i class="fa-solid fa-clipboard-list"></i></div><span>15. OBSERVATIONS</span></div>
+                        <div class="header-title"><div class="icon-box bg-yellow"><i class="fa-solid fa-clipboard-list"></i></div><span>13. OBSERVATIONS</span></div>
                         <i class="fa-solid fa-chevron-down arrow"></i>
                     </button>
                     <div class="accordion-content">
@@ -400,13 +355,26 @@
             </form>
         </div>
 
-        <!-- ================= TAB 2: EXCEL ================= -->
+        <!-- ================= TAB 2: EXCEL / PDF ================= -->
         <div id="tab-synthese" class="tab-pane">
             <div class="modern-card p-20" style="background: var(--card-teal);">
-                <h3 class="text-center mb-15"><i class="fa-solid fa-file-excel"></i> Exportation Excel</h3>
-                <p class="text-center mb-15">Génère le rapport complet de la STEP sous format Excel.</p>
-                <input type="month" id="exportMonth" class="mb-15 w-100">
-                <button type="button" id="btnExportExcel" class="btn-secondary w-100"><i class="fa-solid fa-download"></i> Télécharger le Fichier Excel Complet</button>
+                <h3 class="text-center mb-15"><i class="fa-solid fa-file-export"></i> Rapports (Excel / PDF)</h3>
+                <p class="text-center mb-20">Générez et téléchargez vos rapports sous le format souhaité.</p>
+                
+                <!-- خيار تحميل Excel -->
+                <div style="background: #ffffff; padding: 18px; border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--srm-dark-blue);">
+                    <h4 style="margin-bottom: 8px; color: var(--srm-dark-blue); font-size: 1.1rem;"><i class="fa-solid fa-file-excel text-green"></i> Rapport Mensuel (Excel)</h4>
+                    <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 12px;">Exporte toutes les données journalières du mois sélectionné.</p>
+                    <input type="month" id="exportMonth" class="mb-15 w-100" style="border-color: var(--srm-green);">
+                    <button type="button" id="btnExportExcel" class="btn-primary w-100" style="background-color: var(--srm-green); border-color: var(--srm-green); box-shadow: 4px 4px 0px var(--srm-dark-blue);"><i class="fa-solid fa-download"></i> Télécharger (Format Excel)</button>
+                </div>
+
+                <!-- خيار تحميل PDF -->
+                <div style="background: #ffffff; padding: 18px; border-radius: 10px; border: 1px solid var(--srm-dark-blue);">
+                    <h4 style="margin-bottom: 8px; color: var(--srm-dark-blue); font-size: 1.1rem;"><i class="fa-solid fa-file-pdf text-red"></i> Rapport d'Intervention (PDF)</h4>
+                    <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 15px;">Génère un rapport professionnel (PDF) basé sur les informations d'intervention saisies aujourd'hui dans l'onglet "Saisie".</p>
+                    <button type="button" id="btnGeneratePDF" class="btn-primary w-100" style="background-color: var(--srm-red); border-color: var(--srm-red); box-shadow: 4px 4px 0px var(--srm-dark-blue);"><i class="fa-solid fa-download"></i> Télécharger (Format PDF)</button>
+                </div>
             </div>
         </div>
 
@@ -454,8 +422,8 @@
         </div>
     </main>
 
-    <!-- ================= قالب PDF الاحترافي (GMAO) ================= -->
-    <div id="pdf-report-container" style="display: none; position: absolute; z-index: -9999; top: 0; left: 0; width: 800px; background: #fff;">
+    <!-- ================= قالب PDF (مخفي خارج الشاشة لضمان الرسم الدقيق) ================= -->
+    <div id="pdf-report-container" style="position: fixed; z-index: -9999; top: 0; left: -10000px; width: 800px; background: #ffffff;">
         <div id="pdf-report-content" style="padding: 40px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #ffffff; color: #1c3d5a;">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 4px solid #1c3d5a; padding-bottom: 15px; margin-bottom: 25px;">
                 <div><img src="logo.png" id="pdf_logo" alt="Logo SRM" style="max-height: 75px;"></div>
