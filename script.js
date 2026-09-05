@@ -5,17 +5,14 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem(PIN_KEY, '1111'); // الرمز الافتراضي
     }
     
-    // إخفاء الـ Splash Screen بعد ثانيتين
     setTimeout(() => { 
         document.getElementById('splash-screen').classList.add('hidden-splash'); 
     }, 2000);
 
-    // التحقق من الجلسة
     if (sessionStorage.getItem('isLoggedIn') === 'true') {
         document.getElementById('login-screen').style.display = 'none';
     }
 
-    // زر فك القفل
     document.getElementById('btn-login').addEventListener('click', () => {
         const enteredPin = document.getElementById('login-pin').value;
         const savedPin = localStorage.getItem(PIN_KEY);
@@ -29,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // تغيير الرقم السري (الإعدادات)
     document.getElementById('btnChangePin').addEventListener('click', () => {
         const oldPin = document.getElementById('old_pin').value;
         const newPin = document.getElementById('new_pin').value;
@@ -54,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('new_pin').value = '';
     });
 
-    // 2. التنقل بين التبويبات
+    // 2. التنقل
     const navItems = document.querySelectorAll('.nav-item');
     const tabPanes = document.querySelectorAll('.tab-pane');
     navItems.forEach(btn => {
@@ -70,7 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const todayStr = new Date().toISOString().split('T')[0];
     document.getElementById('date_exp').value = todayStr;
 
-    // الميتيو
     async function fetchAutoWeather() {
         try {
             const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=32.0494&longitude=-7.4083&current_weather=true`);
@@ -83,11 +78,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (wc >= 1 && wc <= 3) meteoSelect.value = "Nuageux";
                 else meteoSelect.value = "Ensoleillé";
             }
-        } catch (e) { console.log("Météo hors ligne."); }
+        } catch (e) {}
     }
     fetchAutoWeather();
 
-    // Ratio 1j auto
     document.querySelectorAll('.exploit-input').forEach(input => {
         input.addEventListener('input', () => {
             let diffIn = parseFloat(document.getElementById('diff_in').value) || 0;
@@ -107,13 +101,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.accordion-header').forEach(h => {
         h.addEventListener('click', (e) => {
-            if(e.target.classList.contains('btn-print-card')) return; // تجاهل زر الطباعة
+            if(e.target.classList.contains('btn-print-card')) return; 
             h.nextElementSibling.classList.toggle('active');
             h.classList.toggle('active-header');
         });
     });
 
-    // 3. إدارة التدخلات المتعددة (Avant / Après)
+    // 3. التدخلات (Avant / Après)
     let interventionPhotosMap = { "1": { avant: [], apres: [] } };
     let intCounter = 1;
 
@@ -158,7 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // استماع لرفع الصور (قبل / بعد)
     document.getElementById('interventions_container').addEventListener('change', function(e) {
         if(e.target.classList.contains('int_photos_avant') || e.target.classList.contains('int_photos_apres')) {
             const block = e.target.closest('.intervention-block');
@@ -187,15 +180,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ================== 4. نظام PDF الاحترافي (NotebookLM Style & Page Breaks) ==================
+    // ================== 4. نظام PDF (حل المساحة البيضاء وفصل الصفحات) ==================
     function buildPdfContent(cardsToInclude) {
         let contentHTML = `
-            <div style="border-bottom: 2px solid #e8eaed; padding-bottom: 20px; margin-bottom: 30px; display:flex; justify-content:space-between; align-items:flex-end;">
+            <div style="border-bottom: 2px solid #e8eaed; padding-bottom: 12px; margin-bottom: 25px; display:flex; justify-content:space-between; align-items:flex-end;">
                 <div>
                     <h1 style="margin: 0; font-size: 26px; color: #202124; font-weight: 800; letter-spacing: -0.5px;">Rapport d'Exploitation</h1>
-                    <p style="margin: 6px 0 0; font-size: 14px; color: #5f6368; font-weight: 500;">STEP El Kelaa des Sraghna &bull; <b>${document.getElementById('date_exp').value}</b></p>
+                    <p style="margin: 5px 0 0; font-size: 13px; color: #5f6368; font-weight: 500;">STEP El Kelaa des Sraghna &bull; <b>${document.getElementById('date_exp').value}</b></p>
                 </div>
-                <div><img src="logo.png" style="max-height: 55px;"></div>
+                <div><img src="logo.png" style="max-height: 50px;"></div>
             </div>
         `;
 
@@ -206,17 +199,18 @@ document.addEventListener('DOMContentLoaded', () => {
             let cardNum = index + 1;
             if(!cardsToInclude.includes(cardNum)) return;
 
-            // فصل الصفحات: إذا لم تكن هذه هي البطاقة الأولى، نضع فاصلاً
-            let pageBreakClass = (!isFirstIncluded && cardsToInclude.length > 1) ? 'pdf-page-break' : '';
+            // فاصل صفحات إجباري إذا لم تكن هذه أول بطاقة يتم طباعتها (يمنع تداخل الجداول)
+            let pageBreakStyle = (!isFirstIncluded && cardsToInclude.length > 1) ? 'page-break-before: always; padding-top: 20px;' : '';
             isFirstIncluded = false;
 
             let cardTitle = card.querySelector('.header-title span').innerText;
+            
             contentHTML += `
-                <div class="${pageBreakClass}" style="margin-bottom: 40px; page-break-inside: avoid;">
-                    <h2 style="font-size: 15px; color: #1a73e8; border-bottom: 2px solid #f1f3f4; padding-bottom: 8px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px;">${cardTitle}</h2>
+                <div style="${pageBreakStyle} margin-bottom: 30px;">
+                    <h2 style="font-size: 15px; color: #1a73e8; border-bottom: 1px solid #e8eaed; padding-bottom: 6px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px;">${cardTitle}</h2>
             `;
 
-            // بطاقة التدخلات
+            // التدخلات
             if (cardNum === 3) {
                 const blocks = card.querySelectorAll('.intervention-block');
                 if(blocks.length === 0) contentHTML += `<p style="font-size:13px; color:#80868b; font-style: italic;">Aucune intervention enregistrée.</p>`;
@@ -232,49 +226,40 @@ document.addEventListener('DOMContentLoaded', () => {
                     let pdr = block.querySelector('.int_pdr').value || '-';
 
                     contentHTML += `
-                        <div style="background:#f8f9fa; border:1px solid #dadce0; border-radius:8px; padding:20px; margin-bottom:20px; page-break-inside: avoid;">
-                            <h4 style="margin:0 0 15px 0; color:#202124; font-size:16px;">Équipement : <span style="color:#1a73e8;">${equip}</span></h4>
-                            <table style="width:100%; font-size:13px; border-collapse: collapse; margin-bottom:15px; color:#3c4043;">
-                                <tr><td style="padding:6px 0; width:50%;"><b>Puissance :</b> ${puiss}</td><td style="padding:6px 0;"><b>Rôle :</b> ${role}</td></tr>
-                                <tr><td style="padding:6px 0;"><b>Date :</b> ${date}</td><td style="padding:6px 0;"><b>Durée :</b> ${duree} Heures</td></tr>
-                                <tr><td style="padding:8px 0; border-top:1px dashed #dadce0;" colspan="2"><b>Matériel utilisé :</b> ${mat}</td></tr>
-                                <tr><td style="padding:8px 0; border-top:1px dashed #dadce0;" colspan="2"><b>Pièces de rechange :</b> ${pdr}</td></tr>
+                        <div style="background:#f8f9fa; border:1px solid #dadce0; border-radius:8px; padding:15px; margin-bottom:15px; page-break-inside: avoid;">
+                            <h4 style="margin:0 0 10px 0; color:#202124; font-size:15px;">Équipement : <span style="color:#1a73e8;">${equip}</span></h4>
+                            <table style="width:100%; font-size:13px; border-collapse: collapse; margin-bottom:10px; color:#3c4043;">
+                                <tr style="page-break-inside: avoid;"><td style="padding:6px 0; width:50%;"><b>Puissance :</b> ${puiss}</td><td style="padding:6px 0;"><b>Rôle :</b> ${role}</td></tr>
+                                <tr style="page-break-inside: avoid;"><td style="padding:6px 0;"><b>Date :</b> ${date}</td><td style="padding:6px 0;"><b>Durée :</b> ${duree} Heures</td></tr>
+                                <tr style="page-break-inside: avoid;"><td style="padding:8px 0; border-top:1px dashed #dadce0;" colspan="2"><b>Matériel utilisé :</b> ${mat}</td></tr>
+                                <tr style="page-break-inside: avoid;"><td style="padding:8px 0; border-top:1px dashed #dadce0;" colspan="2"><b>Pièces de rechange :</b> ${pdr}</td></tr>
                             </table>
                     `;
-                    // عرض صور قبل وبعد
                     let photos = interventionPhotosMap[id];
                     if((photos.avant && photos.avant.length > 0) || (photos.apres && photos.apres.length > 0)) {
-                        contentHTML += `<div style="display:flex; justify-content: space-between; gap: 15px; border-top: 1px solid #e8eaed; padding-top: 15px;">`;
+                        contentHTML += `<div style="display:flex; justify-content: space-between; gap: 15px; border-top: 1px solid #e8eaed; padding-top: 10px; page-break-inside: avoid;">`;
                         
-                        // Avant
                         contentHTML += `<div style="width:48%;">
-                            <h5 style="margin:0 0 10px 0; font-size:12px; color:#d93025; text-transform:uppercase;">Avant</h5>
+                            <h5 style="margin:0 0 8px 0; font-size:12px; color:#d93025; text-transform:uppercase;">Avant</h5>
                             <div style="display:flex; gap:8px; flex-wrap:wrap;">`;
-                        (photos.avant || []).forEach(p => {
-                            contentHTML += `<img src="${p}" style="width:120px; height:80px; object-fit:cover; border-radius:6px; border:1px solid #dadce0;">`;
-                        });
+                        (photos.avant || []).forEach(p => { contentHTML += `<img src="${p}" style="width:110px; height:75px; object-fit:cover; border-radius:4px; border:1px solid #dadce0;">`; });
                         contentHTML += `</div></div>`;
 
-                        // Après
                         contentHTML += `<div style="width:48%;">
-                            <h5 style="margin:0 0 10px 0; font-size:12px; color:#188038; text-transform:uppercase;">Après</h5>
+                            <h5 style="margin:0 0 8px 0; font-size:12px; color:#188038; text-transform:uppercase;">Après</h5>
                             <div style="display:flex; gap:8px; flex-wrap:wrap;">`;
-                        (photos.apres || []).forEach(p => {
-                            contentHTML += `<img src="${p}" style="width:120px; height:80px; object-fit:cover; border-radius:6px; border:1px solid #dadce0;">`;
-                        });
-                        contentHTML += `</div></div>`;
-
-                        contentHTML += `</div>`;
+                        (photos.apres || []).forEach(p => { contentHTML += `<img src="${p}" style="width:110px; height:75px; object-fit:cover; border-radius:4px; border:1px solid #dadce0;">`; });
+                        contentHTML += `</div></div></div>`;
                     }
                     contentHTML += `</div>`;
                 });
             } 
-            else if (cardNum === 13) { // الملاحظات
+            else if (cardNum === 13) { 
                 let obs = document.getElementById('obs_text').value || 'Aucune observation enregistrée.';
-                contentHTML += `<div style="font-size:14px; color:#3c4043; line-height:1.6; background:#f8f9fa; border-left: 4px solid #fbbc04; padding:15px; border-radius:4px;">${obs.replace(/\n/g, '<br>')}</div>`;
+                contentHTML += `<div style="font-size:13px; color:#3c4043; line-height:1.6; background:#f8f9fa; border-left: 3px solid #fbbc04; padding:12px; border-radius:4px;">${obs.replace(/\n/g, '<br>')}</div>`;
             }
             else {
-                // الجداول العادية
+                // الجداول مع (page-break-inside: avoid) لكل سطر لمنع القطع العشوائي
                 contentHTML += `<table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #3c4043;"><tbody>`;
                 const inputs = card.querySelectorAll('input, select');
                 let count = 0;
@@ -283,15 +268,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     if(!label) return;
                     let val = input.value || '-';
                     
-                    if (count % 2 === 0) contentHTML += `<tr>`;
+                    if (count % 2 === 0) contentHTML += `<tr style="page-break-inside: avoid;">`;
                     contentHTML += `
-                        <td style="padding: 10px 8px; border-bottom: 1px solid #f1f3f4; width: 25%; font-weight: 500; color:#5f6368; background: #fafafa;">${label}</td>
-                        <td style="padding: 10px 8px; border-bottom: 1px solid #f1f3f4; width: 25%; font-weight: 600;">${val}</td>
+                        <td style="padding: 8px 6px; border-bottom: 1px solid #f1f3f4; width: 25%; font-weight: 500; color:#5f6368; background: ${count%4 < 2 ? '#ffffff' : '#fafafa'};">${label}</td>
+                        <td style="padding: 8px 6px; border-bottom: 1px solid #f1f3f4; width: 25%; font-weight: 600; background: ${count%4 < 2 ? '#ffffff' : '#fafafa'};">${val}</td>
                     `;
                     if (count % 2 === 1) contentHTML += `</tr>`;
                     count++;
                 });
-                if (count % 2 !== 0) contentHTML += `<td colspan="2" style="border-bottom: 1px solid #f1f3f4; background: #fafafa;"></td></tr>`;
+                if (count % 2 !== 0) contentHTML += `<td colspan="2" style="border-bottom: 1px solid #f1f3f4; background: ${count%4 < 2 ? '#ffffff' : '#fafafa'};"></td></tr>`;
                 contentHTML += `</tbody></table>`;
             }
             
@@ -299,24 +284,42 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         contentHTML += `
-            <div style="margin-top: 50px; padding-top: 15px; border-top: 1px solid #e8eaed; text-align: center; font-size: 11px; color: #9aa0a6;">
-                Document sécurisé généré par SRM DPKS - Système de Gestion Intégrée
+            <div style="margin-top: 30px; padding-top: 10px; border-top: 1px solid #e8eaed; text-align: center; font-size: 10px; color: #9aa0a6;">
+                Généré par SRM DPKS - Système de Gestion (Notebook Style)
             </div>
         `;
 
         document.getElementById('pdf-dynamic-content').innerHTML = contentHTML;
     }
 
+    // دالة إنشاء الـ PDF المعدلة بالكامل لحل مشكلة الإزاحة البيضاء
     function generatePDF(filename) {
+        const container = document.getElementById('pdf-master-container');
         const element = document.getElementById('pdf-dynamic-content');
+        
+        // إظهار الحاوية مؤقتاً لتستطيع html2canvas رسمها
+        container.style.visibility = 'visible';
+        
+        // حفظ موقع التمرير الحالي، والعودة لأعلى الصفحة لتجنب المساحة البيضاء
+        const currentScroll = window.scrollY;
+        window.scrollTo(0, 0); 
+        
         html2pdf().set({
-            margin: 0.5, 
+            margin: [0.5, 0.4, 0.5, 0.4], 
             filename: filename,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-            jsPDF: { unit: 'in', format: 'A4', orientation: 'portrait' },
-            pagebreak: { mode: ['css', 'legacy'] } // تفعيل خاصية الفصل في المكتبة
-        }).from(element).save();
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: { 
+                scale: 2, 
+                useCORS: true,
+                scrollY: 0, 
+                windowWidth: 850
+            },
+            jsPDF: { unit: 'in', format: 'A4', orientation: 'portrait' }
+        }).from(element).save().then(() => {
+            // إخفاء الحاوية وإرجاع المستخدم لمكانه الطبيعي
+            container.style.visibility = 'hidden';
+            window.scrollTo(0, currentScroll);
+        });
     }
 
     // الأزرار
