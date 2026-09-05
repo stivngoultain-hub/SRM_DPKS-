@@ -6,7 +6,7 @@
     <title>SRM DPKS - STEP Kelaa des Sraghna</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-    <link rel="stylesheet" href="style.css?v=3">
+    <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
     <div id="splash-screen">
@@ -52,10 +52,55 @@
                     </div>
                 </div>
 
-                <!-- 0. Débits -->
+                <!-- 1. ÉQUIPEMENTS (البطاقة الأولى الجديدة) -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-blue"><i class="fa-solid fa-clock"></i></div><span>DÉBITS (24H)</span></div>
+                        <div class="header-title"><div class="icon-box bg-orange"><i class="fa-solid fa-cogs"></i></div><span>1. ÉTAT DES ÉQUIPEMENTS</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
+                            
+                            <div class="full-width"><h4 class="section-subtitle">Relevage & Prétraitement</h4></div>
+                            <div class="input-group"><label>Dég. grossier auto</label><select id="eq_dg_auto" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Dég. grossier man</label><select id="eq_dg_man" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Pompe de relevage 1</label><select id="eq_pr1" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Pompe de relevage 2</label><select id="eq_pr2" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Pompe de relevage 3</label><select id="eq_pr3" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Pompe de relevage 4</label><select id="eq_pr4" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Dégrilleur fin 1</label><select id="eq_df1" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Dégrilleur fin 2</label><select id="eq_df2" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Aéroflot 1</label><select id="eq_aero1" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Aéroflot 2</label><select id="eq_aero2" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Racleur 1</label><select id="eq_rac1" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Racleur 2</label><select id="eq_rac2" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Pompe à sable 1</label><select id="eq_ps1" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Pompe à sable 2</label><select id="eq_ps2" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Pompe à graisse</label><select id="eq_pg" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Agitateur sub.</label><select id="eq_agi" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Concentrateur graisse</label><select id="eq_cg" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Classificateur sable</label><select id="eq_cs" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+
+                            <div class="full-width"><h4 class="section-subtitle">Ouvrages Biologiques & Bassins</h4></div>
+                            <div class="input-group"><label>Radeau de curage</label><select id="eq_rad" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Pompe ALB 1</label><select id="eq_palb1" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Pompe ALB 2</label><select id="eq_palb2" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Pompe ALB 3</label><select id="eq_palb3" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Pompe ALB 4</label><select id="eq_palb4" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Sprinkler 1</label><select id="eq_sp1" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Sprinkler 2</label><select id="eq_sp2" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Ventilateur 1</label><select id="eq_vent1" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Ventilateur 2</label><select id="eq_vent2" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Pont racleur 1</label><select id="eq_pont1" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                            <div class="input-group"><label>Pont racleur 2</label><select id="eq_pont2" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Débits -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-blue"><i class="fa-solid fa-clock"></i></div><span>2. DÉBITS (24H)</span></div>
                         <i class="fa-solid fa-chevron-down arrow"></i>
                     </button>
                     <div class="accordion-content">
@@ -75,10 +120,10 @@
                     </div>
                 </div>
 
-                <!-- 1. Entrée STEP -->
+                <!-- 3. Entrée STEP -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-cyan"><i class="fa-solid fa-arrow-right-to-bracket"></i></div><span>1. ENTRÉE STEP</span></div>
+                        <div class="header-title"><div class="icon-box bg-cyan"><i class="fa-solid fa-arrow-right-to-bracket"></i></div><span>3. ENTRÉE STEP</span></div>
                         <i class="fa-solid fa-chevron-down arrow"></i>
                     </button>
                     <div class="accordion-content">
@@ -92,34 +137,10 @@
                     </div>
                 </div>
 
-                <!-- NEW: 2. Prétraitement -->
+                <!-- 4. Lits Bactériens -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-orange"><i class="fa-solid fa-gear"></i></div><span>2. PRÉTRAITEMENT</span></div>
-                        <i class="fa-solid fa-chevron-down arrow"></i>
-                    </button>
-                    <div class="accordion-content">
-                        <div class="form-grid">
-                            <div class="input-group">
-                                <label>Dégrilleur 1</label>
-                                <select id="deg1"><option value="Auto">Auto</option><option value="Manuel">Manuel</option><option value="Arrêt">En Panne</option></select>
-                            </div>
-                            <div class="input-group">
-                                <label>Dégrilleur 2</label>
-                                <select id="deg2"><option value="Auto">Auto</option><option value="Manuel">Manuel</option><option value="Arrêt">En Panne</option></select>
-                            </div>
-                            <div class="input-group full-width">
-                                <label>Pont Racleur (Heures de marche)</label>
-                                <input type="number" id="pont_racleur" step="0.1">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 3. Lits Bactériens -->
-                <div class="modern-card accordion-item">
-                    <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-green"><i class="fa-solid fa-microbes"></i></div><span>3. LITS BACTÉRIENS</span></div>
+                        <div class="header-title"><div class="icon-box bg-green"><i class="fa-solid fa-microbes"></i></div><span>4. LITS BACTÉRIENS</span></div>
                         <i class="fa-solid fa-chevron-down arrow"></i>
                     </button>
                     <div class="accordion-content">
@@ -133,10 +154,10 @@
                     </div>
                 </div>
 
-                <!-- NEW: 4. Décanteur Secondaire -->
+                <!-- 5. Décanteur Secondaire -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-blue"><i class="fa-solid fa-water"></i></div><span>4. DÉCANTEUR SEC.</span></div>
+                        <div class="header-title"><div class="icon-box bg-blue"><i class="fa-solid fa-water"></i></div><span>5. DÉCANTEUR SEC.</span></div>
                         <i class="fa-solid fa-chevron-down arrow"></i>
                     </button>
                     <div class="accordion-content">
@@ -147,10 +168,10 @@
                     </div>
                 </div>
 
-                <!-- 5. Parshall Sortie -->
+                <!-- 6. Parshall Sortie -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-cyan"><i class="fa-solid fa-flag-checkered"></i></div><span>5. PARSHALL SORTIE</span></div>
+                        <div class="header-title"><div class="icon-box bg-cyan"><i class="fa-solid fa-flag-checkered"></i></div><span>6. PARSHALL SORTIE</span></div>
                         <i class="fa-solid fa-chevron-down arrow"></i>
                     </button>
                     <div class="accordion-content">
@@ -160,22 +181,6 @@
                             <div class="input-group"><label>MES (mg/l)</label><input type="number" id="p_mes" step="0.1" class="cctp-check" data-max="75"></div>
                             <div class="input-group"><label>DBO5 (mg/l)</label><input type="number" id="p_dbo5" step="0.1" class="cctp-check" data-max="50"></div>
                             <div class="input-group"><label>DCO (mg/l)</label><input type="number" id="p_dco" step="0.1" class="cctp-check" data-max="150"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- NEW: 6. Équipements -->
-                <div class="modern-card accordion-item">
-                    <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-orange"><i class="fa-solid fa-plug"></i></div><span>6. ÉQUIPEMENTS</span></div>
-                        <i class="fa-solid fa-chevron-down arrow"></i>
-                    </button>
-                    <div class="accordion-content">
-                        <div class="form-grid">
-                            <div class="input-group"><label>Pompes Relevage (H)</label><input type="number" id="h_pompe_rel" step="0.1"></div>
-                            <div class="input-group"><label>État Relevage</label><select id="etat_pompe_rel"><option value="Marche">En Marche</option><option value="Panne">En Panne</option></select></div>
-                            <div class="input-group"><label>Pompes Recirc. (H)</label><input type="number" id="h_pompe_rec" step="0.1"></div>
-                            <div class="input-group"><label>État Recirculation</label><select id="etat_pompe_rec"><option value="Marche">En Marche</option><option value="Panne">En Panne</option></select></div>
                         </div>
                     </div>
                 </div>
@@ -190,7 +195,6 @@
                         <div class="form-grid">
                             <div class="input-group"><label class="text-orange">Énergie (kWh)</label><input type="number" id="cons_nrj" step="0.1"></div>
                             <div class="input-group"><label class="text-cyan">Heures GE</label><input type="number" id="h_ge" step="0.1"></div>
-                            <!-- NEW: Réactifs -->
                             <div class="input-group"><label>Polymère (Kg)</label><input type="number" id="poly_kg" step="0.1"></div>
                             <div class="input-group"><label>Chlore/Javel (L)</label><input type="number" id="chlore_l" step="0.1"></div>
                         </div>
@@ -213,7 +217,7 @@
                     </div>
                 </div>
 
-                <!-- NEW: 9. Observations -->
+                <!-- 9. Observations -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
                         <div class="header-title"><div class="icon-box bg-cyan"><i class="fa-solid fa-clipboard-list"></i></div><span>9. OBSERVATIONS</span></div>
