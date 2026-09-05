@@ -13,7 +13,7 @@
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
-    <link rel="stylesheet" href="style.css?v=19">
+    <link rel="stylesheet" href="style.css?v=21">
 </head>
 <body>
     <!-- واجهة التحميل -->
@@ -151,7 +151,7 @@
                     </div>
                 </div>
 
-                <!-- 3. INTERVENTIONS -->
+                <!-- 3. INTERVENTIONS (مع الإضافات الجديدة) -->
                 <div class="modern-card accordion-item" id="card-3">
                     <button type="button" class="accordion-header">
                         <div class="header-title"><div class="icon-box bg-red"><i class="fa-solid fa-screwdriver-wrench"></i></div><span class="text-red">3. INTERVENTIONS</span></div>
@@ -172,6 +172,28 @@
                                     <div class="input-group"><label>Rôle</label><input type="text" class="int_role" placeholder="Ex: Relevage E.B"></div>
                                     <div class="input-group"><label>Date d'intervention</label><input type="date" class="int_date"></div>
                                     <div class="input-group"><label>Durée (Heures)</label><input type="number" class="int_duree" step="0.5" placeholder="Ex: 2.5"></div>
+                                    
+                                    <!-- Étape de traitement (جديد) -->
+                                    <div class="input-group">
+                                        <label>Étape de traitement</label>
+                                        <select class="int_etape">
+                                            <option value="Prétraitement">Prétraitement</option>
+                                            <option value="Traitement primaire">Traitement primaire</option>
+                                            <option value="Traitement secondaire">Traitement secondaire</option>
+                                            <option value="Traitement tertiaire">Traitement tertiaire</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Type de panne (جديد) -->
+                                    <div class="input-group">
+                                        <label>Type de panne</label>
+                                        <select class="int_panne_type">
+                                            <option value="Panne électrique">Panne électrique</option>
+                                            <option value="Panne mécanique">Panne mécanique</option>
+                                            <option value="Panne hydraulique">Panne hydraulique</option>
+                                        </select>
+                                    </div>
+
                                     <div class="input-group full-width"><label>Matériel utilisé</label><textarea class="int_materiel" rows="2" placeholder="Outils, engins..."></textarea></div>
                                     <div class="input-group full-width"><label>PDR utilisés (Pièces)</label><textarea class="int_pdr" rows="2" placeholder="Roulements, joints..."></textarea></div>
                                     
@@ -257,25 +279,11 @@
                     </div>
                 </div>
 
-                <!-- 7. DÉCANTEUR SECONDAIRE -->
+                <!-- 7. PARSHALL SORTIE (تمت إعادة ترقيمها وتحديثها بعد حذف البطاقة السابقة) -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-orange"><i class="fa-solid fa-water"></i></div><span>7. DÉCANTEUR SEC.</span></div>
+                        <div class="header-title"><div class="icon-box bg-green"><i class="fa-solid fa-flag-checkered"></i></div><span>7. PARSHALL SORTIE</span></div>
                         <div class="header-actions"><i class="fa-solid fa-print btn-print-card" data-card="7"></i><i class="fa-solid fa-chevron-down arrow"></i></div>
-                    </button>
-                    <div class="accordion-content">
-                        <div class="form-grid">
-                            <div class="input-group"><label>Niveau Voile Boue (m)</label><input type="number" id="voile_boue" step="0.01"></div>
-                            <div class="input-group"><label>Taux Recirculation (%)</label><input type="number" id="taux_recirc" step="1"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 8. PARSHALL SORTIE -->
-                <div class="modern-card accordion-item">
-                    <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-green"><i class="fa-solid fa-flag-checkered"></i></div><span>8. PARSHALL SORTIE</span></div>
-                        <div class="header-actions"><i class="fa-solid fa-print btn-print-card" data-card="8"></i><i class="fa-solid fa-chevron-down arrow"></i></div>
                     </button>
                     <div class="accordion-content">
                         <div class="form-grid">
@@ -293,11 +301,11 @@
                     </div>
                 </div>
 
-                <!-- 9. TERTIAIRE -->
+                <!-- 8. TERTIAIRE -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-cyan"><i class="fa-solid fa-filter"></i></div><span>9. TERTIAIRE</span></div>
-                        <div class="header-actions"><i class="fa-solid fa-print btn-print-card" data-card="9"></i><i class="fa-solid fa-chevron-down arrow"></i></div>
+                        <div class="header-title"><div class="icon-box bg-cyan"><i class="fa-solid fa-filter"></i></div><span>8. TERTIAIRE</span></div>
+                        <div class="header-actions"><i class="fa-solid fa-print btn-print-card" data-card="8"></i><i class="fa-solid fa-chevron-down arrow"></i></div>
                     </button>
                     <div class="accordion-content">
                         <div class="form-grid">
@@ -315,11 +323,11 @@
                     </div>
                 </div>
 
-                <!-- 10. QUALITÉ DES BOUES -->
+                <!-- 9. QUALITÉ DES BOUES -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-orange"><i class="fa-solid fa-vial"></i></div><span>10. QUALITÉ DES BOUES</span></div>
-                        <div class="header-actions"><i class="fa-solid fa-print btn-print-card" data-card="10"></i><i class="fa-solid fa-chevron-down arrow"></i></div>
+                        <div class="header-title"><div class="icon-box bg-orange"><i class="fa-solid fa-vial"></i></div><span>9. QUALITÉ DES BOUES</span></div>
+                        <div class="header-actions"><i class="fa-solid fa-print btn-print-card" data-card="9"></i><i class="fa-solid fa-chevron-down arrow"></i></div>
                     </button>
                     <div class="accordion-content">
                         <div class="form-grid">
@@ -336,49 +344,31 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- 11. CONSO. & RÉACTIFS -->
-                <div class="modern-card accordion-item">
-                    <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-teal"><i class="fa-solid fa-bolt" style="color:var(--srm-teal)"></i></div><span style="color:var(--srm-teal)">11. CONSO. & RÉACTIFS</span></div>
-                        <div class="header-actions"><i class="fa-solid fa-print btn-print-card" data-card="11"></i><i class="fa-solid fa-chevron-down arrow"></i></div>
-                    </button>
-                    <div class="accordion-content">
-                        <div class="form-grid">
-                            <div class="input-group full-width"><label class="text-orange">Conso. Énergie (kWh)</label><input type="number" id="cons_nrj" step="0.1"></div>
-                            <div class="input-group"><label class="text-cyan">Taux de Conso.</label><input type="number" id="taux_nrj" readonly class="readonly-input"></div>
-                            <div class="input-group"><label>Heures fnct GE</label><input type="number" id="h_ge" step="0.1"></div>
-                            <div class="input-group"><label>Polymère (Kg)</label><input type="number" id="poly_kg" step="0.1"></div>
-                            <div class="input-group"><label>Chlore/Javel (L)</label><input type="number" id="chlore_l" step="0.1"></div>
-                        </div>
-                    </div>
-                </div>
                 
-                <!-- 12. GESTION DES DÉCHETS -->
+                <!-- 10. GESTION DES DÉCHETS (بعد التعديلات: إزالة Boues évacuées وتعديل اسم Sables) -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-blue"><i class="fa-solid fa-cubes-stacked"></i></div><span>12. GESTION DES DÉCHETS</span></div>
-                        <div class="header-actions"><i class="fa-solid fa-print btn-print-card" data-card="12"></i><i class="fa-solid fa-chevron-down arrow"></i></div>
+                        <div class="header-title"><div class="icon-box bg-blue"><i class="fa-solid fa-cubes-stacked"></i></div><span>10. GESTION DES DÉCHETS</span></div>
+                        <div class="header-actions"><i class="fa-solid fa-print btn-print-card" data-card="10"></i><i class="fa-solid fa-chevron-down arrow"></i></div>
                     </button>
                     <div class="accordion-content">
                         <div class="form-grid">
                             <div class="input-group"><label>Bassin Purgé</label><input type="text" id="bass_purge"></div>
                             <div class="input-group"><label>Boues Purgés (m³)</label><input type="number" id="v_boue_p" step="0.1"></div>
                             <div class="input-group"><label>Boues Sèches (m³)</label><input type="number" id="v_boue_s" step="0.1"></div>
-                            <div class="input-group"><label>Boues Évacuées (m³)</label><input type="number" id="v_boue_e" step="0.1"></div>
                             <div class="input-group"><label>Déchets DG (m³)</label><input type="number" id="v_dg" step="0.1"></div>
                             <div class="input-group"><label>Déchets DF (m³)</label><input type="number" id="v_df" step="0.1"></div>
-                            <div class="input-group"><label>Sables Évacués (m³)</label><input type="number" id="v_sables" step="0.1"></div>
+                            <div class="input-group"><label>Sable (m³)</label><input type="number" id="v_sables" step="0.1"></div>
                             <div class="input-group"><label>Graisses (m³)</label><input type="number" id="v_graisses" step="0.1"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 13. OBSERVATIONS -->
+                <!-- 11. OBSERVATIONS -->
                 <div class="modern-card accordion-item">
                     <button type="button" class="accordion-header">
-                        <div class="header-title"><div class="icon-box bg-yellow"><i class="fa-solid fa-clipboard-list"></i></div><span>13. OBSERVATIONS</span></div>
-                        <div class="header-actions"><i class="fa-solid fa-print btn-print-card" data-card="13"></i><i class="fa-solid fa-chevron-down arrow"></i></div>
+                        <div class="header-title"><div class="icon-box bg-yellow"><i class="fa-solid fa-clipboard-list"></i></div><span>11. OBSERVATIONS</span></div>
+                        <div class="header-actions"><i class="fa-solid fa-print btn-print-card" data-card="11"></i><i class="fa-solid fa-chevron-down arrow"></i></div>
                     </button>
                     <div class="accordion-content">
                         <div class="form-grid" style="grid-template-columns: 1fr;">
@@ -417,11 +407,39 @@
             </div>
         </div>
 
-        <!-- ================= TAB 3: PV EVACUATION ================= -->
+        <!-- ================= TAB 3: PV EVACUATION (مع الحقول الجديدة القابلة للتعديل والحفظ) ================= -->
         <div id="tab-pv" class="tab-pane">
             <div class="modern-card p-20 document-view">
-                <h3 class="text-center text-cyan">PV D'ÉVACUATION DES DÉCHETS</h3>
+                <h3 class="text-center text-cyan mb-10">PV D'ÉVACUATION DES DÉCHETS</h3>
                 <p class="text-center text-muted mb-15">STEP EL KELAA DE SRAGHNA</p>
+                <hr class="mb-15">
+                
+                <form id="pvForm">
+                    <div class="form-grid mb-15">
+                        <div class="input-group">
+                            <label>Société transporteur</label>
+                            <input type="text" id="pv_societe" placeholder="Nom de la société">
+                        </div>
+                        <div class="input-group">
+                            <label>Nom de chauffeur</label>
+                            <input type="text" id="pv_chauffeur" placeholder="Nom du chauffeur">
+                        </div>
+                        <div class="input-group">
+                            <label>Matricule de camion</label>
+                            <input type="text" id="pv_matricule" placeholder="Ex: 12345-A-6">
+                        </div>
+                        <div class="input-group">
+                            <label>Agrément N°</label>
+                            <input type="text" id="pv_agrement" placeholder="Numéro d'agrément">
+                        </div>
+                        <div class="input-group full-width">
+                            <label>Ville de Destination</label>
+                            <input type="text" id="pv_ville" placeholder="Destination finale">
+                        </div>
+                    </div>
+                    <button type="button" id="btnSavePVDetails" class="btn-primary w-100 mb-15" style="padding: 10px; font-size: 0.95rem;"><i class="fa-solid fa-floppy-disk"></i> Enregistrer les infos du transport</button>
+                </form>
+
                 <hr class="mb-15">
                 <p><strong>Représentants SRM DPKS :</strong></p>
                 <ul class="waste-list mt-10">
@@ -431,10 +449,9 @@
                 </ul>
                 <hr class="mt-15 mb-15">
                 <ul class="waste-list mt-10">
-                    <li>Boues évacuées : <b id="pv_boues" class="text-orange">0</b> m³</li>
                     <li>Déchets DG : <b id="pv_dg" class="text-orange">0</b> m³</li>
                     <li>Déchets DF : <b id="pv_df" class="text-orange">0</b> m³</li>
-                    <li>Sables évacués : <b id="pv_sables" class="text-orange">0</b> m³</li>
+                    <li>Sable : <b id="pv_sables" class="text-orange">0</b> m³</li>
                     <li>Graisses évacuées : <b id="pv_graisses" class="text-orange">0</b> m³</li>
                 </ul>
             </div>
