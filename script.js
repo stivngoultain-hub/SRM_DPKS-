@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 3. إدارة التدخلات (مع الحقول الجديدة: Étape de traitement & Type de panne)
+    // 3. إدارة التدخلات
     let interventionPhotosMap = { "1": { avant: [], apres: [] } };
     let intCounter = 1;
 
@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 4. حفظ بيانات النقل في PV Évacuation
+    // 4. حفظ بيانات النقل
     document.getElementById('btnSavePVDetails').addEventListener('click', () => {
         const pvData = {
             societe: document.getElementById('pv_societe').value,
@@ -213,15 +213,17 @@ document.addEventListener('DOMContentLoaded', () => {
         alert("✔ Informations de transport enregistrées avec succès !");
     });
 
-    // 5. نظام PDF وتلوين حالات المعدات (Vert, Orange, Rouge)
+    // 5. نظام PDF
     function buildPdfContent(cardsToInclude) {
+        let logoImgSrc = document.getElementById('main-logo') ? document.getElementById('main-logo').src : 'logo.png';
+        
         let contentHTML = `
             <div style="border-bottom: 2px solid #e8eaed; padding-bottom: 12px; margin-bottom: 25px; display:flex; justify-content:space-between; align-items:flex-end;">
                 <div>
                     <h1 style="margin: 0; font-size: 26px; color: #202124; font-weight: 800; letter-spacing: -0.5px;">Rapport d'Exploitation</h1>
                     <p style="margin: 5px 0 0; font-size: 13px; color: #5f6368; font-weight: 500;">STEP El Kelaa des Sraghna &bull; <b>${document.getElementById('date_exp').value}</b></p>
                 </div>
-                <div><img src="logo.png" style="max-height: 50px; mix-blend-mode: multiply;"></div>
+                <div><img src="${logoImgSrc}" style="max-height: 50px; mix-blend-mode: multiply;" crossorigin="anonymous"></div>
             </div>
         `;
 
@@ -242,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h2 style="font-size: 15px; color: #1a73e8; border-bottom: 1px solid #e8eaed; padding-bottom: 6px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px;">${cardTitle}</h2>
             `;
 
-            if (cardNum === 3) { // البطاقة 3: Interventions
+            if (cardNum === 3) {
                 const blocks = card.querySelectorAll('.intervention-block');
                 if(blocks.length === 0) contentHTML += `<p style="font-size:13px; color:#80868b; font-style: italic;">Aucune intervention enregistrée.</p>`;
                 
@@ -288,12 +290,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     contentHTML += `</div>`;
                 });
             } 
-            else if (cardNum === 11) { // البطاقة 11: Observations
+            else if (cardNum === 11) {
                 let obs = document.getElementById('obs_text').value || 'Aucune observation enregistrée.';
                 contentHTML += `<div style="font-size:13px; color:#3c4043; line-height:1.6; background:#f8f9fa; border-left: 3px solid #fbbc04; padding:12px; border-radius:4px;">${obs.replace(/\n/g, '<br>')}</div>`;
             }
             else {
-                // تلوين الحالات في البطاقة الأولى (Etat des équipements) بناءً على طلبك
                 contentHTML += `<table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #3c4043;"><tbody>`;
                 const inputs = card.querySelectorAll('input, select');
                 let count = 0;
@@ -305,11 +306,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     let valStyle = "font-weight: 600;";
                     if (cardNum === 1) {
                         if (val === "Marche") {
-                            valStyle += " color: #2d8a35; background-color: #dff0e1; padding: 2px 6px; border-radius: 4px;"; // Vert
+                            valStyle += " color: #2d8a35; background-color: #dff0e1; padding: 2px 6px; border-radius: 4px; display: inline-block;";
                         } else if (val === "Arrêt") {
-                            valStyle += " color: #d94f1c; background-color: #fce6dc; padding: 2px 6px; border-radius: 4px;"; // Orange
+                            valStyle += " color: #d94f1c; background-color: #fce6dc; padding: 2px 6px; border-radius: 4px; display: inline-block;";
                         } else if (val === "Panne") {
-                            valStyle += " color: #ea5348; background-color: #f8e1e1; padding: 2px 6px; border-radius: 4px;"; // Rouge
+                            valStyle += " color: #ea5348; background-color: #f8e1e1; padding: 2px 6px; border-radius: 4px; display: inline-block;";
                         }
                     }
 
@@ -330,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         contentHTML += `
             <div style="margin-top: 30px; padding-top: 10px; border-top: 1px solid #e8eaed; text-align: center; font-size: 10px; color: #9aa0a6;">
-                Généré par SRM DPKS - Système de Gestion (Notebook Style)
+                SRM DPKS - Système de Gestion d'Exploitation STEP
             </div>
         `;
 
@@ -378,7 +379,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 6. الحفظ (Enregistrement)
+    // 6. الحفظ
     document.getElementById('stepForm').addEventListener('submit', (e) => {
         e.preventDefault();
         const dateKey = document.getElementById('date_exp').value;
@@ -423,7 +424,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const month = document.getElementById('date_exp').value.substring(0, 7);
         let tdg=0, tdf=0, ts=0, tg=0;
         
-        // استرجاع تفاصيل النقل المحفوظة إن وجدت
         let savedPvData = localStorage.getItem('PV_Transport_Details');
         if(savedPvData) {
             let pvd = JSON.parse(savedPvData);
