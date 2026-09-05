@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('new_pin').value = '';
     });
 
-    // 2. التنقل
+    // 2. التنقل بين التبويبات
     const navItems = document.querySelectorAll('.nav-item');
     const tabPanes = document.querySelectorAll('.tab-pane');
     navItems.forEach(btn => {
@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 3. التدخلات (Avant / Après)
+    // 3. إدارة التدخلات (Avant / Après)
     let interventionPhotosMap = { "1": { avant: [], apres: [] } };
     let intCounter = 1;
 
@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ================== 4. نظام PDF (حل المساحة البيضاء وفصل الصفحات) ==================
+    // ================== 4. نظام PDF (NotebookLM Style & logo.png القديم) ==================
     function buildPdfContent(cardsToInclude) {
         let contentHTML = `
             <div style="border-bottom: 2px solid #e8eaed; padding-bottom: 12px; margin-bottom: 25px; display:flex; justify-content:space-between; align-items:flex-end;">
@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h1 style="margin: 0; font-size: 26px; color: #202124; font-weight: 800; letter-spacing: -0.5px;">Rapport d'Exploitation</h1>
                     <p style="margin: 5px 0 0; font-size: 13px; color: #5f6368; font-weight: 500;">STEP El Kelaa des Sraghna &bull; <b>${document.getElementById('date_exp').value}</b></p>
                 </div>
-                <div><img src="logo.png" style="max-height: 50px;"></div>
+                <div><img src="logo.png" style="max-height: 50px; mix-blend-mode: multiply;"></div>
             </div>
         `;
 
@@ -199,7 +199,6 @@ document.addEventListener('DOMContentLoaded', () => {
             let cardNum = index + 1;
             if(!cardsToInclude.includes(cardNum)) return;
 
-            // فاصل صفحات إجباري إذا لم تكن هذه أول بطاقة يتم طباعتها (يمنع تداخل الجداول)
             let pageBreakStyle = (!isFirstIncluded && cardsToInclude.length > 1) ? 'page-break-before: always; padding-top: 20px;' : '';
             isFirstIncluded = false;
 
@@ -210,7 +209,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h2 style="font-size: 15px; color: #1a73e8; border-bottom: 1px solid #e8eaed; padding-bottom: 6px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px;">${cardTitle}</h2>
             `;
 
-            // التدخلات
             if (cardNum === 3) {
                 const blocks = card.querySelectorAll('.intervention-block');
                 if(blocks.length === 0) contentHTML += `<p style="font-size:13px; color:#80868b; font-style: italic;">Aucune intervention enregistrée.</p>`;
@@ -259,7 +257,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 contentHTML += `<div style="font-size:13px; color:#3c4043; line-height:1.6; background:#f8f9fa; border-left: 3px solid #fbbc04; padding:12px; border-radius:4px;">${obs.replace(/\n/g, '<br>')}</div>`;
             }
             else {
-                // الجداول مع (page-break-inside: avoid) لكل سطر لمنع القطع العشوائي
                 contentHTML += `<table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #3c4043;"><tbody>`;
                 const inputs = card.querySelectorAll('input, select');
                 let count = 0;
@@ -292,15 +289,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('pdf-dynamic-content').innerHTML = contentHTML;
     }
 
-    // دالة إنشاء الـ PDF المعدلة بالكامل لحل مشكلة الإزاحة البيضاء
     function generatePDF(filename) {
         const container = document.getElementById('pdf-master-container');
         const element = document.getElementById('pdf-dynamic-content');
         
-        // إظهار الحاوية مؤقتاً لتستطيع html2canvas رسمها
         container.style.visibility = 'visible';
-        
-        // حفظ موقع التمرير الحالي، والعودة لأعلى الصفحة لتجنب المساحة البيضاء
         const currentScroll = window.scrollY;
         window.scrollTo(0, 0); 
         
@@ -316,13 +309,11 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             jsPDF: { unit: 'in', format: 'A4', orientation: 'portrait' }
         }).from(element).save().then(() => {
-            // إخفاء الحاوية وإرجاع المستخدم لمكانه الطبيعي
             container.style.visibility = 'hidden';
             window.scrollTo(0, currentScroll);
         });
     }
 
-    // الأزرار
     document.getElementById('btnGenerateAllPDF').addEventListener('click', () => {
         buildPdfContent([1,2,3,4,5,6,7,8,9,10,11,12,13]);
         let d = document.getElementById('date_exp').value;
