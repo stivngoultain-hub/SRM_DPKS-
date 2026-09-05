@@ -62,7 +62,6 @@ body { background-color: var(--bg-color); color: var(--text-dark); padding-botto
 .modern-card, .global-info-card, .document-view { border-radius: 12px; border: 1px solid var(--srm-dark-blue); margin-bottom: 25px; overflow: hidden; }
 .global-info-card { background-color: var(--card-yellow); box-shadow: 5px 5px 0px var(--srm-dark-blue); padding: 22px; }
 
-/* Colors for cards (تم إعادة ترتيبها بعد حذف البطاقتين 7 و 11) */
 .modern-card:nth-of-type(1) { background-color: var(--card-teal); box-shadow: 5px 5px 0px var(--srm-teal); }
 .modern-card:nth-of-type(2) { background-color: var(--card-blue); box-shadow: 5px 5px 0px var(--srm-dark-blue); }
 .modern-card:nth-of-type(3) { background-color: var(--card-red); box-shadow: 5px 5px 0px var(--srm-red); border-color: var(--srm-red); } 
@@ -82,7 +81,6 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--s
 .readonly-input { background: var(--bg-color); color: var(--srm-orange); font-weight: bold; border-style: dashed; }
 .exceed-cctp { color: #8a1717 !important; background: #e8a2a2 !important; border-color: #b52a2a !important; }
 
-/* Dynamic Interventions Styles */
 .intervention-block { background: #ffffff; border: 1px solid var(--srm-red); padding: 15px; border-radius: 8px; margin-bottom: 15px; }
 .intervention-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--border-color); padding-bottom: 10px; margin-bottom: 15px; }
 .intervention-header h5 { color: var(--srm-dark-blue); font-size: 1.05rem; }
