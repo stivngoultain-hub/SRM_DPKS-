@@ -2,6 +2,7 @@
   "name": "SRM DPKS - STEP Kelaa des Sraghna",
   "short_name": "SRM DPKS",
   "id": "srm.dpks.step",
+  "package_id": "com.srm.dpks.step",
   "start_url": "./index.html",
   "scope": "./",
   "dir": "ltr",
