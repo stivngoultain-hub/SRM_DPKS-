@@ -4,14 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SRM DPKS - STEP Kelaa des Sraghna</title>
-    <!-- مكتبة الأيقونات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- مكتبة Excel -->
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-    <!-- مكتبة إنشاء PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    
-    <link rel="stylesheet" href="style.css?v=7">
+    <link rel="stylesheet" href="style.css?v=10">
 </head>
 <body>
     <div id="splash-screen">
@@ -38,7 +34,6 @@
         <!-- ================= TAB 1: SAISIE JOURNALIÈRE ================= -->
         <div id="tab-saisie" class="tab-pane active">
             <form id="stepForm">
-                <!-- المعلومات الأساسية -->
                 <div class="global-info-card">
                     <div class="input-group">
                         <label>Date d'exploitation</label>
@@ -65,7 +60,6 @@
                         <i class="fa-solid fa-chevron-down arrow"></i>
                     </button>
                     <div class="accordion-content">
-                        <!-- (نفس محتوى المعدات السابق) -->
                         <div class="form-grid">
                             <div class="full-width"><h4 class="section-subtitle">Relevage & Prétraitement</h4></div>
                             <div class="input-group"><label>Dég. grossier auto</label><select id="eq_dg_auto" class="eq-select"><option value="Marche">En Marche</option><option value="Arrêt">À l'arrêt</option><option value="Panne">En Panne</option></select></div>
@@ -110,7 +104,6 @@
                         <i class="fa-solid fa-chevron-down arrow"></i>
                     </button>
                     <div class="accordion-content">
-                        <!-- (نفس محتوى المستشعرات السابق) -->
                         <div class="form-grid">
                             <div class="input-group"><label>Sonde US DG</label><select id="inst_us_dg" class="eq-select"><option value="Bon">Bon état</option><option value="Panne">En Panne</option></select></div>
                             <div class="full-width"><h4 class="section-subtitle">Station de Relevage (SR)</h4></div>
@@ -148,14 +141,12 @@
                             <div class="input-group full-width"><label>Matériel utilisé</label><textarea id="interv_materiel" rows="2" placeholder="Outils, engins..."></textarea></div>
                             <div class="input-group full-width"><label>PDR utilisés (Pièces de rechange)</label><textarea id="interv_pdr" rows="2" placeholder="Roulements, joints..."></textarea></div>
                             
-                            <!-- رفع الصور -->
                             <div class="input-group full-width">
                                 <label><i class="fa-solid fa-camera"></i> Photos de l'intervention</label>
                                 <input type="file" id="interv_photos" accept="image/*" multiple class="file-upload-input">
                                 <div id="photos_preview" class="photos-preview-container mt-10"></div>
                             </div>
                             
-                            <!-- زر استخراج تقرير PDF للتدخل -->
                             <div class="input-group full-width mt-10">
                                 <button type="button" id="btnGeneratePDF" class="btn-primary w-100" style="background-color: var(--srm-dark-blue); box-shadow: 4px 4px 0px var(--srm-teal);"><i class="fa-solid fa-file-pdf"></i> Générer Rapport d'Intervention (PDF)</button>
                             </div>
@@ -163,10 +154,246 @@
                     </div>
                 </div>
 
-                <!-- 4. Débits إلى 11. Observations -->
-                <!-- (يرجى الاحتفاظ بباقي البطاقات من 4 إلى 11 كما هي تماماً لعدم إطالة الكود) -->
+                <!-- NEW: 4. DONNÉES D'EXPLOITATION -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-teal"><i class="fa-solid fa-chart-line"></i></div><span>4. DONNÉES D'EXPLOITATION</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
+                            <div class="input-group"><label>Index débit d'entrée</label><input type="number" id="idx_in" step="0.1"></div>
+                            <div class="input-group"><label class="text-orange">Débit d'entrée (Différence)</label><input type="number" id="diff_in" step="0.1" class="exploit-input"></div>
+                            
+                            <div class="input-group"><label>Index débit de sortie</label><input type="number" id="idx_out" step="0.1"></div>
+                            <div class="input-group"><label class="text-cyan">Débit de sortie (Différence)</label><input type="number" id="diff_out" step="0.1" class="exploit-input"></div>
+                            
+                            <div class="input-group"><label>Index Énergie électrique</label><input type="number" id="idx_nrj" step="0.1"></div>
+                            <div class="input-group"><label class="text-green">Énergie élect. (Différence)</label><input type="number" id="diff_nrj" step="0.1" class="exploit-input"></div>
+
+                            <div class="input-group"><label>Ratio 1j (Énergie / Débit In)</label><input type="number" id="ratio_1j" readonly class="readonly-input"></div>
+                            <div class="input-group"><label>Rendement (Débit Out / In)</label><input type="number" id="rendement" readonly class="readonly-input"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. DÉBITS -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-blue"><i class="fa-solid fa-clock"></i></div><span>5. DÉBITS (24H)</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="table-responsive">
+                            <table class="hourly-table">
+                                <thead><tr><th>HEURE</th><th>ENTRÉE (m³)</th><th>SORTIE (m³)</th></tr></thead>
+                                <tbody id="hourly-tbody"></tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td><strong>TOTAL</strong></td>
+                                        <td><input type="number" id="vol_entree" readonly class="readonly-input"></td>
+                                        <td><input type="number" id="vol_sortie" readonly class="readonly-input"></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. ENTRÉE STEP -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-green"><i class="fa-solid fa-arrow-right-to-bracket"></i></div><span>6. ENTRÉE STEP</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
+                            <div class="input-group"><label>H. Prélèvement</label><input type="time" id="e_hp"></div>
+                            <div class="input-group"><label>H. Analyse</label><input type="time" id="e_ha"></div>
+                            <div class="input-group"><label>pH</label><input type="number" id="e_ph" step="0.01"></div>
+                            <div class="input-group"><label>Température (ºC)</label><input type="number" id="e_temp" step="0.1"></div>
+                            <div class="input-group"><label>O2 dissous</label><input type="number" id="e_o2" step="0.01"></div>
+                            <div class="input-group"><label>Cond. (ms/cm)</label><input type="number" id="e_cond" step="0.001"></div>
+                            <div class="input-group"><label>MES (mg/l)</label><input type="number" id="e_mes" step="0.1" class="cctp-check" data-max="482.1"></div>
+                            <div class="input-group"><label>DBO5 (mgO2/l)</label><input type="number" id="e_dbo5" step="0.1" class="cctp-check" data-max="535.7"></div>
+                            <div class="input-group"><label>DCO TOTAL</label><input type="number" id="e_dco" step="0.1" class="cctp-check" data-max="1071.4"></div>
+                            <div class="input-group"><label>UVT (%)</label><input type="number" id="e_uvt" step="0.1"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. LITS BACTÉRIENS -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-blue"><i class="fa-solid fa-microbes"></i></div><span>7. LITS BACTÉRIENS</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
+                            <div class="input-group"><label>H. Prélèvement</label><input type="time" id="l_hp"></div>
+                            <div class="input-group"><label>H. Analyse</label><input type="time" id="l_ha"></div>
+                            <div class="input-group"><label>pH</label><input type="number" id="l_ph" step="0.01"></div>
+                            <div class="input-group"><label>Température (ºC)</label><input type="number" id="l_temp" step="0.1"></div>
+                            <div class="input-group"><label>O2 dissous</label><input type="number" id="l_o2" step="0.01"></div>
+                            <div class="input-group"><label>Cond. (mS)</label><input type="number" id="l_cond" step="0.001"></div>
+                            <div class="input-group"><label>MES (mg/l)</label><input type="number" id="l_mes" step="0.1" class="cctp-check" data-max="246.6"></div>
+                            <div class="input-group"><label>DBO5 (mgO2/l)</label><input type="number" id="l_dbo5" step="0.1" class="cctp-check" data-max="180.6"></div>
+                            <div class="input-group"><label>DCO TOTAL</label><input type="number" id="l_dco" step="0.1" class="cctp-check" data-max="361.2"></div>
+                            <div class="input-group"><label>UVT (%)</label><input type="number" id="l_uvt" step="0.1"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 8. DÉCANTEUR SECONDAIRE -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-orange"><i class="fa-solid fa-water"></i></div><span>8. DÉCANTEUR SEC.</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
+                            <div class="input-group"><label>Niveau Voile Boue (m)</label><input type="number" id="voile_boue" step="0.01"></div>
+                            <div class="input-group"><label>Taux Recirculation (%)</label><input type="number" id="taux_recirc" step="1"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 9. PARSHALL SORTIE -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-green"><i class="fa-solid fa-flag-checkered"></i></div><span>9. PARSHALL SORTIE</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
+                            <div class="input-group"><label>H. Prélèvement</label><input type="time" id="p_hp"></div>
+                            <div class="input-group"><label>H. Analyse</label><input type="time" id="p_ha"></div>
+                            <div class="input-group"><label>pH</label><input type="number" id="p_ph" step="0.01"></div>
+                            <div class="input-group"><label>Temp (ºC)</label><input type="number" id="p_temp" step="0.1"></div>
+                            <div class="input-group"><label>O2 dissous</label><input type="number" id="p_o2" step="0.01"></div>
+                            <div class="input-group"><label>Cond. (mS)</label><input type="number" id="p_cond" step="0.001"></div>
+                            <div class="input-group"><label>MES (mg/l)</label><input type="number" id="p_mes" step="0.1" class="cctp-check" data-max="75"></div>
+                            <div class="input-group"><label>DBO5 (mg/l)</label><input type="number" id="p_dbo5" step="0.1" class="cctp-check" data-max="50"></div>
+                            <div class="input-group"><label>DCO TOTAL</label><input type="number" id="p_dco" step="0.1" class="cctp-check" data-max="150"></div>
+                            <div class="input-group"><label>UVT (%)</label><input type="number" id="p_uvt" step="0.1"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 10. TERTIAIRE -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-cyan"><i class="fa-solid fa-filter"></i></div><span>10. TERTIAIRE</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
+                            <div class="input-group"><label>H. Prélèvement</label><input type="time" id="t_hp"></div>
+                            <div class="input-group"><label>H. Analyse</label><input type="time" id="t_ha"></div>
+                            <div class="input-group"><label>pH</label><input type="number" id="t_ph" step="0.01"></div>
+                            <div class="input-group"><label>Temp (ºC)</label><input type="number" id="t_temp" step="0.1"></div>
+                            <div class="input-group"><label>O2 dissous</label><input type="number" id="t_o2" step="0.01"></div>
+                            <div class="input-group"><label>Cond. (mS)</label><input type="number" id="t_cond" step="0.001"></div>
+                            <div class="input-group"><label>UFC C1</label><input type="number" id="t_ufc1" step="0.1" class="cctp-check" data-max="1000"></div>
+                            <div class="input-group"><label>UFC C2</label><input type="number" id="t_ufc2" step="0.1"></div>
+                            <div class="input-group"><label>Nématodes</label><input type="number" id="t_nem" step="0.1" class="cctp-check" data-max="0"></div>
+                            <div class="input-group"><label>UVT (%)</label><input type="number" id="t_uvt" step="0.1"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 11. QUALITÉ DES BOUES -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-orange"><i class="fa-solid fa-vial"></i></div><span>11. QUALITÉ DES BOUES</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
+                            <div class="input-group"><label>H. Prélèvement</label><input type="time" id="b_hp"></div>
+                            <div class="input-group"><label>H. Analyse</label><input type="time" id="b_ha"></div>
+                            <div class="input-group"><label>pH</label><input type="number" id="b_ph" step="0.01"></div>
+                            <div class="input-group"><label>Temp (ºC)</label><input type="number" id="b_temp" step="0.1"></div>
+                            <div class="input-group"><label>O2 dissous</label><input type="number" id="b_o2" step="0.01"></div>
+                            <div class="input-group"><label>Cond. (mS)</label><input type="number" id="b_cond" step="0.001"></div>
+                            <div class="input-group"><label>MES (mg/l)</label><input type="number" id="b_mes" step="0.1"></div>
+                            <div class="input-group"><label>MVS (mg/l)</label><input type="number" id="b_mvs" step="0.1"></div>
+                            <div class="input-group"><label>Siccité (%)</label><input type="number" id="b_siccite" step="0.1"></div>
+                            <div class="input-group"><label>Lieu Prélèvement</label><input type="text" id="b_lieu"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 12. CONSO. & RÉACTIFS -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-teal"><i class="fa-solid fa-bolt" style="color:var(--srm-teal)"></i></div><span style="color:var(--srm-teal)">12. CONSO. & RÉACTIFS</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
+                            <div class="input-group full-width"><label class="text-orange">Conso. Énergie (kWh)</label><input type="number" id="cons_nrj" step="0.1"></div>
+                            <div class="input-group"><label class="text-cyan">Taux de Conso.</label><input type="number" id="taux_nrj" readonly class="readonly-input"></div>
+                            <div class="input-group"><label>Heures fnct GE</label><input type="number" id="h_ge" step="0.1"></div>
+                            <div class="input-group"><label>Polymère (Kg)</label><input type="number" id="poly_kg" step="0.1"></div>
+                            <div class="input-group"><label>Chlore/Javel (L)</label><input type="number" id="chlore_l" step="0.1"></div>
+                        </div>
+                    </div>
+                </div>
                 
-                <!-- سأضع زر الحفظ النهائي هنا -->
+                <!-- 13. GESTION DES DÉCHETS -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-blue"><i class="fa-solid fa-cubes-stacked"></i></div><span>13. GESTION DES DÉCHETS</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
+                            <div class="input-group"><label>Bassin Purgé</label><input type="text" id="bass_purge"></div>
+                            <div class="input-group"><label>Boues Purgés (m³)</label><input type="number" id="v_boue_p" step="0.1"></div>
+                            <div class="input-group"><label>Boues Sèches (m³)</label><input type="number" id="v_boue_s" step="0.1"></div>
+                            <div class="input-group"><label>Boues Évacuées (m³)</label><input type="number" id="v_boue_e" step="0.1"></div>
+                            <div class="input-group"><label>Déchets DG (m³)</label><input type="number" id="v_dg" step="0.1"></div>
+                            <div class="input-group"><label>Déchets DF (m³)</label><input type="number" id="v_df" step="0.1"></div>
+                            <div class="input-group"><label>Sables Évacués (m³)</label><input type="number" id="v_sables" step="0.1"></div>
+                            <div class="input-group"><label>Graisses (m³)</label><input type="number" id="v_graisses" step="0.1"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NEW: 14. EXTRACTION (M3) -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-red"><i class="fa-solid fa-truck-ramp-box"></i></div><span>14. EXTRACTION EN (M³)</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid">
+                            <div class="input-group"><label>Déchets grossiers</label><input type="number" id="ext_dg" step="0.1"></div>
+                            <div class="input-group"><label>Déchets fins</label><input type="number" id="ext_df" step="0.1"></div>
+                            <div class="input-group"><label>Sable</label><input type="number" id="ext_sable" step="0.1"></div>
+                            <div class="input-group"><label>Graisses</label><input type="number" id="ext_graisse" step="0.1"></div>
+                            <div class="input-group"><label>Boues primaires</label><input type="number" id="ext_bp" step="0.1"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 15. OBSERVATIONS -->
+                <div class="modern-card accordion-item">
+                    <button type="button" class="accordion-header">
+                        <div class="header-title"><div class="icon-box bg-yellow"><i class="fa-solid fa-clipboard-list"></i></div><span>15. OBSERVATIONS</span></div>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="form-grid" style="grid-template-columns: 1fr;">
+                            <div class="input-group">
+                                <label>Remarques / Anomalies</label>
+                                <textarea id="obs_text" rows="3" style="width: 100%; border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-bg); padding: 12px; color: var(--text-dark); font-weight: 600;" placeholder="RAS..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-actions-padding mt-20">
                     <button type="submit" class="btn-primary w-100"><i class="fa-solid fa-floppy-disk"></i> Enregistrer la fiche de saisie</button>
                 </div>
@@ -179,78 +406,120 @@
                 <h3 class="text-center mb-15"><i class="fa-solid fa-file-excel"></i> Exportation Excel</h3>
                 <p class="text-center mb-15">Génère le rapport complet de la STEP sous format Excel.</p>
                 <input type="month" id="exportMonth" class="mb-15 w-100">
-                <button type="button" id="btnExportExcel" class="btn-secondary w-100"><i class="fa-solid fa-download"></i> Télécharger le Fichier</button>
+                <button type="button" id="btnExportExcel" class="btn-secondary w-100"><i class="fa-solid fa-download"></i> Télécharger le Fichier Excel Complet</button>
             </div>
         </div>
 
-        <!-- TAB 3 و TAB 4 (احتفظ بها كما هي) -->
+        <!-- ================= TAB 3: PV EVACUATION ================= -->
+        <div id="tab-pv" class="tab-pane">
+            <div class="modern-card p-20 document-view">
+                <h3 class="text-center text-cyan">PV D'ÉVACUATION DES DÉCHETS</h3>
+                <p class="text-center text-muted mb-15">STEP EL KELAA DE SRAGHNA</p>
+                <hr class="mb-15">
+                <p><strong>Représentants SRM DPKS :</strong></p>
+                <ul class="waste-list mt-10">
+                    <li>Mr. Said AIT ALI (Tech. d'exploitation)</li>
+                    <li>Mr. Abdelilah Chouki (Tech. de maintenance)</li>
+                    <li>Mr. Abdelkader (Tech. Laboratoire)</li>
+                </ul>
+                <hr class="mt-15 mb-15">
+                <ul class="waste-list mt-10">
+                    <li>Boues évacuées : <b id="pv_boues" class="text-orange">0</b> m³</li>
+                    <li>Déchets DG : <b id="pv_dg" class="text-orange">0</b> m³</li>
+                    <li>Déchets DF : <b id="pv_df" class="text-orange">0</b> m³</li>
+                    <li>Sables évacués : <b id="pv_sables" class="text-orange">0</b> m³</li>
+                    <li>Graisses évacuées : <b id="pv_graisses" class="text-orange">0</b> m³</li>
+                </ul>
+            </div>
+        </div>
 
+        <!-- ================= TAB 4: ATTACHEMENT ================= -->
+        <div id="tab-finance" class="tab-pane">
+            <div class="modern-card p-20" style="background: var(--card-green);">
+                <h3 class="text-center mb-15"><i class="fa-solid fa-file-invoice-dollar"></i> ATTACHEMENT FINANCIER</h3>
+                <p class="text-center mb-15">Saisie des montants mensuels (en MAD)</p>
+                <form id="financeForm">
+                    <div class="input-group mb-12"><label>Chef d'exploitation</label><input type="number" id="fin_chef" class="fin-input" step="0.01"></div>
+                    <div class="input-group mb-12"><label>Laborantin</label><input type="number" id="fin_labo" class="fin-input" step="0.01"></div>
+                    <div class="input-group mb-12"><label>Tech. électromécanicien</label><input type="number" id="fin_electro" class="fin-input" step="0.01"></div>
+                    <div class="input-group mb-20"><label>Evacuation des boues</label><input type="number" id="fin_boues" class="fin-input" step="0.01"></div>
+                    <div class="global-info-card mt-15" style="box-shadow: none;">
+                        <div class="input-group mb-12"><label>TOTAL HT</label><input type="text" id="fin_total_ht" readonly class="readonly-input" value="0.00"></div>
+                        <div class="input-group mb-12"><label>TVA (20%)</label><input type="text" id="fin_tva" readonly class="readonly-input" value="0.00"></div>
+                        <div class="input-group"><label class="text-cyan font-bold">TOTAL TTC</label><input type="text" id="fin_total_ttc" readonly class="readonly-input" value="0.00"></div>
+                    </div>
+                    <button type="button" id="btnSaveFinance" class="btn-primary w-100 mt-20"><i class="fa-solid fa-floppy-disk"></i> Enregistrer</button>
+                </form>
+            </div>
+        </div>
     </main>
 
-    <!-- ================= القالب المخفي لتقرير الـ PDF ================= -->
-    <!-- هذا الجزء لا يظهر على الشاشة، بل يتم تحويله لـ PDF عند الضغط على الزر -->
-    <div id="pdf-report-container" style="display: none; position: absolute; top: -9999px; left: -9999px;">
-        <div id="pdf-report-content" style="padding: 40px; font-family: 'Segoe UI', Arial, sans-serif; background: #ffffff; color: #1c3d5a; width: 800px;">
-            
-            <!-- الترويسة والشعار -->
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #358898; padding-bottom: 15px; margin-bottom: 25px;">
-                <img src="logo.png" id="pdf_logo" alt="Logo SRM" style="max-height: 70px;">
+    <!-- ================= قالب PDF الاحترافي (GMAO) ================= -->
+    <div id="pdf-report-container" style="display: none; position: absolute; z-index: -9999; top: 0; left: 0; width: 800px; background: #fff;">
+        <div id="pdf-report-content" style="padding: 40px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #ffffff; color: #1c3d5a;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 4px solid #1c3d5a; padding-bottom: 15px; margin-bottom: 25px;">
+                <div><img src="logo.png" id="pdf_logo" alt="Logo SRM" style="max-height: 75px;"></div>
                 <div style="text-align: right;">
-                    <h1 style="margin: 0; color: #1c3d5a; font-size: 24px; text-transform: uppercase;">Rapport d'Intervention</h1>
-                    <p style="margin: 5px 0 0; font-size: 14px; color: #4a637c; font-weight: bold;">STEP Kelaa des Sraghna</p>
+                    <h1 style="margin: 0; color: #1c3d5a; font-size: 26px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">Rapport d'Intervention</h1>
+                    <p style="margin: 5px 0 0; font-size: 14px; color: #358898; font-weight: bold;">GMAO - STEP Kelaa des Sraghna</p>
+                    <p style="margin: 5px 0 0; font-size: 12px; color: #64748b;">Réf: INT-<span id="pdf_ref"></span></p>
                 </div>
             </div>
 
-            <!-- التاريخ والوقت -->
-            <div style="margin-bottom: 30px; font-size: 15px; background: #f4f7fa; padding: 15px; border-left: 4px solid #ea5348;">
-                <p style="margin: 0;"><strong>Édité le :</strong> <span id="pdf_date_heure"></span></p>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 25px; background: #f8fafc; padding: 15px; border-left: 5px solid #ea5348; border-radius: 4px;">
+                <div style="width: 48%;">
+                    <p style="margin: 0 0 5px; font-size: 12px; color: #64748b; text-transform: uppercase;">Date d'édition :</p>
+                    <p style="margin: 0; font-size: 15px; font-weight: bold; color: #1c3d5a;" id="pdf_date_heure"></p>
+                </div>
+                <div style="width: 48%;">
+                    <p style="margin: 0 0 5px; font-size: 12px; color: #64748b; text-transform: uppercase;">Équipe technique :</p>
+                    <p style="margin: 0; font-size: 15px; font-weight: bold; color: #1c3d5a;">Service Maintenance SRM DPKS</p>
+                </div>
             </div>
 
-            <!-- تفاصيل التدخل -->
-            <h3 style="border-bottom: 2px solid #cbd5e1; padding-bottom: 8px; margin-bottom: 15px; color: #1c3d5a;">Détails de l'intervention</h3>
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; font-size: 14px;">
-                <tr>
-                    <td style="padding: 12px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: bold; width: 35%;">Équipement concerné</td>
-                    <td style="padding: 12px; border: 1px solid #cbd5e1;" id="pdf_equip"></td>
-                </tr>
-                <tr>
-                    <td style="padding: 12px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: bold;">Puissance (kW)</td>
-                    <td style="padding: 12px; border: 1px solid #cbd5e1;" id="pdf_puiss"></td>
-                </tr>
-                <tr>
-                    <td style="padding: 12px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: bold;">Rôle de l'équipement</td>
-                    <td style="padding: 12px; border: 1px solid #cbd5e1;" id="pdf_role"></td>
-                </tr>
-                <tr>
-                    <td style="padding: 12px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: bold;">Date dernière intervention</td>
-                    <td style="padding: 12px; border: 1px solid #cbd5e1;" id="pdf_date_int"></td>
-                </tr>
-                <tr>
-                    <td style="padding: 12px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: bold;">Durée de l'intervention (Heures)</td>
-                    <td style="padding: 12px; border: 1px solid #cbd5e1;" id="pdf_duree"></td>
-                </tr>
-                <tr>
-                    <td style="padding: 12px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: bold;">Matériel utilisé</td>
-                    <td style="padding: 12px; border: 1px solid #cbd5e1;" id="pdf_materiel"></td>
-                </tr>
-                <tr>
-                    <td style="padding: 12px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: bold;">Pièces de rechange (PDR) utilisées</td>
-                    <td style="padding: 12px; border: 1px solid #cbd5e1;" id="pdf_pdr"></td>
-                </tr>
+            <h3 style="color: #1c3d5a; font-size: 16px; margin-bottom: 10px; border-bottom: 2px solid #358898; padding-bottom: 5px; text-transform: uppercase;">1. Identification de l'équipement</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 14px;">
+                <tbody>
+                    <tr><td style="padding: 10px 15px; background-color: #e2e8f0; border: 1px solid #cbd5e1; font-weight: bold; width: 35%; color: #1c3d5a;">Équipement Concerné</td><td style="padding: 10px 15px; border: 1px solid #cbd5e1; font-weight: bold; color: #ea5348;" id="pdf_equip"></td></tr>
+                    <tr><td style="padding: 10px 15px; background-color: #e2e8f0; border: 1px solid #cbd5e1; font-weight: bold; color: #1c3d5a;">Rôle / Fonction</td><td style="padding: 10px 15px; border: 1px solid #cbd5e1;" id="pdf_role"></td></tr>
+                    <tr><td style="padding: 10px 15px; background-color: #e2e8f0; border: 1px solid #cbd5e1; font-weight: bold; color: #1c3d5a;">Puissance (kW)</td><td style="padding: 10px 15px; border: 1px solid #cbd5e1;" id="pdf_puiss"></td></tr>
+                </tbody>
             </table>
 
-            <!-- الصور المرفقة -->
-            <h3 style="border-bottom: 2px solid #cbd5e1; padding-bottom: 8px; margin-bottom: 15px; color: #1c3d5a;">Photos documentaires</h3>
-            <div id="pdf_photos_container" style="display: flex; flex-wrap: wrap; gap: 15px;">
-                <!-- سيتم حقن الصور هنا برمجياً -->
+            <h3 style="color: #1c3d5a; font-size: 16px; margin-bottom: 10px; border-bottom: 2px solid #358898; padding-bottom: 5px; text-transform: uppercase;">2. Détails de l'intervention</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 14px;">
+                <thead>
+                    <tr style="background-color: #1c3d5a; color: #ffffff;"><th style="padding: 10px; border: 1px solid #cbd5e1; text-align: left; width: 50%;">Matériel & Outillage Utilisé</th><th style="padding: 10px; border: 1px solid #cbd5e1; text-align: left; width: 50%;">Pièces de Rechange (PDR) Consommées</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td style="padding: 15px; border: 1px solid #cbd5e1; vertical-align: top; background: #ffffff; min-height: 80px;" id="pdf_materiel"></td><td style="padding: 15px; border: 1px solid #cbd5e1; vertical-align: top; background: #ffffff;" id="pdf_pdr"></td></tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2" style="padding: 10px 15px; background-color: #f1f5f9; border: 1px solid #cbd5e1;">
+                            <strong>Date d'intervention :</strong> <span id="pdf_date_int" style="margin-right: 30px; color: #358898;"></span>
+                            <strong>Durée de l'arrêt :</strong> <span id="pdf_duree" style="color: #ea5348; font-weight: bold;"></span> H
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <h3 style="color: #1c3d5a; font-size: 16px; margin-bottom: 15px; border-bottom: 2px solid #358898; padding-bottom: 5px; text-transform: uppercase;">3. Documentation Photographique</h3>
+            <div id="pdf_photos_container" style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 40px; justify-content: center;"></div>
+
+            <div style="display: flex; justify-content: space-between; margin-top: auto; padding-top: 20px; border-top: 1px dashed #cbd5e1;">
+                <div style="text-align: center; width: 45%;">
+                    <p style="margin: 0; font-weight: bold; color: #1c3d5a; font-size: 13px;">Visa du Chef d'Exploitation</p>
+                    <div style="height: 70px; margin-top: 10px; border: 1px solid #cbd5e1; border-radius: 4px; background: #f8fafc;"></div>
+                </div>
+                <div style="text-align: center; width: 45%;">
+                    <p style="margin: 0; font-weight: bold; color: #1c3d5a; font-size: 13px;">Visa du Technicien de Maintenance</p>
+                    <div style="height: 70px; margin-top: 10px; border: 1px solid #cbd5e1; border-radius: 4px; background: #f8fafc;"></div>
+                </div>
             </div>
-            
-            <div style="margin-top: 50px; text-align: right; font-style: italic; color: #4a637c;">
-                <p>Signature (Équipe de Maintenance)</p>
-            </div>
+            <div style="text-align: center; margin-top: 15px; font-size: 10px; color: #94a3b8;">Document généré automatiquement par l'application SRM DPKS - STEP El Kelaa des Sraghna</div>
         </div>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
