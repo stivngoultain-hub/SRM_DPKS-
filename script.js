@@ -33,17 +33,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     fetchAutoWeather();
 
-    // حساب آلي لـ Ratio 1j
+    // Ratio 1j auto
     document.querySelectorAll('.exploit-input').forEach(input => {
         input.addEventListener('input', () => {
             let diffIn = parseFloat(document.getElementById('diff_in').value) || 0;
             let diffNrj = parseFloat(document.getElementById('diff_nrj').value) || 0;
-            
-            if (diffIn > 0) {
-                document.getElementById('ratio_1j').value = (diffNrj / diffIn).toFixed(3);
-            } else {
-                document.getElementById('ratio_1j').value = '';
-            }
+            if (diffIn > 0) document.getElementById('ratio_1j').value = (diffNrj / diffIn).toFixed(3);
+            else document.getElementById('ratio_1j').value = '';
         });
     });
 
@@ -56,113 +52,239 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.querySelectorAll('.accordion-header').forEach(h => {
-        h.addEventListener('click', () => {
+        h.addEventListener('click', (e) => {
+            // تجاهل النقر إذا كان على زر الطباعة
+            if(e.target.classList.contains('btn-print-card')) return;
             h.nextElementSibling.classList.toggle('active');
             h.classList.toggle('active-header');
         });
     });
 
-    let interventionPhotosBase64 = [];
-    document.getElementById('interv_photos').addEventListener('change', function(e) {
-        const previewContainer = document.getElementById('photos_preview');
-        previewContainer.innerHTML = ''; 
-        interventionPhotosBase64 = [];
-        const files = Array.from(e.target.files);
-        files.forEach(file => {
-            if(file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const base64Str = event.target.result;
-                    interventionPhotosBase64.push(base64Str);
-                    const img = document.createElement('img');
-                    img.src = base64Str;
-                    previewContainer.appendChild(img);
-                };
-                reader.readAsDataURL(file);
-            }
+    // إدارة التدخلات المتعددة (Interventions)
+    let interventionPhotosMap = { "1": [] };
+    let intCounter = 1;
+
+    document.getElementById('btnAddIntervention').addEventListener('click', () => {
+        intCounter++;
+        interventionPhotosMap[intCounter.toString()] = [];
+        const container = document.getElementById('interventions_container');
+        const newBlock = document.createElement('div');
+        newBlock.className = 'intervention-block';
+        newBlock.setAttribute('data-id', intCounter.toString());
+        newBlock.innerHTML = `
+            <div class="intervention-header">
+                <h5>Intervention #${intCounter}</h5>
+                <button type="button" class="btn-remove-int"><i class="fa-solid fa-trash"></i></button>
+            </div>
+            <div class="form-grid">
+                <div class="input-group full-width"><label>Équipement d'intervention</label><input type="text" class="int_equip" placeholder="Ex: Pompe..."></div>
+                <div class="input-group"><label>Puissance (kW)</label><input type="text" class="int_puiss"></div>
+                <div class="input-group"><label>Rôle</label><input type="text" class="int_role"></div>
+                <div class="input-group"><label>Date d'intervention</label><input type="date" class="int_date"></div>
+                <div class="input-group"><label>Durée (Heures)</label><input type="number" class="int_duree" step="0.5"></div>
+                <div class="input-group full-width"><label>Matériel utilisé</label><textarea class="int_materiel" rows="2"></textarea></div>
+                <div class="input-group full-width"><label>PDR utilisés</label><textarea class="int_pdr" rows="2"></textarea></div>
+                <div class="input-group full-width">
+                    <label><i class="fa-solid fa-camera"></i> Photos</label>
+                    <input type="file" accept="image/*" multiple class="file-upload-input int_photos_input">
+                    <div class="photos-preview-container mt-10"></div>
+                </div>
+            </div>
+        `;
+        container.appendChild(newBlock);
+
+        // زر الحذف
+        newBlock.querySelector('.btn-remove-int').addEventListener('click', function() {
+            delete interventionPhotosMap[intCounter.toString()];
+            newBlock.remove();
         });
     });
 
-    // استخراج PDF مع حل نهائي لمشكلة الورقة البيضاء
-    document.getElementById('btnGeneratePDF').addEventListener('click', () => {
-        let equipName = document.getElementById('interv_equip').value;
-        if(!equipName) return alert("Veuillez saisir au moins le nom de l'équipement d'intervention dans l'onglet 'Saisie' (Section 3) !");
-
-        let now = new Date();
-        let dateTimeStr = now.toLocaleDateString('fr-FR') + ' à ' + now.toLocaleTimeString('fr-FR');
-        document.getElementById('pdf_date_heure').innerText = dateTimeStr;
-        document.getElementById('pdf_ref').innerText = Math.floor(1000 + Math.random() * 9000) + '-' + now.getFullYear();
-
-        document.getElementById('pdf_equip').innerText = equipName;
-        document.getElementById('pdf_puiss').innerText = document.getElementById('interv_puiss').value || 'Non spécifié';
-        document.getElementById('pdf_role').innerText = document.getElementById('interv_role').value || 'Non spécifié';
-        
-        let intDateRaw = document.getElementById('interv_date').value;
-        document.getElementById('pdf_date_int').innerText = intDateRaw ? new Date(intDateRaw).toLocaleDateString('fr-FR') : 'Non spécifiée';
-        document.getElementById('pdf_duree').innerText = document.getElementById('interv_duree').value || '0';
-        
-        let mat = document.getElementById('interv_materiel').value || 'Aucun matériel particulier';
-        document.getElementById('pdf_materiel').innerHTML = mat.replace(/\n/g, '<br>');
-        let pdr = document.getElementById('interv_pdr').value || 'Aucune pièce remplacée';
-        document.getElementById('pdf_pdr').innerHTML = pdr.replace(/\n/g, '<br>');
-
-        let photosContainer = document.getElementById('pdf_photos_container');
-        photosContainer.innerHTML = '';
-        if(interventionPhotosBase64.length === 0) {
-            photosContainer.innerHTML = '<p style="color: #94a3b8; font-style: italic; width:100%; text-align:center;">Aucune photo jointe pour cette intervention.</p>';
-        } else {
-            interventionPhotosBase64.forEach(src => {
-                let img = document.createElement('img');
-                img.src = src;
-                img.style.width = "45%"; img.style.height = "180px"; img.style.objectFit = "cover"; 
-                img.style.border = "3px solid #e2e8f0"; img.style.borderRadius = "6px";
-                photosContainer.appendChild(img);
+    // استماع لرفع الصور للتدخلات الحالية والمستقبلية (Event Delegation)
+    document.getElementById('interventions_container').addEventListener('change', function(e) {
+        if(e.target.classList.contains('int_photos_input')) {
+            const block = e.target.closest('.intervention-block');
+            const blockId = block.getAttribute('data-id');
+            const previewContainer = block.querySelector('.photos-preview-container');
+            previewContainer.innerHTML = '';
+            interventionPhotosMap[blockId] = [];
+            
+            Array.from(e.target.files).forEach(file => {
+                if(file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const b64 = event.target.result;
+                        interventionPhotosMap[blockId].push(b64);
+                        const img = document.createElement('img');
+                        img.src = b64;
+                        previewContainer.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                }
             });
         }
+    });
 
-        const element = document.getElementById('pdf-report-content');
+    // ================== نظام PDF الاحترافي (أسلوب NotebookLM) ==================
+    function buildPdfContent(cardsToInclude) {
+        let contentHTML = `
+            <div style="border-bottom: 2px solid #e0e0e0; padding-bottom: 20px; margin-bottom: 30px; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <h1 style="margin: 0; font-size: 24px; color: #202124; font-weight: 700;">Rapport d'Exploitation</h1>
+                    <p style="margin: 5px 0 0; font-size: 14px; color: #5f6368;">STEP El Kelaa des Sraghna - Date : <b>${document.getElementById('date_exp').value}</b></p>
+                </div>
+                <div><img src="logo.png" style="max-height: 50px;"></div>
+            </div>
+        `;
+
+        const allCards = document.querySelectorAll('.accordion-item');
         
-        // استخدام html2pdf مباشرة لأن الحاوية الآن موجودة ومبنية دائماً خارج الشاشة (left: -10000px)
+        allCards.forEach((card, index) => {
+            let cardNum = index + 1;
+            if(!cardsToInclude.includes(cardNum)) return; // سكيب إذا لم يتم اختيار البطاقة
+
+            let cardTitle = card.querySelector('.header-title span').innerText;
+            contentHTML += `
+                <div style="page-break-inside: avoid; margin-bottom: 35px;">
+                    <h2 style="font-size: 16px; color: #1a73e8; border-bottom: 1px solid #1a73e8; padding-bottom: 5px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px;">${cardTitle}</h2>
+            `;
+
+            // معالجة خاصة لبطاقة التدخلات (رقم 3)
+            if (cardNum === 3) {
+                const blocks = card.querySelectorAll('.intervention-block');
+                if(blocks.length === 0) contentHTML += `<p style="font-size:12px; color:#5f6368;">Aucune intervention enregistrée.</p>`;
+                blocks.forEach(block => {
+                    let id = block.getAttribute('data-id');
+                    let equip = block.querySelector('.int_equip').value || '-';
+                    let puiss = block.querySelector('.int_puiss').value || '-';
+                    let role = block.querySelector('.int_role').value || '-';
+                    let date = block.querySelector('.int_date').value || '-';
+                    let duree = block.querySelector('.int_duree').value || '-';
+                    let mat = block.querySelector('.int_materiel').value || '-';
+                    let pdr = block.querySelector('.int_pdr').value || '-';
+
+                    contentHTML += `
+                        <div style="background:#f8f9fa; border:1px solid #dadce0; border-radius:8px; padding:15px; margin-bottom:15px; page-break-inside: avoid;">
+                            <h4 style="margin:0 0 10px 0; color:#202124; font-size:14px;">Équipement: ${equip}</h4>
+                            <table style="width:100%; font-size:12px; border-collapse: collapse; margin-bottom:10px;">
+                                <tr><td style="padding:4px 0; width:50%;"><b>Puissance:</b> ${puiss}</td><td style="padding:4px 0;"><b>Rôle:</b> ${role}</td></tr>
+                                <tr><td style="padding:4px 0;"><b>Date:</b> ${date}</td><td style="padding:4px 0;"><b>Durée:</b> ${duree} H</td></tr>
+                                <tr><td style="padding:4px 0; border-top:1px dashed #dadce0;" colspan="2"><b>Matériel:</b> ${mat}</td></tr>
+                                <tr><td style="padding:4px 0; border-top:1px dashed #dadce0;" colspan="2"><b>Pièces:</b> ${pdr}</td></tr>
+                            </table>
+                    `;
+                    // الصور
+                    let photos = interventionPhotosMap[id];
+                    if(photos && photos.length > 0) {
+                        contentHTML += `<div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">`;
+                        photos.forEach(p => {
+                            contentHTML += `<img src="${p}" style="width:150px; height:100px; object-fit:cover; border-radius:4px; border:1px solid #dadce0;">`;
+                        });
+                        contentHTML += `</div>`;
+                    }
+                    contentHTML += `</div>`;
+                });
+            } 
+            else if (cardNum === 13) { // الملاحظات
+                let obs = document.getElementById('obs_text').value || 'Aucune observation.';
+                contentHTML += `<p style="font-size:13px; color:#202124; line-height:1.6; background:#f1f3f4; padding:12px; border-radius:6px;">${obs.replace(/\n/g, '<br>')}</p>`;
+            }
+            else {
+                // البطاقات العادية (جداول البيانات)
+                contentHTML += `<table style="width: 100%; border-collapse: collapse; font-size: 12px; color: #202124;"><tbody>`;
+                const inputs = card.querySelectorAll('input, select');
+                let count = 0;
+                inputs.forEach(input => {
+                    let label = input.previousElementSibling ? input.previousElementSibling.innerText : '';
+                    if(!label) return;
+                    let val = input.value || '-';
+                    
+                    if (count % 2 === 0) contentHTML += `<tr>`;
+                    contentHTML += `
+                        <td style="padding: 8px; border-bottom: 1px solid #f1f3f4; width: 25%; font-weight: 600; color:#5f6368;">${label}</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #f1f3f4; width: 25%;">${val}</td>
+                    `;
+                    if (count % 2 === 1) contentHTML += `</tr>`;
+                    count++;
+                });
+                if (count % 2 !== 0) contentHTML += `<td colspan="2" style="border-bottom: 1px solid #f1f3f4;"></td></tr>`; // إغلاق السطر إذا كان فردي
+                contentHTML += `</tbody></table>`;
+            }
+            
+            contentHTML += `</div>`;
+        });
+
+        // تذييل الصفحة
+        contentHTML += `
+            <div style="margin-top: 40px; padding-top: 15px; border-top: 1px solid #e0e0e0; text-align: center; font-size: 10px; color: #9aa0a6;">
+                Document généré par l'application SRM DPKS - Kelaa des Sraghna
+            </div>
+        `;
+
+        document.getElementById('pdf-dynamic-content').innerHTML = contentHTML;
+    }
+
+    function generatePDF(filename) {
+        const element = document.getElementById('pdf-dynamic-content');
         html2pdf().set({
-            margin: 0.2, 
-            filename: `Intervention_${equipName.replace(/[^a-z0-9]/gi, '_')}_${now.toISOString().split('T')[0]}.pdf`,
+            margin: 0.4, 
+            filename: filename,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2, useCORS: true },
             jsPDF: { unit: 'in', format: 'A4', orientation: 'portrait' }
-        }).from(element).save().catch(err => { console.error("PDF Error: ", err); });
+        }).from(element).save();
+    }
+
+    // زر الطباعة الشامل (كل البطاقات 1 إلى 13)
+    document.getElementById('btnGenerateAllPDF').addEventListener('click', () => {
+        buildPdfContent([1,2,3,4,5,6,7,8,9,10,11,12,13]);
+        let d = document.getElementById('date_exp').value;
+        generatePDF(`Rapport_Complet_STEP_${d}.pdf`);
     });
 
+    // أزرار الطباعة الفردية (في رأس كل بطاقة)
+    document.querySelectorAll('.btn-print-card').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation(); // لمنع طي/فتح البطاقة
+            let cardId = parseInt(this.getAttribute('data-card'));
+            buildPdfContent([cardId]);
+            let d = document.getElementById('date_exp').value;
+            generatePDF(`Rapport_Section_${cardId}_STEP_${d}.pdf`);
+        });
+    });
+
+    // ================== الحفظ ==================
     document.getElementById('stepForm').addEventListener('submit', (e) => {
         e.preventDefault();
         const dateKey = document.getElementById('date_exp').value;
 
-        const eqList = [ 'eq_dg_auto', 'eq_dg_man', 'eq_pr1', 'eq_pr2', 'eq_pr3', 'eq_pr4', 'eq_df1', 'eq_df2', 'eq_aero1', 'eq_aero2', 'eq_rac1', 'eq_rac2', 'eq_ps1', 'eq_ps2', 'eq_pg', 'eq_agi', 'eq_cg', 'eq_cs', 'eq_rad', 'eq_palb1', 'eq_palb2', 'eq_palb3', 'eq_palb4', 'eq_sp1', 'eq_sp2', 'eq_vent1', 'eq_vent2', 'eq_pont1', 'eq_pont2'];
-        const instList = [ 'inst_us_dg', 'inst_poire_sr1', 'inst_poire_sr2', 'inst_poire_sr3', 'inst_poire_sr4', 'inst_us_df1', 'inst_us_df2', 'inst_poire_gr1', 'inst_poire_gr2', 'inst_poire_gr3', 'inst_us_salb', 'inst_poire_salb'];
-        
-        let equipData = {}; let pannes = [];
-        eqList.forEach(id => { let el = document.getElementById(id); if(el){ equipData[id] = el.value; if(el.value === 'Panne') pannes.push(el.previousElementSibling.innerText); } });
-        instList.forEach(id => { let el = document.getElementById(id); if(el){ equipData[id] = el.value; if(el.value === 'Panne') pannes.push(el.previousElementSibling.innerText); } });
+        // تجميع التدخلات (Interventions)
+        let savedInterventions = [];
+        document.querySelectorAll('.intervention-block').forEach(block => {
+            savedInterventions.push({
+                equip: block.querySelector('.int_equip').value,
+                puiss: block.querySelector('.int_puiss').value,
+                role: block.querySelector('.int_role').value,
+                date: block.querySelector('.int_date').value,
+                duree: block.querySelector('.int_duree').value,
+                mat: block.querySelector('.int_materiel').value,
+                pdr: block.querySelector('.int_pdr').value
+            });
+        });
 
         const dataToSave = {
             date: dateKey, meteo: document.getElementById('meteo').value, t_amb: document.getElementById('t_amb').value, pluvio: document.getElementById('pluvio').value,
-            equipData: equipData, pannesStr: pannes.length > 0 ? pannes.join(" | ") : "Aucune",
-            interventions: { equip: document.getElementById('interv_equip').value, duree: document.getElementById('interv_duree').value, pdr: document.getElementById('interv_pdr').value },
-            
+            interventions: savedInterventions, // مصفوفة التدخلات
             exploitation: { 
                 idx_in: document.getElementById('idx_in').value, diff_in: document.getElementById('diff_in').value,
                 idx_out: document.getElementById('idx_out').value, diff_out: document.getElementById('diff_out').value,
                 idx_nrj: document.getElementById('idx_nrj').value, diff_nrj: document.getElementById('diff_nrj').value,
                 ratio_1j: document.getElementById('ratio_1j').value
             },
-            
-            entree: { hp: document.getElementById('e_hp').value, ha: document.getElementById('e_ha').value, ph: document.getElementById('e_ph').value, temp: document.getElementById('e_temp').value, o2: document.getElementById('e_o2').value, cond: document.getElementById('e_cond').value, mes: document.getElementById('e_mes').value, dbo5: document.getElementById('e_dbo5').value, dco: document.getElementById('e_dco').value, uvt: document.getElementById('e_uvt').value },
-            lits: { hp: document.getElementById('l_hp').value, ha: document.getElementById('l_ha').value, ph: document.getElementById('l_ph').value, temp: document.getElementById('l_temp').value, o2: document.getElementById('l_o2').value, cond: document.getElementById('l_cond').value, mes: document.getElementById('l_mes').value, dbo5: document.getElementById('l_dbo5').value, dco: document.getElementById('l_dco').value, uvt: document.getElementById('l_uvt').value },
-            decanteur: { voile: document.getElementById('voile_boue').value, recirc: document.getElementById('taux_recirc').value },
-            parshall: { hp: document.getElementById('p_hp').value, ha: document.getElementById('p_ha').value, ph: document.getElementById('p_ph').value, temp: document.getElementById('p_temp').value, o2: document.getElementById('p_o2').value, cond: document.getElementById('p_cond').value, mes: document.getElementById('p_mes').value, dbo5: document.getElementById('p_dbo5').value, dco: document.getElementById('p_dco').value, uvt: document.getElementById('p_uvt').value },
-            tertiaire: { hp: document.getElementById('t_hp').value, ha: document.getElementById('t_ha').value, ph: document.getElementById('t_ph').value, temp: document.getElementById('t_temp').value, o2: document.getElementById('t_o2').value, cond: document.getElementById('t_cond').value, ufc1: document.getElementById('t_ufc1').value, ufc2: document.getElementById('t_ufc2').value, nem: document.getElementById('t_nem').value, uvt: document.getElementById('t_uvt').value },
-            boues: { hp: document.getElementById('b_hp').value, ha: document.getElementById('b_ha').value, ph: document.getElementById('b_ph').value, temp: document.getElementById('b_temp').value, o2: document.getElementById('b_o2').value, cond: document.getElementById('b_cond').value, mes: document.getElementById('b_mes').value, mvs: document.getElementById('b_mvs').value, siccite: document.getElementById('b_siccite').value, lieu: document.getElementById('b_lieu').value },
-            gestion: { energie: document.getElementById('cons_nrj').value, h_ge: document.getElementById('h_ge').value, poly: document.getElementById('poly_kg').value, chlore: document.getElementById('chlore_l').value, bass: document.getElementById('bass_purge').value, bp: document.getElementById('v_boue_p').value, bs: document.getElementById('v_boue_s').value, be: document.getElementById('v_boue_e').value, dg: document.getElementById('v_dg').value, df: document.getElementById('v_df').value, sables: document.getElementById('v_sables').value, graisses: document.getElementById('v_graisses').value },
-            
+            entree: { dco: document.getElementById('e_dco').value, dbo5: document.getElementById('e_dbo5').value, mes: document.getElementById('e_mes').value },
+            parshall: { dco: document.getElementById('p_dco').value, dbo5: document.getElementById('p_dbo5').value, mes: document.getElementById('p_mes').value },
+            boues: { siccite: document.getElementById('b_siccite').value },
+            gestion: { be: document.getElementById('v_boue_e').value, dg: document.getElementById('v_dg').value, df: document.getElementById('v_df').value, sables: document.getElementById('v_sables').value, graisses: document.getElementById('v_graisses').value },
             obs: document.getElementById('obs_text').value
         };
 
@@ -170,6 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alert(`✔ Fiche du ${dateKey} enregistrée avec succès !`);
     });
 
+    // ================== PV ==================
     function calculatePV() {
         const month = document.getElementById('date_exp').value.substring(0, 7);
         let tb=0, tdg=0, tdf=0, ts=0, tg=0;
@@ -187,23 +310,14 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('pv_graisses').innerText = tg.toFixed(1);
     }
 
-    const finInputs = document.querySelectorAll('.fin-input');
-    function calculateFinance() {
-        let totalHt = 0; finInputs.forEach(input => totalHt += Number(input.value) || 0);
-        let tva = totalHt * 0.20;
-        document.getElementById('fin_total_ht').value = totalHt.toFixed(2);
-        document.getElementById('fin_tva').value = tva.toFixed(2);
-        document.getElementById('fin_total_ttc').value = (totalHt + tva).toFixed(2);
-    }
-    finInputs.forEach(input => input.addEventListener('input', calculateFinance));
-
+    // ================== Excel ==================
     document.getElementById('btnExportExcel').addEventListener('click', () => {
         const month = document.getElementById('exportMonth').value;
         if(!month) return alert("Veuillez sélectionner un mois.");
         
         let wb = XLSX.utils.book_new();
         let recapData = [
-            ["DATE", "Météo", "T(°C)", "Diff Vol In", "Diff Vol Out", "Diff Nrj", "Ratio 1j", "DCO In", "DBO5 In", "MES In", "DCO Out", "DBO5 Out", "MES Out", "Siccité (%)", "PANNES", "INTERVENTIONS", "OBSERVATIONS"]
+            ["DATE", "Météo", "T(°C)", "Diff Vol In", "Diff Vol Out", "Diff Nrj", "Ratio 1j", "DCO In", "DBO5 In", "MES In", "DCO Out", "DBO5 Out", "MES Out", "Siccité (%)", "Nbr Interventions", "OBSERVATIONS"]
         ];
 
         for(let d=1; d<=31; d++) {
@@ -211,12 +325,13 @@ document.addEventListener('DOMContentLoaded', () => {
             let item = localStorage.getItem(key);
             if(item) {
                 let data = JSON.parse(item);
+                let numInterv = data.interventions ? data.interventions.length : 0;
                 recapData.push([
                     data.date, data.meteo, data.t_amb, 
                     data.exploitation?.diff_in, data.exploitation?.diff_out, data.exploitation?.diff_nrj, data.exploitation?.ratio_1j,
                     data.entree?.dco, data.entree?.dbo5, data.entree?.mes, data.parshall?.dco, data.parshall?.dbo5, data.parshall?.mes,
                     data.boues?.siccite,
-                    data.pannesStr, (data.interventions?.equip ? data.interventions.equip : ""), data.obs
+                    numInterv, data.obs
                 ]);
             }
         }
