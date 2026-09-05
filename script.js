@@ -1,173 +1,105 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. شاشة الافتتاحية
-    setTimeout(() => { document.getElementById('splash-screen').classList.add('hidden-splash'); }, 2000);
+:root {
+    --srm-dark-blue: #1c3d5a; 
+    --srm-teal: #358898;      
+    --srm-red: #ea5348;       
+    --srm-green: #2d8a35;     
+    --srm-orange: #d94f1c;    
+    
+    --bg-color: #e4ecef;      
+    --header-bg: #dce5eb;     
+    --input-bg: #d1dde6;      
+    --button-text: #f0f4f8;   
 
-    // 2. التنقل
-    const navItems = document.querySelectorAll('.nav-item');
-    const tabPanes = document.querySelectorAll('.tab-pane');
-    navItems.forEach(btn => {
-        btn.addEventListener('click', () => {
-            navItems.forEach(b => b.classList.remove('active'));
-            tabPanes.forEach(p => p.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById(btn.dataset.target).classList.add('active');
-            if(btn.dataset.target === 'tab-pv') calculatePV();
-        });
-    });
+    --card-blue: #dce6f0;     
+    --card-teal: #d0e6e9;     
+    --card-green: #dff0e1;    
+    --card-orange: #fce6dc;   
+    --card-yellow: #fcf1d7;   
+    
+    --text-dark: #1c3d5a;     
+    --text-muted: #4a637c;    
+    --border-color: #aebfd1;
+}
 
-    const todayStr = new Date().toISOString().split('T')[0];
-    document.getElementById('date_exp').value = todayStr;
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+body { background-color: var(--bg-color); color: var(--text-dark); padding-bottom: 50px; }
 
-    // 3. جلب الطقس التلقائي (قلعة السراغنة)
-    async function fetchAutoWeather() {
-        try {
-            const lat = 32.0494; const lon = -7.4083;
-            const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
-            const data = await response.json();
-            if(data && data.current_weather) {
-                document.getElementById('t_amb').value = data.current_weather.temperature;
-                let wc = data.current_weather.weathercode;
-                let meteoSelect = document.getElementById('meteo');
-                if (wc >= 50 && wc <= 67) meteoSelect.value = "Pluvieux";
-                else if (wc >= 1 && wc <= 3) meteoSelect.value = "Nuageux";
-                else meteoSelect.value = "Ensoleillé";
-            }
-        } catch (e) { console.log("Météo hors ligne."); }
-    }
-    fetchAutoWeather();
+.text-blue { color: var(--srm-dark-blue); } .text-cyan { color: var(--srm-teal); } .text-green { color: var(--srm-green); } .text-orange { color: var(--srm-orange); } 
+.text-center { text-align: center; } .font-bold { font-weight: bold; }
+.mt-10 { margin-top: 10px; } .mt-15 { margin-top: 15px; } .mt-20 { margin-top: 20px; } .mb-10 { margin-bottom: 10px; } .mb-12 { margin-bottom: 12px; } .mb-15 { margin-bottom: 15px; } .mb-20 { margin-bottom: 20px; } 
+.w-100 { width: 100%; } .p-15 { padding: 15px; } .p-20 { padding: 22px; }
 
-    // 4. جدول التدفقات 24 ساعة
-    const tbody = document.getElementById('hourly-tbody');
-    for (let i = 0; i < 24; i++) {
-        let h1 = (9 + i) % 24, h2 = (10 + i) % 24;
-        let timeStr = `${h1.toString().padStart(2,'0')}:00 - ${h2.toString().padStart(2,'0')}:00`;
-        tbody.insertAdjacentHTML('beforeend', `
-            <tr>
-                <td>${timeStr}</td>
-                <td><input type="number" class="val-entree" data-idx="${i}" step="0.1" placeholder="0"></td>
-                <td><input type="number" class="val-sortie" data-idx="${i}" step="0.1" placeholder="0"></td>
-            </tr>
-        `);
-    }
+#splash-screen { position: fixed; inset: 0; background: var(--bg-color); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 0.5s opacity ease; }
+.splash-img { width: 180px !important; height: 180px !important; object-fit: contain !important; display: block !important; animation: pulse 2s infinite; }
+.loader { width: 35px; height: 35px; border: 4px solid var(--border-color); border-top: 4px solid var(--srm-teal); border-radius: 50%; animation: spin 1s linear infinite; margin-top: 20px; }
+@keyframes spin { 100% { transform: rotate(360deg); } } @keyframes pulse { 50% { transform: scale(1.05); } }
+.hidden-splash { opacity: 0; visibility: hidden; pointer-events: none; }
 
-    const calcTotals = () => {
-        let sumE = 0, sumS = 0;
-        document.querySelectorAll('.val-entree').forEach(i => sumE += Number(i.value) || 0);
-        document.querySelectorAll('.val-sortie').forEach(i => sumS += Number(i.value) || 0);
-        document.getElementById('vol_entree').value = sumE.toFixed(1);
-        document.getElementById('vol_sortie').value = sumS.toFixed(1);
-    };
-    document.getElementById('hourly-tbody').addEventListener('input', calcTotals);
+.app-header { background: var(--header-bg); padding: 18px 15px; text-align: center; border-bottom: 2px solid var(--srm-dark-blue); margin-bottom: 20px; }
+.logo-container { margin-bottom: 6px; display: flex; justify-content: center; align-items: center; }
+.app-logo { height: 45px !important; width: auto !important; max-width: 150px !important; object-fit: contain !important; display: block !important; }
+.app-title { font-size: 1.6rem; color: var(--srm-dark-blue); font-weight: 900; letter-spacing: 1px; }
+.app-subtitle { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; margin-top: 4px; }
 
-    // 5. CCTP Check
-    document.querySelectorAll('.cctp-check').forEach(input => {
-        input.addEventListener('input', function() {
-            let max = parseFloat(this.getAttribute('data-max'));
-            if(parseFloat(this.value) > max) this.classList.add('exceed-cctp');
-            else this.classList.remove('exceed-cctp');
-        });
-    });
+.app-nav { display: flex; background: transparent; padding: 0 16px; gap: 8px; overflow-x: auto; margin-bottom: 25px; }
+.nav-item { flex: 1; min-width: 90px; padding: 12px 8px; border: 1px solid var(--srm-dark-blue); background: var(--header-bg); border-radius: 10px; font-size: 0.85rem; font-weight: 700; color: var(--srm-dark-blue); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; box-shadow: 2px 2px 0px var(--srm-dark-blue); transition: 0.2s; }
+.nav-item.active { color: var(--button-text); background: var(--srm-dark-blue); box-shadow: 0px 0px 0px transparent; transform: translateY(2px) translateX(2px); }
+.nav-item i { font-size: 1.2rem; }
 
-    // 6. الأكورديون
-    document.querySelectorAll('.accordion-header').forEach(h => {
-        h.addEventListener('click', () => {
-            h.nextElementSibling.classList.toggle('active');
-            h.classList.toggle('active-header');
-        });
-    });
+.tabs-container { padding: 0 16px; } .tab-pane { display: none; } .tab-pane.active { display: block; }
+.modern-card, .global-info-card, .document-view { border-radius: 12px; border: 1px solid var(--srm-dark-blue); margin-bottom: 25px; overflow: hidden; }
 
-    // 7. حفظ البيانات الشاملة
-    document.getElementById('stepForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const dateKey = document.getElementById('date_exp').value;
-        let hourly = [];
-        for(let i=0; i<24; i++) {
-            hourly.push({
-                in: document.querySelector(`.val-entree[data-idx="${i}"]`).value,
-                out: document.querySelector(`.val-sortie[data-idx="${i}"]`).value
-            });
-        }
+.global-info-card { background-color: var(--card-yellow); box-shadow: 5px 5px 0px var(--srm-dark-blue); padding: 22px; }
 
-        const dataToSave = {
-            date: dateKey, meteo: document.getElementById('meteo').value, t_amb: document.getElementById('t_amb').value, pluvio: document.getElementById('pluvio').value,
-            debits: { hourly, tot_in: document.getElementById('vol_entree').value, tot_out: document.getElementById('vol_sortie').value },
-            entree: { ph: document.getElementById('e_ph').value, temp: document.getElementById('e_temp').value, mes: document.getElementById('e_mes').value, dbo5: document.getElementById('e_dbo5').value, dco: document.getElementById('e_dco').value },
-            pretraite: { deg1: document.getElementById('deg1').value, deg2: document.getElementById('deg2').value, pont: document.getElementById('pont_racleur').value },
-            lits: { ph: document.getElementById('l_ph').value, temp: document.getElementById('l_temp').value, mes: document.getElementById('l_mes').value, dbo5: document.getElementById('l_dbo5').value, dco: document.getElementById('l_dco').value },
-            decanteur: { voile: document.getElementById('voile_boue').value, recirc: document.getElementById('taux_recirc').value },
-            parshall: { ph: document.getElementById('p_ph').value, temp: document.getElementById('p_temp').value, mes: document.getElementById('p_mes').value, dbo5: document.getElementById('p_dbo5').value, dco: document.getElementById('p_dco').value },
-            equip: { h_rel: document.getElementById('h_pompe_rel').value, et_rel: document.getElementById('etat_pompe_rel').value, h_rec: document.getElementById('h_pompe_rec').value, et_rec: document.getElementById('etat_pompe_rec').value },
-            gestion: { energie: document.getElementById('cons_nrj').value, h_ge: document.getElementById('h_ge').value, poly: document.getElementById('poly_kg').value, chlore: document.getElementById('chlore_l').value, v_be: document.getElementById('v_boue_e').value, dg: document.getElementById('v_dg').value, sables: document.getElementById('v_sables').value, siccite: document.getElementById('b_siccite').value },
-            obs: document.getElementById('obs_text').value
-        };
+.modern-card:nth-of-type(1) { background-color: var(--card-teal); box-shadow: 5px 5px 0px var(--srm-teal); }
+.modern-card:nth-of-type(2) { background-color: var(--card-blue); box-shadow: 5px 5px 0px var(--srm-dark-blue); }
+.modern-card:nth-of-type(3) { background-color: var(--card-orange); box-shadow: 5px 5px 0px var(--srm-orange); }
+.modern-card:nth-of-type(4) { background-color: var(--card-green); box-shadow: 5px 5px 0px var(--srm-green); }
+.modern-card:nth-of-type(5) { background-color: var(--card-teal); box-shadow: 5px 5px 0px var(--srm-teal); }
+.modern-card:nth-of-type(6) { background-color: var(--card-blue); box-shadow: 5px 5px 0px var(--srm-dark-blue); }
+.modern-card:nth-of-type(7) { background-color: var(--card-orange); box-shadow: 5px 5px 0px var(--srm-orange); }
+.modern-card:nth-of-type(8) { background-color: var(--card-green); box-shadow: 5px 5px 0px var(--srm-green); }
+.modern-card:nth-of-type(9) { background-color: var(--card-yellow); box-shadow: 5px 5px 0px var(--srm-dark-blue); }
 
-        localStorage.setItem(`STEP_${dateKey}`, JSON.stringify(dataToSave));
-        alert(`✔ Fiche du ${dateKey} enregistrée avec succès !`);
-    });
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; } .full-width { grid-column: span 2; }
+.input-group label { font-size: 0.85rem; font-weight: 700; color: var(--srm-dark-blue); display: block; margin-bottom: 8px; }
+input, select, textarea { width: 100%; padding: 12px 14px; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; font-size: 1rem; color: var(--text-dark); font-weight: 600; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--srm-teal); box-shadow: 0 0 0 3px rgba(53, 136, 152, 0.2); }
+.readonly-input { background: var(--bg-color); color: var(--srm-orange); font-weight: bold; border-style: dashed; }
+.exceed-cctp { color: #8a1717 !important; background: #e8a2a2 !important; border-color: #b52a2a !important; }
 
-    // 8. حساب PV
-    function calculatePV() {
-        const month = document.getElementById('date_exp').value.substring(0, 7);
-        let tb=0, tdg=0, ts=0;
-        for(let i=0; i<localStorage.length; i++) {
-            let k = localStorage.key(i);
-            if(k.startsWith(`STEP_${month}`)) {
-                let d = JSON.parse(localStorage.getItem(k));
-                tb += Number(d.gestion.v_be); tdg += Number(d.gestion.dg); ts += Number(d.gestion.sables);
-            }
-        }
-        document.getElementById('pv_boues').innerText = tb.toFixed(1);
-        document.getElementById('pv_dg').innerText = tdg.toFixed(1);
-        document.getElementById('pv_sables').innerText = ts.toFixed(1);
-    }
+/* تنسيق العناوين الفرعية للمعدات */
+.section-subtitle {
+    color: var(--srm-dark-blue);
+    border-bottom: 2px dashed var(--border-color);
+    padding-bottom: 6px;
+    margin-top: 10px;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+}
 
-    // 9. Attachement Financier
-    const finInputs = document.querySelectorAll('.fin-input');
-    function calculateFinance() {
-        let totalHt = 0;
-        finInputs.forEach(input => totalHt += Number(input.value) || 0);
-        let tva = totalHt * 0.20;
-        document.getElementById('fin_total_ht').value = totalHt.toFixed(2);
-        document.getElementById('fin_tva').value = tva.toFixed(2);
-        document.getElementById('fin_total_ttc').value = (totalHt + tva).toFixed(2);
-    }
-    finInputs.forEach(input => input.addEventListener('input', calculateFinance));
+.table-responsive { overflow-x: auto; }
+.hourly-table { width: 100%; text-align: center; border-collapse: collapse; font-size: 0.9rem; }
+.hourly-table th { background: var(--border-color); color: var(--srm-dark-blue); padding: 12px; font-weight: 700; border-bottom: 1px solid var(--srm-dark-blue); }
+.hourly-table td { padding: 8px; border-bottom: 1px solid var(--border-color); }
+.hourly-table input { padding: 10px; text-align: center; background: var(--input-bg); border: 1px solid var(--border-color); }
 
-    // 10. التصدير الفعلي لملف Excel بجميع الأعمدة
-    document.getElementById('btnExportExcel').addEventListener('click', () => {
-        const month = document.getElementById('exportMonth').value;
-        if(!month) return alert("Veuillez sélectionner un mois d'abord.");
-        
-        let wb = XLSX.utils.book_new();
-        // رؤوس الأعمدة شاملة كل المراحل الجديدة
-        let recapData = [
-            ["DATE", "Météo", "T. Amb(°C)", "Vol. Entrée", "Vol. Sortie", 
-             "DCO In", "DBO5 In", "MES In", "DCO Out", "DBO5 Out", "MES Out", 
-             "Dég. 1", "Dég. 2", "Pont (H)", "Voile Boue (m)", "Recirculation (%)", 
-             "P. Relevage (H)", "P. Recirc. (H)", 
-             "Énergie (kWh)", "Polymère (Kg)", "Chlore (L)", "Boues (m³)", "Observations"]
-        ];
+.accordion-header { width: 100%; padding: 20px 22px; background: transparent; border: none; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+.header-title { display: flex; align-items: center; gap: 15px; } .header-title span { font-weight: 800; color: var(--srm-dark-blue); font-size: 1.05rem; }
+.icon-box { width: 42px; height: 42px; border-radius: 10px; display: flex; justify-content: center; align-items: center; color: var(--button-text); font-size: 1.15rem; }
+.bg-blue { background-color: var(--srm-dark-blue); } .bg-cyan { background-color: var(--srm-teal); } .bg-green { background-color: var(--srm-green); } .bg-orange { background-color: var(--srm-orange); }
 
-        for(let d=1; d<=31; d++) {
-            let dayStr = d.toString().padStart(2, '0');
-            let key = `STEP_${month}-${dayStr}`;
-            let item = localStorage.getItem(key);
-            if(item) {
-                let data = JSON.parse(item);
-                recapData.push([
-                    data.date, data.meteo, data.t_amb, data.debits.tot_in, data.debits.tot_out,
-                    data.entree.dco, data.entree.dbo5, data.entree.mes, data.parshall.dco, data.parshall.dbo5, data.parshall.mes,
-                    data.pretraite.deg1, data.pretraite.deg2, data.pretraite.pont, data.decanteur.voile, data.decanteur.recirc,
-                    data.equip.h_rel, data.equip.h_rec,
-                    data.gestion.energie, data.gestion.poly, data.gestion.chlore, data.gestion.v_be, data.obs
-                ]);
-            }
-        }
+.accordion-content { display: none; padding: 22px; border-top: 1px dashed var(--srm-dark-blue); background: transparent; } 
+.accordion-content.active { display: block; }
+.arrow { transition: transform 0.3s; color: var(--srm-dark-blue); font-size: 1.1rem; } 
+.accordion-header.active-header .arrow { transform: rotate(180deg); }
 
-        if(recapData.length === 1) return alert("Aucune donnée enregistrée pour ce mois.");
+.btn-primary, .btn-secondary { padding: 16px; border: 1px solid var(--srm-dark-blue); border-radius: 8px; font-weight: bold; font-size: 1.05rem; color: var(--button-text); cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; transition: 0.1s; }
+.btn-primary { background-color: var(--srm-teal); box-shadow: 4px 4px 0px var(--srm-dark-blue); } 
+.btn-secondary { background-color: var(--srm-red); box-shadow: 4px 4px 0px var(--srm-dark-blue); }
+.btn-primary:active, .btn-secondary:active { transform: translateY(4px) translateX(4px); box-shadow: 0px 0px 0px transparent; }
 
-        let ws = XLSX.utils.aoa_to_sheet(recapData);
-        XLSX.utils.book_append_sheet(wb, ws, "Rapport Mensuel");
-        XLSX.writeFile(wb, `Rapport_STEP_${month}.xlsx`);
-    });
-});
+.document-view { background-color: var(--header-bg); padding: 22px; box-shadow: 5px 5px 0px var(--srm-teal); }
+.document-view hr { border-color: var(--border-color); margin: 15px 0; }
+.waste-list { list-style: none; line-height: 1.8; }
+.waste-list li { background: var(--card-blue); padding: 10px 15px; border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--srm-dark-blue); }
