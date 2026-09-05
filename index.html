@@ -2,21 +2,34 @@
 <html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
+    <!-- إعدادات الشاشة للهواتف -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
     <title>SRM DPKS - STEP Kelaa des Sraghna</title>
+    
+    <!-- ربط ملف الـ Manifest لتحويل الموقع إلى تطبيق هاتف (PWA) -->
+    <link rel="manifest" href="manifest.json">
+    <!-- تلوين شريط الإشعارات في الهاتف ليتناسب مع تصميم التطبيق -->
+    <meta name="theme-color" content="#1c3d5a">
+    <!-- أيقونة التطبيق على أجهزة آبل (اختياري) -->
+    <link rel="apple-touch-icon" href="logo.png">
+
+    <!-- المكتبات الخارجية (أيقونات، إكسيل، PDF) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <link rel="stylesheet" href="style.css?v=14">
+    
+    <!-- ملف التصميم الخاص بنا -->
+    <link rel="stylesheet" href="style.css?v=15">
 </head>
 <body>
-    <!-- واجهة التحميل -->
+    <!-- واجهة التحميل (Splash Screen) -->
     <div id="splash-screen">
         <img src="splash.png" alt="SRM Splash" class="splash-img">
         <div class="loader"></div>
     </div>
 
-    <!-- واجهة تسجيل الدخول (الحماية) -->
+    <!-- واجهة تسجيل الدخول (الحماية PIN) -->
     <div id="login-screen">
         <div class="login-card">
             <img src="logo.png" alt="Logo SRM" class="login-logo">
@@ -28,6 +41,7 @@
         </div>
     </div>
 
+    <!-- ترويسة التطبيق (Header) -->
     <header class="app-header">
         <div class="logo-container">
             <img src="logo.png" alt="Logo SRM DPKS" class="app-logo" id="main-logo">
@@ -36,6 +50,7 @@
         <p class="app-subtitle">Exploitation STEP - El Kelaa des Sraghna</p>
     </header>
 
+    <!-- شريط التنقل (Navigation) -->
     <nav class="app-nav">
         <button class="nav-item active" data-target="tab-saisie"><i class="fa-solid fa-pen-to-square"></i> Saisie</button>
         <button class="nav-item" data-target="tab-synthese"><i class="fa-solid fa-file-export"></i> Rapports</button>
@@ -44,7 +59,9 @@
         <button class="nav-item" data-target="tab-settings"><i class="fa-solid fa-gear"></i> Paramètres</button>
     </nav>
 
+    <!-- المحتوى الرئيسي (Tabs) -->
     <main class="tabs-container">
+        
         <!-- ================= TAB 1: SAISIE JOURNALIÈRE ================= -->
         <div id="tab-saisie" class="tab-pane active">
             <form id="stepForm">
@@ -475,13 +492,14 @@
         </div>
     </main>
 
-    <!-- ================= حاوية الـ PDF الديناميكي (حل مشكلة التموضع المطلق) ================= -->
+    <!-- ================= حاوية الـ PDF الديناميكي (مخفية ومجهزة للطباعة بدون فراغات بيضاء) ================= -->
     <div id="pdf-master-container" style="position: absolute; top: 0; left: 0; width: 850px; z-index: -9999; visibility: hidden; background: #ffffff;">
         <div id="pdf-dynamic-content" style="padding: 10px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #ffffff; color: #202124;">
             <!-- سيتم حقن الكود هنا عبر الجافاسكربت -->
         </div>
     </div>
 
+    <!-- ملف السكربت -->
     <script src="script.js"></script>
 </body>
 </html>
