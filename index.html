@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <link rel="stylesheet" href="style.css?v=13">
+    <link rel="stylesheet" href="style.css?v=14">
 </head>
 <body>
     <!-- واجهة التحميل -->
@@ -155,7 +155,6 @@
                     </button>
                     <div class="accordion-content">
                         <div id="interventions_container">
-                            <!-- استمارة التدخل الأولى (الافتراضية) -->
                             <div class="intervention-block" data-id="1">
                                 <div class="intervention-header">
                                     <h5>Intervention #1</h5>
@@ -169,7 +168,6 @@
                                     <div class="input-group full-width"><label>Matériel utilisé</label><textarea class="int_materiel" rows="2" placeholder="Outils, engins..."></textarea></div>
                                     <div class="input-group full-width"><label>PDR utilisés (Pièces)</label><textarea class="int_pdr" rows="2" placeholder="Roulements, joints..."></textarea></div>
                                     
-                                    <!-- تقسيم الصور إلى قبل وبعد -->
                                     <div class="input-group">
                                         <label class="text-orange"><i class="fa-solid fa-camera"></i> Photos AVANT</label>
                                         <input type="file" accept="image/*" multiple class="file-upload-input int_photos_avant">
@@ -477,9 +475,9 @@
         </div>
     </main>
 
-    <!-- ================= حاوية الـ PDF الديناميكي (NotebookLM Style) ================= -->
-    <div id="pdf-master-container" style="position: fixed; z-index: -9999; top: 0; left: -10000px; width: 850px; background: #ffffff;">
-        <div id="pdf-dynamic-content" style="padding: 40px; font-family: 'Helvetica Neue', Arial, sans-serif; background: #ffffff; color: #202124;">
+    <!-- ================= حاوية الـ PDF الديناميكي (حل مشكلة التموضع المطلق) ================= -->
+    <div id="pdf-master-container" style="position: absolute; top: 0; left: 0; width: 850px; z-index: -9999; visibility: hidden; background: #ffffff;">
+        <div id="pdf-dynamic-content" style="padding: 10px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #ffffff; color: #202124;">
             <!-- سيتم حقن الكود هنا عبر الجافاسكربت -->
         </div>
     </div>
