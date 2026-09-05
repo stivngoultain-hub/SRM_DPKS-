@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. نظام الحماية (Login System)
     const PIN_KEY = 'app_secure_pin';
     if (!localStorage.getItem(PIN_KEY)) {
         localStorage.setItem(PIN_KEY, '1111');
@@ -50,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('new_pin').value = '';
     });
 
-    // 2. التنقل بين التبويبات
     const navItems = document.querySelectorAll('.nav-item');
     const tabPanes = document.querySelectorAll('.tab-pane');
     navItems.forEach(btn => {
@@ -107,7 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 3. إدارة التدخلات
     let interventionPhotosMap = { "1": { avant: [], apres: [] } };
     let intCounter = 1;
 
@@ -200,7 +197,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 4. حفظ بيانات النقل
     document.getElementById('btnSavePVDetails').addEventListener('click', () => {
         const pvData = {
             societe: document.getElementById('pv_societe').value,
@@ -213,7 +209,6 @@ document.addEventListener('DOMContentLoaded', () => {
         alert("✔ Informations de transport enregistrées avec succès !");
     });
 
-    // 5. نظام PDF
     function buildPdfContent(cardsToInclude) {
         let logoImgSrc = document.getElementById('main-logo') ? document.getElementById('main-logo').src : 'logo.png';
         
@@ -379,7 +374,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 6. الحفظ
     document.getElementById('stepForm').addEventListener('submit', (e) => {
         e.preventDefault();
         const dateKey = document.getElementById('date_exp').value;
@@ -419,7 +413,6 @@ document.addEventListener('DOMContentLoaded', () => {
         alert(`✔ Fiche du ${dateKey} enregistrée avec succès !`);
     });
 
-    // 7. PV & Excel
     function calculatePV() {
         const month = document.getElementById('date_exp').value.substring(0, 7);
         let tdg=0, tdf=0, ts=0, tg=0;
