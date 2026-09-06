@@ -57,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
             tabPanes.forEach(p => p.classList.remove('active'));
             btn.classList.add('active');
             document.getElementById(btn.dataset.target).classList.add('active');
-            if(btn.dataset.target === 'tab-pv') loadPVData();
         });
     });
 
@@ -65,17 +64,90 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('date_exp').value = todayStr;
     document.getElementById('pv_date').value = todayStr;
 
+    // تبديل نماذج Signalement d'anomalie حسب الاختيار
+    const anomTypeSelect = document.getElementById('anom_type');
+    const anomSections = {
+        'Equipements': document.getElementById('anom_sec_equip'),
+        'Ouvrage': document.getElementById('anom_sec_ouvrage'),
+        'Engin': document.getElementById('anom_sec_engin'),
+        'Autres': document.getElementById('anom_sec_autres')
+    };
+
+    anomTypeSelect.addEventListener('change', () => {
+        let val = anomTypeSelect.value;
+        Object.keys(anomSections).forEach(k => {
+            anomSections[k].style.display = (k === val) ? 'block' : 'none';
+        });
+    });
+
+    // تخزين صور الإبلاغ عن العيوب
+    let anomPhotos = { equip: [], ouvrage: [], engin: [], autres: [] };
+    function handleAnomImages(inputEl, previewEl, key) {
+        inputEl.addEventListener('change', function() {
+            previewEl.innerHTML = '';
+            anomPhotos[key] = [];
+            Array.from(this.files).forEach(file => {
+                if(file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        let b64 = e.target.result;
+                        anomPhotos[key].push(b64);
+                        const img = document.createElement('img');
+                        img.src = b64;
+                        img.className = 'anom-img-preview';
+                        previewEl.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+    }
+    handleAnomImages(document.getElementById('anom_eq_photos'), document.getElementById('anom_eq_preview'), 'equip');
+    handleAnomImages(document.getElementById('anom_ouv_photos'), document.getElementById('anom_ouv_preview'), 'ouvrage');
+    handleAnomImages(document.getElementById('anom_engin_photos'), document.getElementById('anom_engin_preview'), 'engin');
+    handleAnomImages(document.getElementById('anom_autre_photos'), document.getElementById('anom_autre_preview'), 'autres');
+
+    document.getElementById('btnSaveAnomalie').addEventListener('click', () => {
+        let type = anomTypeSelect.value;
+        let anomData = { type, date: todayStr };
+        if(type === 'Equipements') {
+            anomData.nom = document.getElementById('anom_eq_nom').value;
+            anomData.etape = document.getElementById('anom_eq_etape').value;
+            anomData.role = document.getElementById('anom_eq_role').value;
+            anomData.def = document.getElementById('anom_eq_def').value;
+            anomData.sol = document.getElementById('anom_eq_sol').value;
+            anomData.pdr = document.getElementById('anom_eq_pdr').value;
+            anomData.duree = document.getElementById('anom_eq_duree').value;
+            anomData.impact = document.getElementById('anom_eq_impact').value;
+            anomData.rem = document.getElementById('anom_eq_rem').value;
+            anomData.photos = anomPhotos.equip;
+        } else if(type === 'Ouvrage') {
+            anomData.nom = document.getElementById('anom_ouv_nom').value;
+            anomData.rem = document.getElementById('anom_ouv_rem').value;
+            anomData.photos = anomPhotos.ouvrage;
+        } else if(type === 'Engin') {
+            anomData.enginType = document.getElementById('anom_engin_type').value;
+            anomData.mat = document.getElementById('anom_engin_mat').value;
+            anomData.km = document.getElementById('anom_engin_km').value;
+            anomData.prob = document.getElementById('anom_engin_prob').value;
+            anomData.sol = document.getElementById('anom_engin_sol').value;
+            anomData.impact = document.getElementById('anom_engin_impact').value;
+            anomData.rem = document.getElementById('anom_engin_rem').value;
+            anomData.photos = anomPhotos.engin;
+        } else {
+            anomData.rem = document.getElementById('anom_autre_rem').value;
+            anomData.photos = anomPhotos.autres;
+        }
+        localStorage.setItem(`Anomalie_${Date.now()}`, JSON.stringify(anomData));
+        alert("✔ Signalement d'anomalie enregistré avec succès !");
+    });
+
     async function fetchAutoWeather() {
         try {
             const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=32.0494&longitude=-7.4083&current_weather=true`);
             const data = await response.json();
             if(data && data.current_weather) {
                 document.getElementById('t_amb').value = data.current_weather.temperature;
-                let wc = data.current_weather.weathercode;
-                let meteoSelect = document.getElementById('meteo');
-                if (wc >= 50 && wc <= 67) meteoSelect.value = "Pluvieux";
-                else if (wc >= 1 && wc <= 3) meteoSelect.value = "Nuageux";
-                else meteoSelect.value = "Ensoleillé";
             }
         } catch (e) {}
     }
@@ -90,14 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    document.querySelectorAll('.cctp-check').forEach(input => {
-        input.addEventListener('input', function() {
-            let max = parseFloat(this.getAttribute('data-max'));
-            if(parseFloat(this.value) > max) this.classList.add('exceed-cctp');
-            else this.classList.remove('exceed-cctp');
-        });
-    });
-
     document.querySelectorAll('.accordion-header').forEach(h => {
         h.addEventListener('click', (e) => {
             if(e.target.classList.contains('btn-print-card')) return; 
@@ -106,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 1. Interventions Équipements
+    // Interventions Équipements
     let interventionPhotosMap = { "1": { avant: [], apres: [] } };
     let intCounter = 1;
 
@@ -140,16 +204,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
 
                 <div class="input-group">
-                    <label>Type de panne</label>
-                    <select class="int_panne_type">
-                        <option value="Panne électrique">Panne électrique</option>
-                        <option value="Panne mécanique">Panne mécanique</option>
-                        <option value="Panne hydraulique">Panne hydraulique</option>
-                    </select>
+                    <label>Types de panne (Sélectionnez un ou deux)</label>
+                    <div style="display:flex; flex-direction:column; gap:6px; background:var(--input-bg); padding:8px; border-radius:8px; border:1px solid var(--border-color);">
+                        <label style="font-weight:normal; font-size:0.9rem;"><input type="checkbox" class="int_panne_chk" value="Panne électrique"> Panne électrique</label>
+                        <label style="font-weight:normal; font-size:0.9rem;"><input type="checkbox" class="int_panne_chk" value="Panne mécanique"> Panne mécanique</label>
+                        <label style="font-weight:normal; font-size:0.9rem;"><input type="checkbox" class="int_panne_chk" value="Panne hydraulique"> Panne hydraulique</label>
+                    </div>
                 </div>
 
-                <div class="input-group full-width"><label>Matériel utilisé</label><textarea class="int_materiel" rows="2"></textarea></div>
-                <div class="input-group full-width"><label>PDR utilisés</label><textarea class="int_pdr" rows="2"></textarea></div>
+                <div class="input-group full-width"><label>Matériel utilisé</label><textarea class="int_materiel" rows="2" placeholder="Chaque matériel sur une ligne..."></textarea></div>
+                <div class="input-group full-width"><label>PDR utilisés</label><textarea class="int_pdr" rows="2" placeholder="Chaque pièce sur une ligne..."></textarea></div>
                 
                 <div class="input-group">
                     <label class="text-orange"><i class="fa-solid fa-camera"></i> Photos AVANT</label>
@@ -198,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 2. Interventions sur Ouvrage (جديد)
+    // Interventions sur Ouvrage
     let ouvragePhotosMap = { "1": [] };
     let ouvCounter = 1;
 
@@ -285,71 +349,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 3. حفظ تفاصيل PV Evacuation
-    document.getElementById('btnSavePVDetails').addEventListener('click', () => {
-        const pvData = {
-            date: document.getElementById('pv_date').value,
-            societe: document.getElementById('pv_societe').value,
-            chauffeur: document.getElementById('pv_chauffeur').value,
-            matricule: document.getElementById('pv_matricule').value,
-            agrement: document.getElementById('pv_agrement').value,
-            ville: document.getElementById('pv_ville').value,
-            dg: document.getElementById('pv_dg_edit').value,
-            df: document.getElementById('pv_df_edit').value,
-            sable: document.getElementById('pv_sable_edit').value,
-            graisse: document.getElementById('pv_graisse_edit').value
-        };
-        localStorage.setItem('PV_Transport_Details', JSON.stringify(pvData));
-        alert("✔ PV d'évacuation enregistré avec succès !");
-    });
-
-    function loadPVData() {
-        let savedPvData = localStorage.getItem('PV_Transport_Details');
-        if(savedPvData) {
-            let pvd = JSON.parse(savedPvData);
-            document.getElementById('pv_date').value = pvd.date || todayStr;
-            document.getElementById('pv_societe').value = pvd.societe || '';
-            document.getElementById('pv_chauffeur').value = pvd.chauffeur || '';
-            document.getElementById('pv_matricule').value = pvd.matricule || '';
-            document.getElementById('pv_agrement').value = pvd.agrement || '';
-            document.getElementById('pv_ville').value = pvd.ville || '';
-            document.getElementById('pv_dg_edit').value = pvd.dg || '0';
-            document.getElementById('pv_df_edit').value = pvd.df || '0';
-            document.getElementById('pv_sable_edit').value = pvd.sable || '0';
-            document.getElementById('pv_graisse_edit').value = pvd.graisse || '0';
-        } else {
-            // حساب تلقائي افتراضي من النفايات المدخلة
-            let tdg=0, tdf=0, ts=0, tg=0;
-            const month = document.getElementById('date_exp').value.substring(0, 7);
-            for(let i=0; i<localStorage.length; i++) {
-                let k = localStorage.key(i);
-                if(k.startsWith(`STEP_${month}`)) {
-                    let d = JSON.parse(localStorage.getItem(k));
-                    tdg += Number(d.gestion?.dg)||0; 
-                    tdf += Number(d.gestion?.df)||0; 
-                    ts += Number(d.gestion?.sables)||0; 
-                    tg += Number(d.gestion?.graisses)||0;
-                }
-            }
-            document.getElementById('pv_dg_edit').value = tdg.toFixed(1);
-            document.getElementById('pv_df_edit').value = tdf.toFixed(1);
-            document.getElementById('pv_sable_edit').value = ts.toFixed(1);
-            document.getElementById('pv_graisse_edit').value = tg.toFixed(1);
-        }
-    }
-
-    // 4. بناء الـ PDF الشامل
+    // بناء الـ PDF مع الترويسة الرسمية الجديدة وحجم الصور الأكبر
     function buildPdfContent(cardsToInclude) {
         let logoImgSrc = document.getElementById('main-logo') ? document.getElementById('main-logo').src : 'logo.png';
         
+        // الترويسة الرسمية المطلوبة بالضبط
         let contentHTML = `
-            <div style="border-bottom: 2px solid #e8eaed; padding-bottom: 12px; margin-bottom: 25px; display:flex; justify-content:space-between; align-items:flex-end;">
-                <div>
-                    <h1 style="margin: 0; font-size: 26px; color: #202124; font-weight: 800;">Rapport d'Exploitation</h1>
-                    <p style="margin: 5px 0 0; font-size: 13px; color: #5f6368; font-weight: 500;">STEP El Kelaa des Sraghna &bull; <b>${document.getElementById('date_exp').value}</b></p>
+            <div style="border-bottom: 2px solid #1c3d5a; padding-bottom: 12px; margin-bottom: 25px; display:flex; justify-content:space-between; align-items:center;">
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <img src="${logoImgSrc}" style="max-height: 65px; mix-blend-mode: multiply;" crossorigin="anonymous">
+                    <div>
+                        <h3 style="margin:0; font-size:13px; color:#1c3d5a; font-weight:700;">Société régionale multiservices Marrakech-Safi</h3>
+                        <p style="margin:2px 0; font-size:11px; color:#4a637c; font-weight:600;">Direction provinciale El kalâa des sraghna</p>
+                        <p style="margin:2px 0; font-size:11px; color:#4a637c; font-weight:600;">Département assainissement liquide</p>
+                    </div>
                 </div>
-                <div><img src="${logoImgSrc}" style="max-height: 50px; mix-blend-mode: multiply;" crossorigin="anonymous"></div>
+                <div style="text-align:right;">
+                    <p style="margin:0; font-size:10px; color:#5f6368; font-weight:600;">Division exploitation des ouvrages d'assainissement liquide</p>
+                    <p style="margin:2px 0; font-size:11px; color:#1c3d5a; font-weight:800;">Service : STEP</p>
+                    <p style="margin:2px 0; font-size:11px; color:#d94f1c; font-weight:bold;">Date : ${document.getElementById('date_exp').value}</p>
+                </div>
             </div>
+            <h1 style="text-align:center; font-size:20px; color:#1c3d5a; margin-bottom:20px; text-transform:uppercase;">Rapport d'Exploitation & Suivi</h1>
         `;
 
         const allCards = document.querySelectorAll('.accordion-item');
@@ -363,7 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
             isFirstIncluded = false;
 
             let cardTitle = card.querySelector('.header-title span').innerText;
-            contentHTML += `<div style="${pageBreakStyle} margin-bottom: 30px;"><h2 style="font-size: 15px; color: #1a73e8; border-bottom: 1px solid #e8eaed; padding-bottom: 6px; margin-bottom: 15px; text-transform: uppercase;">${cardTitle}</h2>`;
+            contentHTML += `<div style="${pageBreakStyle} margin-bottom: 30px;"><h2 style="font-size: 14px; color: #1c3d5a; border-bottom: 1px solid #1c3d5a; padding-bottom: 6px; margin-bottom: 15px; text-transform: uppercase;">${cardTitle}</h2>`;
 
             if (cardNum === 3) { // Interventions Équipements
                 const blocks = card.querySelectorAll('.intervention-block');
@@ -376,35 +397,43 @@ document.addEventListener('DOMContentLoaded', () => {
                     let date = block.querySelector('.int_date').value || '-';
                     let duree = block.querySelector('.int_duree').value || '-';
                     let etape = block.querySelector('.int_etape').value || '-';
-                    let panneType = block.querySelector('.int_panne_type').value || '-';
-                    let mat = block.querySelector('.int_materiel').value || '-';
-                    let pdr = block.querySelector('.int_pdr').value || '-';
+                    
+                    // جمع أنواع الأعطال المحددة
+                    let pannes = [];
+                    block.querySelectorAll('.int_panne_chk:checked').forEach(chk => pannes.push(chk.value));
+                    let panneType = pannes.length > 0 ? pannes.join(' + ') : '-';
+
+                    let matRaw = block.querySelector('.int_materiel').value || '';
+                    let matLines = matRaw.split('\n').filter(l => l.trim() !== '').map(l => `<div>• ${l}</div>`).join('') || '-';
+
+                    let pdrRaw = block.querySelector('.int_pdr').value || '';
+                    let pdrLines = pdrRaw.split('\n').filter(l => l.trim() !== '').map(l => `<div>• ${l}</div>`).join('') || '-';
 
                     contentHTML += `
                         <div style="background:#f8f9fa; border:1px solid #dadce0; border-radius:8px; padding:15px; margin-bottom:15px; page-break-inside: avoid;">
-                            <h4 style="margin:0 0 10px 0; color:#202124; font-size:15px;">Équipement : <span style="color:#1a73e8;">${equip}</span></h4>
-                            <table style="width:100%; font-size:13px; border-collapse: collapse; margin-bottom:10px; color:#3c4043;">
-                                <tr><td style="padding:6px 0; width:50%;"><b>Puissance :</b> ${puiss}</td><td><b>Rôle :</b> ${role}</td></tr>
-                                <tr><td style="padding:6px 0;"><b>Date :</b> ${date}</td><td><b>Durée :</b> ${duree} H</td></tr>
-                                <tr><td style="padding:6px 0;"><b>Étape :</b> ${etape}</td><td><b>Type de panne :</b> ${panneType}</td></tr>
-                                <tr><td colspan="2" style="padding:6px 0; border-top:1px dashed #dadce0;"><b>Matériel :</b> ${mat}</td></tr>
-                                <tr><td colspan="2" style="padding:6px 0;"><b>PDR :</b> ${pdr}</td></tr>
+                            <h4 style="margin:0 0 10px 0; color:#1c3d5a; font-size:14px;">Équipement : <span style="color:#358898;">${equip}</span></h4>
+                            <table style="width:100%; font-size:12px; border-collapse: collapse; margin-bottom:10px; color:#3c4043;">
+                                <tr><td style="padding:5px 0; width:50%;"><b>Puissance :</b> ${puiss}</td><td><b>Rôle :</b> ${role}</td></tr>
+                                <tr><td style="padding:5px 0;"><b>Date :</b> ${date}</td><td><b>Durée :</b> ${duree} H</td></tr>
+                                <tr><td style="padding:5px 0;"><b>Étape :</b> ${etape}</td><td><b>Type de panne :</b> ${panneType}</td></tr>
+                                <tr><td colspan="2" style="padding:6px 0; border-top:1px dashed #dadce0;"><b>Matériel utilisé :</b><br>${matLines}</td></tr>
+                                <tr><td colspan="2" style="padding:6px 0;"><b>PDR utilisés :</b><br>${pdrLines}</td></tr>
                             </table>
                     `;
                     let photos = interventionPhotosMap[id];
                     if((photos.avant && photos.avant.length > 0) || (photos.apres && photos.apres.length > 0)) {
                         contentHTML += `<div style="display:flex; justify-content:space-between; gap:15px; border-top:1px solid #e8eaed; padding-top:10px;">`;
-                        contentHTML += `<div style="width:48%;"><h5 style="color:#d93025; font-size:11px; margin-bottom:5px;">AVANT</h5><div style="display:flex; gap:5px; flex-wrap:wrap;">`;
-                        (photos.avant || []).forEach(p => { contentHTML += `<img src="${p}" style="width:90px; height:60px; object-fit:cover; border-radius:4px;">`; });
+                        contentHTML += `<div style="width:48%;"><h5 style="color:#d93025; font-size:11px; margin-bottom:5px;">AVANT</h5><div style="display:flex; gap:8px; flex-wrap:wrap;">`;
+                        (photos.avant || []).forEach(p => { contentHTML += `<img src="${p}" style="width:150px; height:110px; object-fit:cover; border-radius:6px; border:1px solid #ccc;">`; });
                         contentHTML += `</div></div>`;
-                        contentHTML += `<div style="width:48%;"><h5 style="color:#188038; font-size:11px; margin-bottom:5px;">APRÈS</h5><div style="display:flex; gap:5px; flex-wrap:wrap;">`;
-                        (photos.apres || []).forEach(p => { contentHTML += `<img src="${p}" style="width:90px; height:60px; object-fit:cover; border-radius:4px;">`; });
+                        contentHTML += `<div style="width:48%;"><h5 style="color:#2d8a35; font-size:11px; margin-bottom:5px;">APRÈS</h5><div style="display:flex; gap:8px; flex-wrap:wrap;">`;
+                        (photos.apres || []).forEach(p => { contentHTML += `<img src="${p}" style="width:150px; height:110px; object-fit:cover; border-radius:6px; border:1px solid #ccc;">`; });
                         contentHTML += `</div></div></div>`;
                     }
                     contentHTML += `</div>`;
                 });
             }
-            else if (cardNum === 4) { // Interventions sur Ouvrage (جديد)
+            else if (cardNum === 4) { // Interventions sur Ouvrage
                 const ouvBlocks = card.querySelectorAll('.ouvrage-block');
                 if(ouvBlocks.length === 0) contentHTML += `<p style="font-size:13px; color:#80868b; font-style: italic;">Aucune intervention sur ouvrage.</p>`;
                 ouvBlocks.forEach(block => {
@@ -419,18 +448,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     contentHTML += `
                         <div style="background:#f8f9fa; border:1px solid #dadce0; border-radius:8px; padding:15px; margin-bottom:15px; page-break-inside: avoid;">
-                            <h4 style="margin:0 0 10px 0; color:#1a73e8; font-size:15px;">Ouvrage : ${quel}</h4>
-                            <table style="width:100%; font-size:13px; border-collapse: collapse; margin-bottom:10px; color:#3c4043;">
-                                <tr><td style="padding:6px 0; width:50%;"><b>Rôle :</b> ${role}</td><td><b>Type d'intervention :</b> ${typeInt}</td></tr>
-                                <tr><td style="padding:6px 0;"><b>Date :</b> ${date}</td><td><b>Réf. Marché :</b> ${ref}</td></tr>
-                                <tr><td colspan="2" style="padding:6px 0;"><b>Entreprise :</b> ${ent}</td></tr>
+                            <h4 style="margin:0 0 10px 0; color:#1c3d5a; font-size:14px;">Ouvrage : ${quel}</h4>
+                            <table style="width:100%; font-size:12px; border-collapse: collapse; margin-bottom:10px; color:#3c4043;">
+                                <tr><td style="padding:5px 0; width:50%;"><b>Rôle :</b> ${role}</td><td><b>Type d'intervention :</b> ${typeInt}</td></tr>
+                                <tr><td style="padding:5px 0;"><b>Date :</b> ${date}</td><td><b>Réf. Marché :</b> ${ref}</td></tr>
+                                <tr><td colspan="2" style="padding:5px 0;"><b>Entreprise :</b> ${ent}</td></tr>
                                 <tr><td colspan="2" style="padding:6px 0; border-top:1px dashed #dadce0;"><b>Remarques :</b> ${rem}</td></tr>
                             </table>
                     `;
                     let oPhotos = ouvragePhotosMap[id];
                     if(oPhotos && oPhotos.length > 0) {
-                        contentHTML += `<div style="border-top:1px solid #e8eaed; padding-top:10px;"><h5 style="color:#1a73e8; font-size:11px; margin-bottom:5px;">PHOTOS OUVRAGE</h5><div style="display:flex; gap:8px; flex-wrap:wrap;">`;
-                        oPhotos.forEach(p => { contentHTML += `<img src="${p}" style="width:100px; height:70px; object-fit:cover; border-radius:4px;">`; });
+                        contentHTML += `<div style="border-top:1px solid #e8eaed; padding-top:10px;"><h5 style="color:#358898; font-size:11px; margin-bottom:5px;">PHOTOS OUVRAGE</h5><div style="display:flex; gap:10px; flex-wrap:wrap;">`;
+                        oPhotos.forEach(p => { contentHTML += `<img src="${p}" style="width:150px; height:110px; object-fit:cover; border-radius:6px; border:1px solid #ccc;">`; });
                         contentHTML += `</div></div>`;
                     }
                     contentHTML += `</div>`;
@@ -441,7 +470,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 contentHTML += `<div style="font-size:13px; color:#3c4043; line-height:1.6; background:#f8f9fa; border-left: 3px solid #fbbc04; padding:12px; border-radius:4px;">${obs.replace(/\n/g, '<br>')}</div>`;
             }
             else {
-                contentHTML += `<table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #3c4043;"><tbody>`;
+                contentHTML += `<table style="width: 100%; border-collapse: collapse; font-size: 12px; color: #3c4043;"><tbody>`;
                 const inputs = card.querySelectorAll('input, select');
                 let count = 0;
                 inputs.forEach(input => {
@@ -458,8 +487,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (count % 2 === 0) contentHTML += `<tr style="page-break-inside: avoid;">`;
                     contentHTML += `
-                        <td style="padding: 8px 6px; border-bottom: 1px solid #f1f3f4; width: 25%; font-weight: 500; color:#5f6368; background: ${count%4 < 2 ? '#ffffff' : '#fafafa'};">${label}</td>
-                        <td style="padding: 8px 6px; border-bottom: 1px solid #f1f3f4; width: 25%; background: ${count%4 < 2 ? '#ffffff' : '#fafafa'};"><span style="${valStyle}">${val}</span></td>
+                        <td style="padding: 7px 6px; border-bottom: 1px solid #f1f3f4; width: 25%; font-weight: 500; color:#5f6368; background: ${count%4 < 2 ? '#ffffff' : '#fafafa'};">${label}</td>
+                        <td style="padding: 7px 6px; border-bottom: 1px solid #f1f3f4; width: 25%; background: ${count%4 < 2 ? '#ffffff' : '#fafafa'};"><span style="${valStyle}">${val}</span></td>
                     `;
                     if (count % 2 === 1) contentHTML += `</tr>`;
                     count++;
@@ -470,7 +499,35 @@ document.addEventListener('DOMContentLoaded', () => {
             contentHTML += `</div>`;
         });
 
-        contentHTML += `<div style="margin-top: 30px; padding-top: 10px; border-top: 1px solid #e8eaed; text-align: center; font-size: 10px; color: #9aa0a6;">SRM DPKS - Système de Gestion d'Exploitation STEP</div>`;
+        // إضافة قسم التقارير الخاصة بـ Anomalies إن وجدت
+        let anomalyKeys = Object.keys(localStorage).filter(k => k.startsWith('Anomalie_'));
+        if(anomalyKeys.length > 0 && cardsToInclude.includes(12)) {
+            contentHTML += `<div style="page-break-before: always; padding-top: 20px;"><h2 style="font-size: 14px; color: #1c3d5a; border-bottom: 1px solid #1c3d5a; padding-bottom: 6px; margin-bottom: 15px; text-transform: uppercase;">SIGNALEMENTS D'ANOMALIES</h2>`;
+            anomalyKeys.forEach(ak => {
+                let anom = JSON.parse(localStorage.getItem(ak));
+                contentHTML += `<div style="background:#f8f9fa; border:1px solid #dadce0; border-radius:8px; padding:15px; margin-bottom:15px; page-break-inside: avoid;">`;
+                contentHTML += `<h4 style="margin:0 0 8px 0; color:#ea5348; font-size:13px;">Type : ${anom.type} (${anom.date})</h4>`;
+                contentHTML += `<table style="width:100%; font-size:12px; border-collapse: collapse; color:#3c4043;">`;
+                if(anom.nom) contentHTML += `<tr><td style="padding:4px 0;"><b>Nom / Ouvrage :</b> ${anom.nom}</td></tr>`;
+                if(anom.etape) contentHTML += `<tr><td style="padding:4px 0;"><b>Étape :</b> ${anom.etape} | <b>Rôle :</b> ${anom.role || '-'}</td></tr>`;
+                if(anom.def) contentHTML += `<tr><td style="padding:4px 0;"><b>Défaillance :</b> ${anom.def} | <b>Solution :</b> ${anom.sol || '-'}</td></tr>`;
+                if(anom.pdr) contentHTML += `<tr><td style="padding:4px 0;"><b>PDR :</b> ${anom.pdr} | <b>Durée :</b> ${anom.duree || '-'}</td></tr>`;
+                if(anom.impact) contentHTML += `<tr><td style="padding:4px 0;"><b>Impact :</b> ${anom.impact}</td></tr>`;
+                if(anom.enginType) contentHTML += `<tr><td style="padding:4px 0;"><b>Engin :</b> ${anom.enginType} (Matricule: ${anom.mat || '-'}, Km/TDF: ${anom.km || '-'})</td></tr>`;
+                if(anom.prob) contentHTML += `<tr><td style="padding:4px 0;"><b>Problème :</b> ${anom.prob} | <b>Solution :</b> ${anom.sol || '-'}</td></tr>`;
+                if(anom.rem) contentHTML += `<tr><td style="padding:4px 0;"><b>Remarques :</b> ${anom.rem}</td></tr>`;
+                contentHTML += `</table>`;
+                if(anom.photos && anom.photos.length > 0) {
+                    contentHTML += `<div style="margin-top:10px; border-top:1px dashed #ccc; padding-top:8px;"><div style="display:flex; gap:8px; flex-wrap:wrap;">`;
+                    anom.photos.forEach(p => { contentHTML += `<img src="${p}" style="width:150px; height:110px; object-fit:cover; border-radius:6px; border:1px solid #ccc;">`; });
+                    contentHTML += `</div></div>`;
+                }
+                contentHTML += `</div>`;
+            });
+            contentHTML += `</div>`;
+        }
+
+        contentHTML += `<div style="margin-top: 30px; padding-top: 10px; border-top: 1px solid #1c3d5a; text-align: center; font-size: 10px; color: #4a637c;">Société régionale multiservices Marrakech-Safi &bull; Direction provinciale El kalâa des sraghna &bull; Service STEP</div>`;
         document.getElementById('pdf-dynamic-content').innerHTML = contentHTML;
     }
 
@@ -482,7 +539,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo(0, 0); 
         
         html2pdf().set({
-            margin: [0.5, 0.4, 0.5, 0.4], 
+            margin: [0.4, 0.4, 0.4, 0.4], 
             filename: filename,
             image: { type: 'jpeg', quality: 1 },
             html2canvas: { scale: 2, useCORS: true, scrollY: 0, windowWidth: 850 },
@@ -509,13 +566,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 5. حفظ السجل اليومي
+    // حفظ السجل اليومي
     document.getElementById('stepForm').addEventListener('submit', (e) => {
         e.preventDefault();
         const dateKey = document.getElementById('date_exp').value;
 
         let savedInterventions = [];
         document.querySelectorAll('.intervention-block').forEach(block => {
+            let pannes = [];
+            block.querySelectorAll('.int_panne_chk:checked').forEach(chk => pannes.push(chk.value));
+
             savedInterventions.push({
                 equip: block.querySelector('.int_equip').value,
                 puiss: block.querySelector('.int_puiss').value,
@@ -523,7 +583,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 date: block.querySelector('.int_date').value,
                 duree: block.querySelector('.int_duree').value,
                 etape: block.querySelector('.int_etape').value,
-                panneType: block.querySelector('.int_panne_type').value,
+                panneTypes: pannes,
                 mat: block.querySelector('.int_materiel').value,
                 pdr: block.querySelector('.int_pdr').value
             });
@@ -552,10 +612,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 idx_nrj: document.getElementById('idx_nrj').value, diff_nrj: document.getElementById('diff_nrj').value,
                 ratio_1j: document.getElementById('ratio_1j').value
             },
-            entree: { dco: document.getElementById('e_dco').value, dbo5: document.getElementById('e_dbo5').value, mes: document.getElementById('e_mes').value },
-            parshall: { dco: document.getElementById('p_dco').value, dbo5: document.getElementById('p_dbo5').value, mes: document.getElementById('p_mes').value },
-            boues: { siccite: document.getElementById('b_siccite').value },
-            gestion: { dg: document.getElementById('v_dg').value, df: document.getElementById('v_df').value, sables: document.getElementById('v_sables').value, graisses: document.getElementById('v_graisses').value },
             obs: document.getElementById('obs_text').value
         };
 
@@ -563,14 +619,14 @@ document.addEventListener('DOMContentLoaded', () => {
         alert(`✔ Fiche du ${dateKey} enregistrée avec succès !`);
     });
 
-    // 6. تصدير إكسيل
+    // تصدير إكسيل
     document.getElementById('btnExportExcel').addEventListener('click', () => {
         const month = document.getElementById('exportMonth').value;
         if(!month) return alert("Veuillez sélectionner un mois.");
         
         let wb = XLSX.utils.book_new();
         let recapData = [
-            ["DATE", "Météo", "T(°C)", "Diff Vol In", "Diff Vol Out", "Diff Nrj", "Ratio 1j", "DCO In", "DBO5 In", "MES In", "DCO Out", "DBO5 Out", "MES Out", "Siccité (%)", "Nbr Interv.", "Nbr Ouvrages", "OBSERVATIONS"]
+            ["DATE", "Météo", "T(°C)", "Diff Vol In", "Diff Vol Out", "Diff Nrj", "Ratio 1j", "Nbr Interv.", "Nbr Ouvrages", "OBSERVATIONS"]
         ];
 
         for(let d=1; d<=31; d++) {
@@ -578,14 +634,12 @@ document.addEventListener('DOMContentLoaded', () => {
             let item = localStorage.getItem(key);
             if(item) {
                 let data = JSON.parse(item);
-                let numInterv = data.interventions ? data.interventions.length : 0;
-                let numOuv = data.ouvrages ? data.ouvrages.length : 0;
                 recapData.push([
                     data.date, data.meteo, data.t_amb, 
                     data.exploitation?.diff_in, data.exploitation?.diff_out, data.exploitation?.diff_nrj, data.exploitation?.ratio_1j,
-                    data.entree?.dco, data.entree?.dbo5, data.entree?.mes, data.parshall?.dco, data.parshall?.dbo5, data.parshall?.mes,
-                    data.boues?.siccite,
-                    numInterv, numOuv, data.obs
+                    data.interventions ? data.interventions.length : 0,
+                    data.ouvrages ? data.ouvrages.length : 0,
+                    data.obs
                 ]);
             }
         }
