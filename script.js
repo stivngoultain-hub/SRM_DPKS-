@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // بناء الـ PDF مع الترويسة المركزية بشعار logo.png والتاريخ الكامل
+    // بناء الـ PDF مع تكبير شعار الشركة logo.png في الترويسة المركزية
     function buildPdfContent(cardsToInclude) {
         let logoImgSrc = 'logo.png';
         
@@ -254,8 +254,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let formattedDate = rawDate ? new Date(rawDate).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' }) : rawDate;
 
         let contentHTML = `
-            <div style="text-align: center; border-bottom: 2px solid #1c3d5a; padding-bottom: 15px; margin-bottom: 25px;">
-                <img src="${logoImgSrc}" style="max-height: 75px; margin-bottom: 10px; mix-blend-mode: multiply;" crossorigin="anonymous">
+            <div style="text-align: center; border-bottom: 2px solid #1c3d5a; padding-bottom: 18px; margin-bottom: 25px;">
+                <img src="${logoImgSrc}" style="max-height: 110px; max-width: 280px; margin-bottom: 12px; object-fit: contain; mix-blend-mode: multiply;" crossorigin="anonymous">
                 <h3 style="margin: 0 0 4px 0; font-size: 15px; color: #1c3d5a; font-weight: 700; text-transform: uppercase;">Société régionale multiservices Marrakech-Safi</h3>
                 <p style="margin: 2px 0; font-size: 13px; color: #4a637c; font-weight: 600;">Direction provinciale El kalâa des sraghna</p>
                 <p style="margin: 2px 0; font-size: 13px; color: #4a637c; font-weight: 600;">Département assainissement liquide</p>
@@ -397,14 +397,4 @@ document.addEventListener('DOMContentLoaded', () => {
             generatePDF(`Rapport_Section_${cardId}_STEP_${d}.pdf`);
         });
     });
-
-    const stepForm = document.getElementById('stepForm');
-    if(stepForm) {
-        stepForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const dateKey = document.getElementById('date_exp').value;
-            alert(`✔ Fiche du ${dateKey} enregistrée avec succès !`);
-        });
-    }
 });
-ظ
