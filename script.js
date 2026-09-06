@@ -57,12 +57,13 @@ document.addEventListener('DOMContentLoaded', () => {
             tabPanes.forEach(p => p.classList.remove('active'));
             btn.classList.add('active');
             document.getElementById(btn.dataset.target).classList.add('active');
-            if(btn.dataset.target === 'tab-pv') calculatePV();
+            if(btn.dataset.target === 'tab-pv') loadPVData();
         });
     });
 
     const todayStr = new Date().toISOString().split('T')[0];
     document.getElementById('date_exp').value = todayStr;
+    document.getElementById('pv_date').value = todayStr;
 
     async function fetchAutoWeather() {
         try {
@@ -105,6 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // 1. Interventions Équipements
     let interventionPhotosMap = { "1": { avant: [], apres: [] } };
     let intCounter = 1;
 
@@ -117,11 +119,11 @@ document.addEventListener('DOMContentLoaded', () => {
         newBlock.setAttribute('data-id', intCounter.toString());
         newBlock.innerHTML = `
             <div class="intervention-header">
-                <h5>Intervention #${intCounter}</h5>
+                <h5>Intervention Équipement #${intCounter}</h5>
                 <button type="button" class="btn-remove-int"><i class="fa-solid fa-trash"></i></button>
             </div>
             <div class="form-grid">
-                <div class="input-group full-width"><label>Équipement</label><input type="text" class="int_equip" placeholder="Ex: Pompe..."></div>
+                <div class="input-group full-width"><label>Équipement</label><input type="text" class="int_equip"></div>
                 <div class="input-group"><label>Puissance (kW)</label><input type="text" class="int_puiss"></div>
                 <div class="input-group"><label>Rôle</label><input type="text" class="int_role"></div>
                 <div class="input-group"><label>Date d'intervention</label><input type="date" class="int_date"></div>
@@ -162,7 +164,6 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
         container.appendChild(newBlock);
-
         newBlock.querySelector('.btn-remove-int').addEventListener('click', function() {
             delete interventionPhotosMap[intCounter.toString()];
             newBlock.remove();
@@ -197,25 +198,154 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // 2. Interventions sur Ouvrage (جديد)
+    let ouvragePhotosMap = { "1": [] };
+    let ouvCounter = 1;
+
+    document.getElementById('btnAddOuvrage').addEventListener('click', () => {
+        ouvCounter++;
+        ouvragePhotosMap[ouvCounter.toString()] = [];
+        const container = document.getElementById('ouvrages_container');
+        const newBlock = document.createElement('div');
+        newBlock.className = 'ouvrage-block';
+        newBlock.setAttribute('data-id', ouvCounter.toString());
+        newBlock.innerHTML = `
+            <div class="intervention-header">
+                <h5>Intervention Ouvrage #${ouvCounter}</h5>
+                <button type="button" class="btn-remove-ouv"><i class="fa-solid fa-trash"></i></button>
+            </div>
+            <div class="form-grid">
+                <div class="input-group">
+                    <label>Quel Ouvrage</label>
+                    <select class="ouv_quel">
+                        <option value="Station de relevage">Station de relevage</option>
+                        <option value="Parshall d'entrée">Parshall d'entrée</option>
+                        <option value="Répartiteur">Répartiteur</option>
+                        <option value="Dessableur-déshuileur 1">Dessableur-déshuileur 1</option>
+                        <option value="Dessableur-déshuileur 2">Dessableur-déshuileur 2</option>
+                        <option value="Equi-repartiteur">Equi-repartiteur</option>
+                        <option value="Les bassins anaérobies">Les bassins anaérobies</option>
+                        <option value="Les lits bactériens">Les lits bactériens</option>
+                        <option value="Les clarificateurs">Les clarificateurs</option>
+                        <option value="Tirtaite">Tirtaite</option>
+                        <option value="SP eau de service">SP eau de service</option>
+                    </select>
+                </div>
+                <div class="input-group"><label>Rôle de l'ouvrage</label><input type="text" class="ouv_role"></div>
+                <div class="input-group">
+                    <label>Type d'intervention</label>
+                    <select class="ouv_type">
+                        <option value="Réhabilitation">Réhabilitation</option>
+                        <option value="Réparation">Réparation</option>
+                        <option value="Nettoyage par jet d'eau">Nettoyage par jet d'eau</option>
+                        <option value="Installation d'un équipement">Installation d'un équipement</option>
+                        <option value="Modification">Modification</option>
+                    </select>
+                </div>
+                <div class="input-group"><label>Date d'intervention</label><input type="date" class="ouv_date"></div>
+                <div class="input-group"><label>Référence de marché</label><input type="text" class="ouv_ref"></div>
+                <div class="input-group"><label>Nom de l'entreprise</label><input type="text" class="ouv_entreprise"></div>
+                <div class="input-group full-width"><label>Remarques</label><textarea class="ouv_remarques" rows="2"></textarea></div>
+                <div class="input-group full-width">
+                    <label class="text-cyan"><i class="fa-solid fa-camera"></i> Photos de l'ouvrage</label>
+                    <input type="file" accept="image/*" multiple class="file-upload-input ouv_photos">
+                    <div class="photos-preview-ouv mt-10" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
+                </div>
+            </div>
+        `;
+        container.appendChild(newBlock);
+        newBlock.querySelector('.btn-remove-ouv').addEventListener('click', function() {
+            delete ouvragePhotosMap[ouvCounter.toString()];
+            newBlock.remove();
+        });
+    });
+
+    document.getElementById('ouvrages_container').addEventListener('change', function(e) {
+        if(e.target.classList.contains('ouv_photos')) {
+            const block = e.target.closest('.ouvrage-block');
+            const blockId = block.getAttribute('data-id');
+            const previewContainer = block.querySelector('.photos-preview-ouv');
+            
+            previewContainer.innerHTML = '';
+            ouvragePhotosMap[blockId] = [];
+            
+            Array.from(e.target.files).forEach(file => {
+                if(file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const b64 = event.target.result;
+                        ouvragePhotosMap[blockId].push(b64);
+                        const img = document.createElement('img');
+                        img.src = b64;
+                        previewContainer.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    });
+
+    // 3. حفظ تفاصيل PV Evacuation
     document.getElementById('btnSavePVDetails').addEventListener('click', () => {
         const pvData = {
+            date: document.getElementById('pv_date').value,
             societe: document.getElementById('pv_societe').value,
             chauffeur: document.getElementById('pv_chauffeur').value,
             matricule: document.getElementById('pv_matricule').value,
             agrement: document.getElementById('pv_agrement').value,
-            ville: document.getElementById('pv_ville').value
+            ville: document.getElementById('pv_ville').value,
+            dg: document.getElementById('pv_dg_edit').value,
+            df: document.getElementById('pv_df_edit').value,
+            sable: document.getElementById('pv_sable_edit').value,
+            graisse: document.getElementById('pv_graisse_edit').value
         };
         localStorage.setItem('PV_Transport_Details', JSON.stringify(pvData));
-        alert("✔ Informations de transport enregistrées avec succès !");
+        alert("✔ PV d'évacuation enregistré avec succès !");
     });
 
+    function loadPVData() {
+        let savedPvData = localStorage.getItem('PV_Transport_Details');
+        if(savedPvData) {
+            let pvd = JSON.parse(savedPvData);
+            document.getElementById('pv_date').value = pvd.date || todayStr;
+            document.getElementById('pv_societe').value = pvd.societe || '';
+            document.getElementById('pv_chauffeur').value = pvd.chauffeur || '';
+            document.getElementById('pv_matricule').value = pvd.matricule || '';
+            document.getElementById('pv_agrement').value = pvd.agrement || '';
+            document.getElementById('pv_ville').value = pvd.ville || '';
+            document.getElementById('pv_dg_edit').value = pvd.dg || '0';
+            document.getElementById('pv_df_edit').value = pvd.df || '0';
+            document.getElementById('pv_sable_edit').value = pvd.sable || '0';
+            document.getElementById('pv_graisse_edit').value = pvd.graisse || '0';
+        } else {
+            // حساب تلقائي افتراضي من النفايات المدخلة
+            let tdg=0, tdf=0, ts=0, tg=0;
+            const month = document.getElementById('date_exp').value.substring(0, 7);
+            for(let i=0; i<localStorage.length; i++) {
+                let k = localStorage.key(i);
+                if(k.startsWith(`STEP_${month}`)) {
+                    let d = JSON.parse(localStorage.getItem(k));
+                    tdg += Number(d.gestion?.dg)||0; 
+                    tdf += Number(d.gestion?.df)||0; 
+                    ts += Number(d.gestion?.sables)||0; 
+                    tg += Number(d.gestion?.graisses)||0;
+                }
+            }
+            document.getElementById('pv_dg_edit').value = tdg.toFixed(1);
+            document.getElementById('pv_df_edit').value = tdf.toFixed(1);
+            document.getElementById('pv_sable_edit').value = ts.toFixed(1);
+            document.getElementById('pv_graisse_edit').value = tg.toFixed(1);
+        }
+    }
+
+    // 4. بناء الـ PDF الشامل
     function buildPdfContent(cardsToInclude) {
         let logoImgSrc = document.getElementById('main-logo') ? document.getElementById('main-logo').src : 'logo.png';
         
         let contentHTML = `
             <div style="border-bottom: 2px solid #e8eaed; padding-bottom: 12px; margin-bottom: 25px; display:flex; justify-content:space-between; align-items:flex-end;">
                 <div>
-                    <h1 style="margin: 0; font-size: 26px; color: #202124; font-weight: 800; letter-spacing: -0.5px;">Rapport d'Exploitation</h1>
+                    <h1 style="margin: 0; font-size: 26px; color: #202124; font-weight: 800;">Rapport d'Exploitation</h1>
                     <p style="margin: 5px 0 0; font-size: 13px; color: #5f6368; font-weight: 500;">STEP El Kelaa des Sraghna &bull; <b>${document.getElementById('date_exp').value}</b></p>
                 </div>
                 <div><img src="${logoImgSrc}" style="max-height: 50px; mix-blend-mode: multiply;" crossorigin="anonymous"></div>
@@ -233,16 +363,11 @@ document.addEventListener('DOMContentLoaded', () => {
             isFirstIncluded = false;
 
             let cardTitle = card.querySelector('.header-title span').innerText;
-            
-            contentHTML += `
-                <div style="${pageBreakStyle} margin-bottom: 30px;">
-                    <h2 style="font-size: 15px; color: #1a73e8; border-bottom: 1px solid #e8eaed; padding-bottom: 6px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px;">${cardTitle}</h2>
-            `;
+            contentHTML += `<div style="${pageBreakStyle} margin-bottom: 30px;"><h2 style="font-size: 15px; color: #1a73e8; border-bottom: 1px solid #e8eaed; padding-bottom: 6px; margin-bottom: 15px; text-transform: uppercase;">${cardTitle}</h2>`;
 
-            if (cardNum === 3) {
+            if (cardNum === 3) { // Interventions Équipements
                 const blocks = card.querySelectorAll('.intervention-block');
-                if(blocks.length === 0) contentHTML += `<p style="font-size:13px; color:#80868b; font-style: italic;">Aucune intervention enregistrée.</p>`;
-                
+                if(blocks.length === 0) contentHTML += `<p style="font-size:13px; color:#80868b; font-style: italic;">Aucune intervention.</p>`;
                 blocks.forEach(block => {
                     let id = block.getAttribute('data-id');
                     let equip = block.querySelector('.int_equip').value || '-';
@@ -259,34 +384,60 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div style="background:#f8f9fa; border:1px solid #dadce0; border-radius:8px; padding:15px; margin-bottom:15px; page-break-inside: avoid;">
                             <h4 style="margin:0 0 10px 0; color:#202124; font-size:15px;">Équipement : <span style="color:#1a73e8;">${equip}</span></h4>
                             <table style="width:100%; font-size:13px; border-collapse: collapse; margin-bottom:10px; color:#3c4043;">
-                                <tr style="page-break-inside: avoid;"><td style="padding:6px 0; width:50%;"><b>Puissance :</b> ${puiss}</td><td style="padding:6px 0;"><b>Rôle :</b> ${role}</td></tr>
-                                <tr style="page-break-inside: avoid;"><td style="padding:6px 0;"><b>Date :</b> ${date}</td><td style="padding:6px 0;"><b>Durée :</b> ${duree} Heures</td></tr>
-                                <tr style="page-break-inside: avoid;"><td style="padding:6px 0;"><b>Étape de traitement :</b> ${etape}</td><td style="padding:6px 0;"><b>Type de panne :</b> ${panneType}</td></tr>
-                                <tr style="page-break-inside: avoid;"><td style="padding:8px 0; border-top:1px dashed #dadce0;" colspan="2"><b>Matériel utilisé :</b> ${mat}</td></tr>
-                                <tr style="page-break-inside: avoid;"><td style="padding:8px 0; border-top:1px dashed #dadce0;" colspan="2"><b>Pièces de rechange :</b> ${pdr}</td></tr>
+                                <tr><td style="padding:6px 0; width:50%;"><b>Puissance :</b> ${puiss}</td><td><b>Rôle :</b> ${role}</td></tr>
+                                <tr><td style="padding:6px 0;"><b>Date :</b> ${date}</td><td><b>Durée :</b> ${duree} H</td></tr>
+                                <tr><td style="padding:6px 0;"><b>Étape :</b> ${etape}</td><td><b>Type de panne :</b> ${panneType}</td></tr>
+                                <tr><td colspan="2" style="padding:6px 0; border-top:1px dashed #dadce0;"><b>Matériel :</b> ${mat}</td></tr>
+                                <tr><td colspan="2" style="padding:6px 0;"><b>PDR :</b> ${pdr}</td></tr>
                             </table>
                     `;
                     let photos = interventionPhotosMap[id];
                     if((photos.avant && photos.avant.length > 0) || (photos.apres && photos.apres.length > 0)) {
-                        contentHTML += `<div style="display:flex; justify-content: space-between; gap: 15px; border-top: 1px solid #e8eaed; padding-top: 10px; page-break-inside: avoid;">`;
-                        
-                        contentHTML += `<div style="width:48%;">
-                            <h5 style="margin:0 0 8px 0; font-size:12px; color:#d93025; text-transform:uppercase;">Avant</h5>
-                            <div style="display:flex; gap:8px; flex-wrap:wrap;">`;
-                        (photos.avant || []).forEach(p => { contentHTML += `<img src="${p}" style="width:110px; height:75px; object-fit:cover; border-radius:4px; border:1px solid #dadce0;">`; });
+                        contentHTML += `<div style="display:flex; justify-content:space-between; gap:15px; border-top:1px solid #e8eaed; padding-top:10px;">`;
+                        contentHTML += `<div style="width:48%;"><h5 style="color:#d93025; font-size:11px; margin-bottom:5px;">AVANT</h5><div style="display:flex; gap:5px; flex-wrap:wrap;">`;
+                        (photos.avant || []).forEach(p => { contentHTML += `<img src="${p}" style="width:90px; height:60px; object-fit:cover; border-radius:4px;">`; });
                         contentHTML += `</div></div>`;
-
-                        contentHTML += `<div style="width:48%;">
-                            <h5 style="margin:0 0 8px 0; font-size:12px; color:#188038; text-transform:uppercase;">Après</h5>
-                            <div style="display:flex; gap:8px; flex-wrap:wrap;">`;
-                        (photos.apres || []).forEach(p => { contentHTML += `<img src="${p}" style="width:110px; height:75px; object-fit:cover; border-radius:4px; border:1px solid #dadce0;">`; });
+                        contentHTML += `<div style="width:48%;"><h5 style="color:#188038; font-size:11px; margin-bottom:5px;">APRÈS</h5><div style="display:flex; gap:5px; flex-wrap:wrap;">`;
+                        (photos.apres || []).forEach(p => { contentHTML += `<img src="${p}" style="width:90px; height:60px; object-fit:cover; border-radius:4px;">`; });
                         contentHTML += `</div></div></div>`;
                     }
                     contentHTML += `</div>`;
                 });
-            } 
-            else if (cardNum === 11) {
-                let obs = document.getElementById('obs_text').value || 'Aucune observation enregistrée.';
+            }
+            else if (cardNum === 4) { // Interventions sur Ouvrage (جديد)
+                const ouvBlocks = card.querySelectorAll('.ouvrage-block');
+                if(ouvBlocks.length === 0) contentHTML += `<p style="font-size:13px; color:#80868b; font-style: italic;">Aucune intervention sur ouvrage.</p>`;
+                ouvBlocks.forEach(block => {
+                    let id = block.getAttribute('data-id');
+                    let quel = block.querySelector('.ouv_quel').value || '-';
+                    let role = block.querySelector('.ouv_role').value || '-';
+                    let typeInt = block.querySelector('.ouv_type').value || '-';
+                    let date = block.querySelector('.ouv_date').value || '-';
+                    let ref = block.querySelector('.ouv_ref').value || '-';
+                    let ent = block.querySelector('.ouv_entreprise').value || '-';
+                    let rem = block.querySelector('.ouv_remarques').value || '-';
+
+                    contentHTML += `
+                        <div style="background:#f8f9fa; border:1px solid #dadce0; border-radius:8px; padding:15px; margin-bottom:15px; page-break-inside: avoid;">
+                            <h4 style="margin:0 0 10px 0; color:#1a73e8; font-size:15px;">Ouvrage : ${quel}</h4>
+                            <table style="width:100%; font-size:13px; border-collapse: collapse; margin-bottom:10px; color:#3c4043;">
+                                <tr><td style="padding:6px 0; width:50%;"><b>Rôle :</b> ${role}</td><td><b>Type d'intervention :</b> ${typeInt}</td></tr>
+                                <tr><td style="padding:6px 0;"><b>Date :</b> ${date}</td><td><b>Réf. Marché :</b> ${ref}</td></tr>
+                                <tr><td colspan="2" style="padding:6px 0;"><b>Entreprise :</b> ${ent}</td></tr>
+                                <tr><td colspan="2" style="padding:6px 0; border-top:1px dashed #dadce0;"><b>Remarques :</b> ${rem}</td></tr>
+                            </table>
+                    `;
+                    let oPhotos = ouvragePhotosMap[id];
+                    if(oPhotos && oPhotos.length > 0) {
+                        contentHTML += `<div style="border-top:1px solid #e8eaed; padding-top:10px;"><h5 style="color:#1a73e8; font-size:11px; margin-bottom:5px;">PHOTOS OUVRAGE</h5><div style="display:flex; gap:8px; flex-wrap:wrap;">`;
+                        oPhotos.forEach(p => { contentHTML += `<img src="${p}" style="width:100px; height:70px; object-fit:cover; border-radius:4px;">`; });
+                        contentHTML += `</div></div>`;
+                    }
+                    contentHTML += `</div>`;
+                });
+            }
+            else if (cardNum === 12) { // Observations
+                let obs = document.getElementById('obs_text').value || 'Aucune observation.';
                 contentHTML += `<div style="font-size:13px; color:#3c4043; line-height:1.6; background:#f8f9fa; border-left: 3px solid #fbbc04; padding:12px; border-radius:4px;">${obs.replace(/\n/g, '<br>')}</div>`;
             }
             else {
@@ -300,13 +451,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     let valStyle = "font-weight: 600;";
                     if (cardNum === 1) {
-                        if (val === "Marche") {
-                            valStyle += " color: #2d8a35; background-color: #dff0e1; padding: 2px 6px; border-radius: 4px; display: inline-block;";
-                        } else if (val === "Arrêt") {
-                            valStyle += " color: #d94f1c; background-color: #fce6dc; padding: 2px 6px; border-radius: 4px; display: inline-block;";
-                        } else if (val === "Panne") {
-                            valStyle += " color: #ea5348; background-color: #f8e1e1; padding: 2px 6px; border-radius: 4px; display: inline-block;";
-                        }
+                        if (val === "Marche") valStyle += " color: #2d8a35; background-color: #dff0e1; padding: 2px 6px; border-radius: 4px; display: inline-block;";
+                        else if (val === "Arrêt") valStyle += " color: #d94f1c; background-color: #fce6dc; padding: 2px 6px; border-radius: 4px; display: inline-block;";
+                        else if (val === "Panne") valStyle += " color: #ea5348; background-color: #f8e1e1; padding: 2px 6px; border-radius: 4px; display: inline-block;";
                     }
 
                     if (count % 2 === 0) contentHTML += `<tr style="page-break-inside: avoid;">`;
@@ -320,23 +467,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (count % 2 !== 0) contentHTML += `<td colspan="2" style="border-bottom: 1px solid #f1f3f4; background: ${count%4 < 2 ? '#ffffff' : '#fafafa'};"></td></tr>`;
                 contentHTML += `</tbody></table>`;
             }
-            
             contentHTML += `</div>`;
         });
 
-        contentHTML += `
-            <div style="margin-top: 30px; padding-top: 10px; border-top: 1px solid #e8eaed; text-align: center; font-size: 10px; color: #9aa0a6;">
-                SRM DPKS - Système de Gestion d'Exploitation STEP
-            </div>
-        `;
-
+        contentHTML += `<div style="margin-top: 30px; padding-top: 10px; border-top: 1px solid #e8eaed; text-align: center; font-size: 10px; color: #9aa0a6;">SRM DPKS - Système de Gestion d'Exploitation STEP</div>`;
         document.getElementById('pdf-dynamic-content').innerHTML = contentHTML;
     }
 
     function generatePDF(filename) {
         const container = document.getElementById('pdf-master-container');
         const element = document.getElementById('pdf-dynamic-content');
-        
         container.style.visibility = 'visible';
         const currentScroll = window.scrollY;
         window.scrollTo(0, 0); 
@@ -345,12 +485,7 @@ document.addEventListener('DOMContentLoaded', () => {
             margin: [0.5, 0.4, 0.5, 0.4], 
             filename: filename,
             image: { type: 'jpeg', quality: 1 },
-            html2canvas: { 
-                scale: 2, 
-                useCORS: true,
-                scrollY: 0, 
-                windowWidth: 850
-            },
+            html2canvas: { scale: 2, useCORS: true, scrollY: 0, windowWidth: 850 },
             jsPDF: { unit: 'in', format: 'A4', orientation: 'portrait' }
         }).from(element).save().then(() => {
             container.style.visibility = 'hidden';
@@ -359,7 +494,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.getElementById('btnGenerateAllPDF').addEventListener('click', () => {
-        buildPdfContent([1,2,3,4,5,6,7,8,9,10,11]);
+        buildPdfContent([1,2,3,4,5,6,7,8,9,10,11,12]);
         let d = document.getElementById('date_exp').value;
         generatePDF(`Rapport_Complet_STEP_${d}.pdf`);
     });
@@ -374,6 +509,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // 5. حفظ السجل اليومي
     document.getElementById('stepForm').addEventListener('submit', (e) => {
         e.preventDefault();
         const dateKey = document.getElementById('date_exp').value;
@@ -393,9 +529,23 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        let savedOuvrages = [];
+        document.querySelectorAll('.ouvrage-block').forEach(block => {
+            savedOuvrages.push({
+                quel: block.querySelector('.ouv_quel').value,
+                role: block.querySelector('.ouv_role').value,
+                type: block.querySelector('.ouv_type').value,
+                date: block.querySelector('.ouv_date').value,
+                ref: block.querySelector('.ouv_ref').value,
+                entreprise: block.querySelector('.ouv_entreprise').value,
+                remarques: block.querySelector('.ouv_remarques').value
+            });
+        });
+
         const dataToSave = {
             date: dateKey, meteo: document.getElementById('meteo').value, t_amb: document.getElementById('t_amb').value, pluvio: document.getElementById('pluvio').value,
             interventions: savedInterventions,
+            ouvrages: savedOuvrages,
             exploitation: { 
                 idx_in: document.getElementById('idx_in').value, diff_in: document.getElementById('diff_in').value,
                 idx_out: document.getElementById('idx_out').value, diff_out: document.getElementById('diff_out').value,
@@ -413,43 +563,14 @@ document.addEventListener('DOMContentLoaded', () => {
         alert(`✔ Fiche du ${dateKey} enregistrée avec succès !`);
     });
 
-    function calculatePV() {
-        const month = document.getElementById('date_exp').value.substring(0, 7);
-        let tdg=0, tdf=0, ts=0, tg=0;
-        
-        let savedPvData = localStorage.getItem('PV_Transport_Details');
-        if(savedPvData) {
-            let pvd = JSON.parse(savedPvData);
-            document.getElementById('pv_societe').value = pvd.societe || '';
-            document.getElementById('pv_chauffeur').value = pvd.chauffeur || '';
-            document.getElementById('pv_matricule').value = pvd.matricule || '';
-            document.getElementById('pv_agrement').value = pvd.agrement || '';
-            document.getElementById('pv_ville').value = pvd.ville || '';
-        }
-
-        for(let i=0; i<localStorage.length; i++) {
-            let k = localStorage.key(i);
-            if(k.startsWith(`STEP_${month}`)) {
-                let d = JSON.parse(localStorage.getItem(k));
-                tdg += Number(d.gestion?.dg)||0; 
-                tdf += Number(d.gestion?.df)||0; 
-                ts += Number(d.gestion?.sables)||0; 
-                tg += Number(d.gestion?.graisses)||0;
-            }
-        }
-        document.getElementById('pv_dg').innerText = tdg.toFixed(1);
-        document.getElementById('pv_df').innerText = tdf.toFixed(1);
-        document.getElementById('pv_sables').innerText = ts.toFixed(1);
-        document.getElementById('pv_graisses').innerText = tg.toFixed(1);
-    }
-
+    // 6. تصدير إكسيل
     document.getElementById('btnExportExcel').addEventListener('click', () => {
         const month = document.getElementById('exportMonth').value;
         if(!month) return alert("Veuillez sélectionner un mois.");
         
         let wb = XLSX.utils.book_new();
         let recapData = [
-            ["DATE", "Météo", "T(°C)", "Diff Vol In", "Diff Vol Out", "Diff Nrj", "Ratio 1j", "DCO In", "DBO5 In", "MES In", "DCO Out", "DBO5 Out", "MES Out", "Siccité (%)", "Nbr Interventions", "OBSERVATIONS"]
+            ["DATE", "Météo", "T(°C)", "Diff Vol In", "Diff Vol Out", "Diff Nrj", "Ratio 1j", "DCO In", "DBO5 In", "MES In", "DCO Out", "DBO5 Out", "MES Out", "Siccité (%)", "Nbr Interv.", "Nbr Ouvrages", "OBSERVATIONS"]
         ];
 
         for(let d=1; d<=31; d++) {
@@ -458,12 +579,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if(item) {
                 let data = JSON.parse(item);
                 let numInterv = data.interventions ? data.interventions.length : 0;
+                let numOuv = data.ouvrages ? data.ouvrages.length : 0;
                 recapData.push([
                     data.date, data.meteo, data.t_amb, 
                     data.exploitation?.diff_in, data.exploitation?.diff_out, data.exploitation?.diff_nrj, data.exploitation?.ratio_1j,
                     data.entree?.dco, data.entree?.dbo5, data.entree?.mes, data.parshall?.dco, data.parshall?.dbo5, data.parshall?.mes,
                     data.boues?.siccite,
-                    numInterv, data.obs
+                    numInterv, numOuv, data.obs
                 ]);
             }
         }
