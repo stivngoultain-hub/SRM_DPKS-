@@ -5,49 +5,58 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     setTimeout(() => { 
-        document.getElementById('splash-screen').classList.add('hidden-splash'); 
+        const splash = document.getElementById('splash-screen');
+        if(splash) splash.classList.add('hidden-splash'); 
     }, 2000);
 
     if (sessionStorage.getItem('isLoggedIn') === 'true') {
-        document.getElementById('login-screen').style.display = 'none';
+        const loginScreen = document.getElementById('login-screen');
+        if(loginScreen) loginScreen.style.display = 'none';
     }
 
-    document.getElementById('btn-login').addEventListener('click', () => {
-        const enteredPin = document.getElementById('login-pin').value;
-        const savedPin = localStorage.getItem(PIN_KEY);
-        if (enteredPin === savedPin) {
-            sessionStorage.setItem('isLoggedIn', 'true');
-            document.getElementById('login-screen').style.opacity = '0';
-            setTimeout(() => { document.getElementById('login-screen').style.display = 'none'; }, 300);
-        } else {
-            document.getElementById('login-error').style.display = 'block';
-            document.getElementById('login-pin').value = '';
-        }
-    });
+    const btnLogin = document.getElementById('btn-login');
+    if(btnLogin) {
+        btnLogin.addEventListener('click', () => {
+            const enteredPin = document.getElementById('login-pin').value;
+            const savedPin = localStorage.getItem(PIN_KEY);
+            if (enteredPin === savedPin) {
+                sessionStorage.setItem('isLoggedIn', 'true');
+                const loginScreen = document.getElementById('login-screen');
+                loginScreen.style.opacity = '0';
+                setTimeout(() => { loginScreen.style.display = 'none'; }, 300);
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+                document.getElementById('login-pin').value = '';
+            }
+        });
+    }
 
-    document.getElementById('btnChangePin').addEventListener('click', () => {
-        const oldPin = document.getElementById('old_pin').value;
-        const newPin = document.getElementById('new_pin').value;
-        const savedPin = localStorage.getItem(PIN_KEY);
-        const msgEl = document.getElementById('pin-msg');
+    const btnChangePin = document.getElementById('btnChangePin');
+    if(btnChangePin) {
+        btnChangePin.addEventListener('click', () => {
+            const oldPin = document.getElementById('old_pin').value;
+            const newPin = document.getElementById('new_pin').value;
+            const savedPin = localStorage.getItem(PIN_KEY);
+            const msgEl = document.getElementById('pin-msg');
 
-        if (oldPin !== savedPin) {
-            msgEl.textContent = 'Ancien code PIN incorrect !';
-            msgEl.className = 'text-center mt-10 text-red';
-            return;
-        }
-        if (newPin.length < 4) {
-            msgEl.textContent = 'Le nouveau code doit contenir au moins 4 caractères.';
-            msgEl.className = 'text-center mt-10 text-red';
-            return;
-        }
+            if (oldPin !== savedPin) {
+                msgEl.textContent = 'Ancien code PIN incorrect !';
+                msgEl.className = 'text-center mt-10 text-red';
+                return;
+            }
+            if (newPin.length < 4) {
+                msgEl.textContent = 'Le nouveau code doit contenir au moins 4 caractères.';
+                msgEl.className = 'text-center mt-10 text-red';
+                return;
+            }
 
-        localStorage.setItem(PIN_KEY, newPin);
-        msgEl.textContent = 'Code PIN mis à jour avec succès !';
-        msgEl.className = 'text-center mt-10 text-green';
-        document.getElementById('old_pin').value = '';
-        document.getElementById('new_pin').value = '';
-    });
+            localStorage.setItem(PIN_KEY, newPin);
+            msgEl.textContent = 'Code PIN mis à jour avec succès !';
+            msgEl.className = 'text-center mt-10 text-green';
+            document.getElementById('old_pin').value = '';
+            document.getElementById('new_pin').value = '';
+        });
+    }
 
     const navItems = document.querySelectorAll('.nav-item');
     const tabPanes = document.querySelectorAll('.tab-pane');
@@ -56,13 +65,16 @@ document.addEventListener('DOMContentLoaded', () => {
             navItems.forEach(b => b.classList.remove('active'));
             tabPanes.forEach(p => p.classList.remove('active'));
             btn.classList.add('active');
-            document.getElementById(btn.dataset.target).classList.add('active');
+            const target = document.getElementById(btn.dataset.target);
+            if(target) target.classList.add('active');
         });
     });
 
     const todayStr = new Date().toISOString().split('T')[0];
-    document.getElementById('date_exp').value = todayStr;
-    document.getElementById('pv_date').value = todayStr;
+    const dateExp = document.getElementById('date_exp');
+    const pvDate = document.getElementById('pv_date');
+    if(dateExp) dateExp.value = todayStr;
+    if(pvDate) pvDate.value = todayStr;
 
     // تبديل نماذج Signalement d'anomalie حسب الاختيار
     const anomTypeSelect = document.getElementById('anom_type');
@@ -73,16 +85,19 @@ document.addEventListener('DOMContentLoaded', () => {
         'Autres': document.getElementById('anom_sec_autres')
     };
 
-    anomTypeSelect.addEventListener('change', () => {
-        let val = anomTypeSelect.value;
-        Object.keys(anomSections).forEach(k => {
-            anomSections[k].style.display = (k === val) ? 'block' : 'none';
+    if(anomTypeSelect) {
+        anomTypeSelect.addEventListener('change', () => {
+            let val = anomTypeSelect.value;
+            Object.keys(anomSections).forEach(k => {
+                if(anomSections[k]) anomSections[k].style.display = (k === val) ? 'block' : 'none';
+            });
         });
-    });
+    }
 
     // تخزين صور الإبلاغ عن العيوب
     let anomPhotos = { equip: [], ouvrage: [], engin: [], autres: [] };
     function handleAnomImages(inputEl, previewEl, key) {
+        if(!inputEl) return;
         inputEl.addEventListener('change', function() {
             previewEl.innerHTML = '';
             anomPhotos[key] = [];
@@ -107,47 +122,51 @@ document.addEventListener('DOMContentLoaded', () => {
     handleAnomImages(document.getElementById('anom_engin_photos'), document.getElementById('anom_engin_preview'), 'engin');
     handleAnomImages(document.getElementById('anom_autre_photos'), document.getElementById('anom_autre_preview'), 'autres');
 
-    document.getElementById('btnSaveAnomalie').addEventListener('click', () => {
-        let type = anomTypeSelect.value;
-        let anomData = { type, date: todayStr };
-        if(type === 'Equipements') {
-            anomData.nom = document.getElementById('anom_eq_nom').value;
-            anomData.etape = document.getElementById('anom_eq_etape').value;
-            anomData.role = document.getElementById('anom_eq_role').value;
-            anomData.def = document.getElementById('anom_eq_def').value;
-            anomData.sol = document.getElementById('anom_eq_sol').value;
-            anomData.pdr = document.getElementById('anom_eq_pdr').value;
-            anomData.duree = document.getElementById('anom_eq_duree').value;
-            anomData.impact = document.getElementById('anom_eq_impact').value;
-            anomData.rem = document.getElementById('anom_eq_rem').value;
-            anomData.photos = anomPhotos.equip;
-        } else if(type === 'Ouvrage') {
-            anomData.nom = document.getElementById('anom_ouv_nom').value;
-            anomData.rem = document.getElementById('anom_ouv_rem').value;
-            anomData.photos = anomPhotos.ouvrage;
-        } else if(type === 'Engin') {
-            anomData.enginType = document.getElementById('anom_engin_type').value;
-            anomData.mat = document.getElementById('anom_engin_mat').value;
-            anomData.km = document.getElementById('anom_engin_km').value;
-            anomData.prob = document.getElementById('anom_engin_prob').value;
-            anomData.sol = document.getElementById('anom_engin_sol').value;
-            anomData.impact = document.getElementById('anom_engin_impact').value;
-            anomData.rem = document.getElementById('anom_engin_rem').value;
-            anomData.photos = anomPhotos.engin;
-        } else {
-            anomData.rem = document.getElementById('anom_autre_rem').value;
-            anomData.photos = anomPhotos.autres;
-        }
-        localStorage.setItem(`Anomalie_${Date.now()}`, JSON.stringify(anomData));
-        alert("✔ Signalement d'anomalie enregistré avec succès !");
-    });
+    const btnSaveAnomalie = document.getElementById('btnSaveAnomalie');
+    if(btnSaveAnomalie) {
+        btnSaveAnomalie.addEventListener('click', () => {
+            let type = anomTypeSelect ? anomTypeSelect.value : 'Equipements';
+            let anomData = { type, date: todayStr };
+            if(type === 'Equipements') {
+                anomData.nom = document.getElementById('anom_eq_nom').value;
+                anomData.etape = document.getElementById('anom_eq_etape').value;
+                anomData.role = document.getElementById('anom_eq_role').value;
+                anomData.def = document.getElementById('anom_eq_def').value;
+                anomData.sol = document.getElementById('anom_eq_sol').value;
+                anomData.pdr = document.getElementById('anom_eq_pdr').value;
+                anomData.duree = document.getElementById('anom_eq_duree').value;
+                anomData.impact = document.getElementById('anom_eq_impact').value;
+                anomData.rem = document.getElementById('anom_eq_rem').value;
+                anomData.photos = anomPhotos.equip;
+            } else if(type === 'Ouvrage') {
+                anomData.nom = document.getElementById('anom_ouv_nom').value;
+                anomData.rem = document.getElementById('anom_ouv_rem').value;
+                anomData.photos = anomPhotos.ouvrage;
+            } else if(type === 'Engin') {
+                anomData.enginType = document.getElementById('anom_engin_type').value;
+                anomData.mat = document.getElementById('anom_engin_mat').value;
+                anomData.km = document.getElementById('anom_engin_km').value;
+                anomData.prob = document.getElementById('anom_engin_prob').value;
+                anomData.sol = document.getElementById('anom_engin_sol').value;
+                anomData.impact = document.getElementById('anom_engin_impact').value;
+                anomData.rem = document.getElementById('anom_engin_rem').value;
+                anomData.photos = anomPhotos.engin;
+            } else {
+                anomData.rem = document.getElementById('anom_autre_rem').value;
+                anomData.photos = anomPhotos.autres;
+            }
+            localStorage.setItem(`Anomalie_${Date.now()}`, JSON.stringify(anomData));
+            alert("✔ Signalement d'anomalie enregistré avec succès !");
+        });
+    }
 
     async function fetchAutoWeather() {
         try {
             const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=32.0494&longitude=-7.4083&current_weather=true`);
             const data = await response.json();
             if(data && data.current_weather) {
-                document.getElementById('t_amb').value = data.current_weather.temperature;
+                const tamb = document.getElementById('t_amb');
+                if(tamb) tamb.value = data.current_weather.temperature;
             }
         } catch (e) {}
     }
@@ -155,10 +174,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.exploit-input').forEach(input => {
         input.addEventListener('input', () => {
-            let diffIn = parseFloat(document.getElementById('diff_in').value) || 0;
-            let diffNrj = parseFloat(document.getElementById('diff_nrj').value) || 0;
-            if (diffIn > 0) document.getElementById('ratio_1j').value = (diffNrj / diffIn).toFixed(3);
-            else document.getElementById('ratio_1j').value = '';
+            let diffIn = parseFloat(document.getElementById('diff_in')?.value) || 0;
+            let diffNrj = parseFloat(document.getElementById('diff_nrj')?.value) || 0;
+            let ratio = document.getElementById('ratio_1j');
+            if(ratio) {
+                if (diffIn > 0) ratio.value = (diffNrj / diffIn).toFixed(3);
+                else ratio.value = '';
+            }
         });
     });
 
@@ -174,203 +196,211 @@ document.addEventListener('DOMContentLoaded', () => {
     let interventionPhotosMap = { "1": { avant: [], apres: [] } };
     let intCounter = 1;
 
-    document.getElementById('btnAddIntervention').addEventListener('click', () => {
-        intCounter++;
-        interventionPhotosMap[intCounter.toString()] = { avant: [], apres: [] };
-        const container = document.getElementById('interventions_container');
-        const newBlock = document.createElement('div');
-        newBlock.className = 'intervention-block';
-        newBlock.setAttribute('data-id', intCounter.toString());
-        newBlock.innerHTML = `
-            <div class="intervention-header">
-                <h5>Intervention Équipement #${intCounter}</h5>
-                <button type="button" class="btn-remove-int"><i class="fa-solid fa-trash"></i></button>
-            </div>
-            <div class="form-grid">
-                <div class="input-group full-width"><label>Équipement</label><input type="text" class="int_equip"></div>
-                <div class="input-group"><label>Puissance (kW)</label><input type="text" class="int_puiss"></div>
-                <div class="input-group"><label>Rôle</label><input type="text" class="int_role"></div>
-                <div class="input-group"><label>Date d'intervention</label><input type="date" class="int_date"></div>
-                <div class="input-group"><label>Durée (Heures)</label><input type="number" class="int_duree" step="0.5"></div>
-                
-                <div class="input-group">
-                    <label>Étape de traitement</label>
-                    <select class="int_etape">
-                        <option value="Prétraitement">Prétraitement</option>
-                        <option value="Traitement primaire">Traitement primaire</option>
-                        <option value="Traitement secondaire">Traitement secondaire</option>
-                        <option value="Traitement tertiaire">Traitement tertiaire</option>
-                    </select>
+    const btnAddIntervention = document.getElementById('btnAddIntervention');
+    if(btnAddIntervention) {
+        btnAddIntervention.addEventListener('click', () => {
+            intCounter++;
+            interventionPhotosMap[intCounter.toString()] = { avant: [], apres: [] };
+            const container = document.getElementById('interventions_container');
+            const newBlock = document.createElement('div');
+            newBlock.className = 'intervention-block';
+            newBlock.setAttribute('data-id', intCounter.toString());
+            newBlock.innerHTML = `
+                <div class="intervention-header">
+                    <h5>Intervention Équipement #${intCounter}</h5>
+                    <button type="button" class="btn-remove-int"><i class="fa-solid fa-trash"></i></button>
                 </div>
+                <div class="form-grid">
+                    <div class="input-group full-width"><label>Équipement</label><input type="text" class="int_equip"></div>
+                    <div class="input-group"><label>Puissance (kW)</label><input type="text" class="int_puiss"></div>
+                    <div class="input-group"><label>Rôle</label><input type="text" class="int_role"></div>
+                    <div class="input-group"><label>Date d'intervention</label><input type="date" class="int_date"></div>
+                    <div class="input-group"><label>Durée (Heures)</label><input type="number" class="int_duree" step="0.5"></div>
+                    
+                    <div class="input-group">
+                        <label>Étape de traitement</label>
+                        <select class="int_etape">
+                            <option value="Prétraitement">Prétraitement</option>
+                            <option value="Traitement primaire">Traitement primaire</option>
+                            <option value="Traitement secondaire">Traitement secondaire</option>
+                            <option value="Traitement tertiaire">Traitement tertiaire</option>
+                        </select>
+                    </div>
 
-                <div class="input-group">
-                    <label>Types de panne (Sélectionnez un ou deux)</label>
-                    <div style="display:flex; flex-direction:column; gap:6px; background:var(--input-bg); padding:8px; border-radius:8px; border:1px solid var(--border-color);">
-                        <label style="font-weight:normal; font-size:0.9rem;"><input type="checkbox" class="int_panne_chk" value="Panne électrique"> Panne électrique</label>
-                        <label style="font-weight:normal; font-size:0.9rem;"><input type="checkbox" class="int_panne_chk" value="Panne mécanique"> Panne mécanique</label>
-                        <label style="font-weight:normal; font-size:0.9rem;"><input type="checkbox" class="int_panne_chk" value="Panne hydraulique"> Panne hydraulique</label>
+                    <div class="input-group">
+                        <label>Types de panne (Sélectionnez un ou deux)</label>
+                        <div style="display:flex; flex-direction:column; gap:6px; background:var(--input-bg); padding:8px; border-radius:8px; border:1px solid var(--border-color);">
+                            <label style="font-weight:normal; font-size:0.9rem;"><input type="checkbox" class="int_panne_chk" value="Panne électrique"> Panne électrique</label>
+                            <label style="font-weight:normal; font-size:0.9rem;"><input type="checkbox" class="int_panne_chk" value="Panne mécanique"> Panne mécanique</label>
+                            <label style="font-weight:normal; font-size:0.9rem;"><input type="checkbox" class="int_panne_chk" value="Panne hydraulique"> Panne hydraulique</label>
+                        </div>
+                    </div>
+
+                    <div class="input-group full-width"><label>Matériel utilisé</label><textarea class="int_materiel" rows="2" placeholder="Chaque matériel sur une ligne..."></textarea></div>
+                    <div class="input-group full-width"><label>PDR utilisés</label><textarea class="int_pdr" rows="2" placeholder="Chaque pièce sur une ligne..."></textarea></div>
+                    
+                    <div class="input-group">
+                        <label class="text-orange"><i class="fa-solid fa-camera"></i> Photos AVANT</label>
+                        <input type="file" accept="image/*" multiple class="file-upload-input int_photos_avant">
+                        <div class="photos-preview-avant mt-10"></div>
+                    </div>
+                    <div class="input-group">
+                        <label class="text-green"><i class="fa-solid fa-camera"></i> Photos APRÈS</label>
+                        <input type="file" accept="image/*" multiple class="file-upload-input int_photos_apres">
+                        <div class="photos-preview-apres mt-10"></div>
                     </div>
                 </div>
-
-                <div class="input-group full-width"><label>Matériel utilisé</label><textarea class="int_materiel" rows="2" placeholder="Chaque matériel sur une ligne..."></textarea></div>
-                <div class="input-group full-width"><label>PDR utilisés</label><textarea class="int_pdr" rows="2" placeholder="Chaque pièce sur une ligne..."></textarea></div>
-                
-                <div class="input-group">
-                    <label class="text-orange"><i class="fa-solid fa-camera"></i> Photos AVANT</label>
-                    <input type="file" accept="image/*" multiple class="file-upload-input int_photos_avant">
-                    <div class="photos-preview-avant mt-10"></div>
-                </div>
-                <div class="input-group">
-                    <label class="text-green"><i class="fa-solid fa-camera"></i> Photos APRÈS</label>
-                    <input type="file" accept="image/*" multiple class="file-upload-input int_photos_apres">
-                    <div class="photos-preview-apres mt-10"></div>
-                </div>
-            </div>
-        `;
-        container.appendChild(newBlock);
-        newBlock.querySelector('.btn-remove-int').addEventListener('click', function() {
-            delete interventionPhotosMap[intCounter.toString()];
-            newBlock.remove();
-        });
-    });
-
-    document.getElementById('interventions_container').addEventListener('change', function(e) {
-        if(e.target.classList.contains('int_photos_avant') || e.target.classList.contains('int_photos_apres')) {
-            const block = e.target.closest('.intervention-block');
-            const blockId = block.getAttribute('data-id');
-            const isAvant = e.target.classList.contains('int_photos_avant');
-            const previewContainer = block.querySelector(isAvant ? '.photos-preview-avant' : '.photos-preview-apres');
-            
-            previewContainer.innerHTML = '';
-            if(isAvant) interventionPhotosMap[blockId].avant = [];
-            else interventionPhotosMap[blockId].apres = [];
-            
-            Array.from(e.target.files).forEach(file => {
-                if(file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        const b64 = event.target.result;
-                        if(isAvant) interventionPhotosMap[blockId].avant.push(b64);
-                        else interventionPhotosMap[blockId].apres.push(b64);
-                        const img = document.createElement('img');
-                        img.src = b64;
-                        previewContainer.appendChild(img);
-                    };
-                    reader.readAsDataURL(file);
-                }
+            `;
+            container.appendChild(newBlock);
+            newBlock.querySelector('.btn-remove-int').addEventListener('click', function() {
+                delete interventionPhotosMap[newBlock.getAttribute('data-id')];
+                newBlock.remove();
             });
-        }
-    });
+        });
+    }
+
+    const intContainer = document.getElementById('interventions_container');
+    if(intContainer) {
+        intContainer.addEventListener('change', function(e) {
+            if(e.target.classList.contains('int_photos_avant') || e.target.classList.contains('int_photos_apres')) {
+                const block = e.target.closest('.intervention-block');
+                const blockId = block.getAttribute('data-id');
+                const isAvant = e.target.classList.contains('int_photos_avant');
+                const previewContainer = block.querySelector(isAvant ? '.photos-preview-avant' : '.photos-preview-apres');
+                
+                previewContainer.innerHTML = '';
+                if(isAvant) interventionPhotosMap[blockId].avant = [];
+                else interventionPhotosMap[blockId].apres = [];
+                
+                Array.from(e.target.files).forEach(file => {
+                    if(file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            const b64 = event.target.result;
+                            if(isAvant) interventionPhotosMap[blockId].avant.push(b64);
+                            else interventionPhotosMap[blockId].apres.push(b64);
+                            const img = document.createElement('img');
+                            img.src = b64;
+                            previewContainer.appendChild(img);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        });
+    }
 
     // Interventions sur Ouvrage
     let ouvragePhotosMap = { "1": [] };
     let ouvCounter = 1;
 
-    document.getElementById('btnAddOuvrage').addEventListener('click', () => {
-        ouvCounter++;
-        ouvragePhotosMap[ouvCounter.toString()] = [];
-        const container = document.getElementById('ouvrages_container');
-        const newBlock = document.createElement('div');
-        newBlock.className = 'ouvrage-block';
-        newBlock.setAttribute('data-id', ouvCounter.toString());
-        newBlock.innerHTML = `
-            <div class="intervention-header">
-                <h5>Intervention Ouvrage #${ouvCounter}</h5>
-                <button type="button" class="btn-remove-ouv"><i class="fa-solid fa-trash"></i></button>
-            </div>
-            <div class="form-grid">
-                <div class="input-group">
-                    <label>Quel Ouvrage</label>
-                    <select class="ouv_quel">
-                        <option value="Station de relevage">Station de relevage</option>
-                        <option value="Parshall d'entrée">Parshall d'entrée</option>
-                        <option value="Répartiteur">Répartiteur</option>
-                        <option value="Dessableur-déshuileur 1">Dessableur-déshuileur 1</option>
-                        <option value="Dessableur-déshuileur 2">Dessableur-déshuileur 2</option>
-                        <option value="Equi-repartiteur">Equi-repartiteur</option>
-                        <option value="Les bassins anaérobies">Les bassins anaérobies</option>
-                        <option value="Les lits bactériens">Les lits bactériens</option>
-                        <option value="Les clarificateurs">Les clarificateurs</option>
-                        <option value="Tirtaite">Tirtaite</option>
-                        <option value="SP eau de service">SP eau de service</option>
-                    </select>
+    const btnAddOuvrage = document.getElementById('btnAddOuvrage');
+    if(btnAddOuvrage) {
+        btnAddOuvrage.addEventListener('click', () => {
+            ouvCounter++;
+            ouvragePhotosMap[ouvCounter.toString()] = [];
+            const container = document.getElementById('ouvrages_container');
+            const newBlock = document.createElement('div');
+            newBlock.className = 'ouvrage-block';
+            newBlock.setAttribute('data-id', ouvCounter.toString());
+            newBlock.innerHTML = `
+                <div class="intervention-header">
+                    <h5>Intervention Ouvrage #${ouvCounter}</h5>
+                    <button type="button" class="btn-remove-ouv"><i class="fa-solid fa-trash"></i></button>
                 </div>
-                <div class="input-group"><label>Rôle de l'ouvrage</label><input type="text" class="ouv_role"></div>
-                <div class="input-group">
-                    <label>Type d'intervention</label>
-                    <select class="ouv_type">
-                        <option value="Réhabilitation">Réhabilitation</option>
-                        <option value="Réparation">Réparation</option>
-                        <option value="Nettoyage par jet d'eau">Nettoyage par jet d'eau</option>
-                        <option value="Installation d'un équipement">Installation d'un équipement</option>
-                        <option value="Modification">Modification</option>
-                    </select>
-                </div>
-                <div class="input-group"><label>Date d'intervention</label><input type="date" class="ouv_date"></div>
-                <div class="input-group"><label>Référence de marché</label><input type="text" class="ouv_ref"></div>
-                <div class="input-group"><label>Nom de l'entreprise</label><input type="text" class="ouv_entreprise"></div>
-                <div class="input-group full-width"><label>Remarques</label><textarea class="ouv_remarques" rows="2"></textarea></div>
-                <div class="input-group full-width">
-                    <label class="text-cyan"><i class="fa-solid fa-camera"></i> Photos de l'ouvrage</label>
-                    <input type="file" accept="image/*" multiple class="file-upload-input ouv_photos">
-                    <div class="photos-preview-ouv mt-10" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
-                </div>
-            </div>
-        `;
-        container.appendChild(newBlock);
-        newBlock.querySelector('.btn-remove-ouv').addEventListener('click', function() {
-            delete ouvragePhotosMap[ouvCounter.toString()];
-            newBlock.remove();
-        });
-    });
-
-    document.getElementById('ouvrages_container').addEventListener('change', function(e) {
-        if(e.target.classList.contains('ouv_photos')) {
-            const block = e.target.closest('.ouvrage-block');
-            const blockId = block.getAttribute('data-id');
-            const previewContainer = block.querySelector('.photos-preview-ouv');
-            
-            previewContainer.innerHTML = '';
-            ouvragePhotosMap[blockId] = [];
-            
-            Array.from(e.target.files).forEach(file => {
-                if(file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        const b64 = event.target.result;
-                        ouvragePhotosMap[blockId].push(b64);
-                        const img = document.createElement('img');
-                        img.src = b64;
-                        previewContainer.appendChild(img);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        }
-    });
-
-    // بناء الـ PDF مع الترويسة الرسمية الجديدة وحجم الصور الأكبر
-    function buildPdfContent(cardsToInclude) {
-        let logoImgSrc = document.getElementById('main-logo') ? document.getElementById('main-logo').src : 'logo.png';
-        
-        // الترويسة الرسمية المطلوبة بالضبط
-        let contentHTML = `
-            <div style="border-bottom: 2px solid #1c3d5a; padding-bottom: 12px; margin-bottom: 25px; display:flex; justify-content:space-between; align-items:center;">
-                <div style="display:flex; align-items:center; gap:15px;">
-                    <img src="${logoImgSrc}" style="max-height: 65px; mix-blend-mode: multiply;" crossorigin="anonymous">
-                    <div>
-                        <h3 style="margin:0; font-size:13px; color:#1c3d5a; font-weight:700;">Société régionale multiservices Marrakech-Safi</h3>
-                        <p style="margin:2px 0; font-size:11px; color:#4a637c; font-weight:600;">Direction provinciale El kalâa des sraghna</p>
-                        <p style="margin:2px 0; font-size:11px; color:#4a637c; font-weight:600;">Département assainissement liquide</p>
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>Quel Ouvrage</label>
+                        <select class="ouv_quel">
+                            <option value="Station de relevage">Station de relevage</option>
+                            <option value="Parshall d'entrée">Parshall d'entrée</option>
+                            <option value="Répartiteur">Répartiteur</option>
+                            <option value="Dessableur-déshuileur 1">Dessableur-déshuileur 1</option>
+                            <option value="Dessableur-déshuileur 2">Dessableur-déshuileur 2</option>
+                            <option value="Equi-repartiteur">Equi-repartiteur</option>
+                            <option value="Les bassins anaérobies">Les bassins anaérobies</option>
+                            <option value="Les lits bactériens">Les lits bactériens</option>
+                            <option value="Les clarificateurs">Les clarificateurs</option>
+                            <option value="Tirtaite">Tirtaite</option>
+                            <option value="SP eau de service">SP eau de service</option>
+                        </select>
+                    </div>
+                    <div class="input-group"><label>Rôle de l'ouvrage</label><input type="text" class="ouv_role"></div>
+                    <div class="input-group">
+                        <label>Type d'intervention</label>
+                        <select class="ouv_type">
+                            <option value="Réhabilitation">Réhabilitation</option>
+                            <option value="Réparation">Réparation</option>
+                            <option value="Nettoyage par jet d'eau">Nettoyage par jet d'eau</option>
+                            <option value="Installation d'un équipement">Installation d'un équipement</option>
+                            <option value="Modification">Modification</option>
+                        </select>
+                    </div>
+                    <div class="input-group"><label>Date d'intervention</label><input type="date" class="ouv_date"></div>
+                    <div class="input-group"><label>Référence de marché</label><input type="text" class="ouv_ref"></div>
+                    <div class="input-group"><label>Nom de l'entreprise</label><input type="text" class="ouv_entreprise"></div>
+                    <div class="input-group full-width"><label>Remarques</label><textarea class="ouv_remarques" rows="2"></textarea></div>
+                    <div class="input-group full-width">
+                        <label class="text-cyan"><i class="fa-solid fa-camera"></i> Photos de l'ouvrage</label>
+                        <input type="file" accept="image/*" multiple class="file-upload-input ouv_photos">
+                        <div class="photos-preview-ouv mt-10" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
                     </div>
                 </div>
-                <div style="text-align:right;">
-                    <p style="margin:0; font-size:10px; color:#5f6368; font-weight:600;">Division exploitation des ouvrages d'assainissement liquide</p>
-                    <p style="margin:2px 0; font-size:11px; color:#1c3d5a; font-weight:800;">Service : STEP</p>
-                    <p style="margin:2px 0; font-size:11px; color:#d94f1c; font-weight:bold;">Date : ${document.getElementById('date_exp').value}</p>
-                </div>
+            `;
+            container.appendChild(newBlock);
+            newBlock.querySelector('.btn-remove-ouv').addEventListener('click', function() {
+                delete ouvragePhotosMap[newBlock.getAttribute('data-id')];
+                newBlock.remove();
+            });
+        });
+    }
+
+    const ouvContainer = document.getElementById('ouvrages_container');
+    if(ouvContainer) {
+        ouvContainer.addEventListener('change', function(e) {
+            if(e.target.classList.contains('ouv_photos')) {
+                const block = e.target.closest('.ouvrage-block');
+                const blockId = block.getAttribute('data-id');
+                const previewContainer = block.querySelector('.photos-preview-ouv');
+                
+                previewContainer.innerHTML = '';
+                ouvragePhotosMap[blockId] = [];
+                
+                Array.from(e.target.files).forEach(file => {
+                    if(file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            const b64 = event.target.result;
+                            ouvragePhotosMap[blockId].push(b64);
+                            const img = document.createElement('img');
+                            img.src = b64;
+                            previewContainer.appendChild(img);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        });
+    }
+
+    // بناء الـ PDF مع الترويسة المركزية، التاريخ الكامل، شعار logo.png، والصور الأكبر
+    function buildPdfContent(cardsToInclude) {
+        let logoImgSrc = 'logo.png';
+        
+        let rawDate = document.getElementById('date_exp').value;
+        let formattedDate = rawDate ? new Date(rawDate).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' }) : '-';
+
+        let contentHTML = `
+            <div style="text-align: center; border-bottom: 2px solid #1c3d5a; padding-bottom: 15px; margin-bottom: 25px;">
+                <img src="${logoImgSrc}" style="max-height: 70px; margin-bottom: 10px; mix-blend-mode: multiply;" crossorigin="anonymous">
+                <h3 style="margin: 0 0 4px 0; font-size: 14px; color: #1c3d5a; font-weight: 700; text-transform: uppercase;">Société régionale multiservices Marrakech-Safi</h3>
+                <p style="margin: 2px 0; font-size: 12px; color: #4a637c; font-weight: 600;">Direction provinciale El kalâa des sraghna</p>
+                <p style="margin: 2px 0; font-size: 12px; color: #4a637c; font-weight: 600;">Département assainissement liquide</p>
+                <p style="margin: 2px 0; font-size: 11px; color: #5f6368; font-weight: 500;">Division exploitation des ouvrages d'assainissement liquide</p>
+                <p style="margin: 4px 0 0 0; font-size: 12px; color: #1c3d5a; font-weight: 800;">Service : STEP</p>
+                <p style="margin: 8px 0 0 0; font-size: 12px; color: #d94f1c; font-weight: bold;">Date : ${formattedDate}</p>
             </div>
-            <h1 style="text-align:center; font-size:20px; color:#1c3d5a; margin-bottom:20px; text-transform:uppercase;">Rapport d'Exploitation & Suivi</h1>
+            <h1 style="text-align: center; font-size: 18px; color: #1c3d5a; margin-bottom: 20px; text-transform: uppercase;">Rapport d'Exploitation & Suivi</h1>
         `;
 
         const allCards = document.querySelectorAll('.accordion-item');
@@ -386,7 +416,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let cardTitle = card.querySelector('.header-title span').innerText;
             contentHTML += `<div style="${pageBreakStyle} margin-bottom: 30px;"><h2 style="font-size: 14px; color: #1c3d5a; border-bottom: 1px solid #1c3d5a; padding-bottom: 6px; margin-bottom: 15px; text-transform: uppercase;">${cardTitle}</h2>`;
 
-            if (cardNum === 3) { // Interventions Équipements
+            if (cardNum === 3) {
                 const blocks = card.querySelectorAll('.intervention-block');
                 if(blocks.length === 0) contentHTML += `<p style="font-size:13px; color:#80868b; font-style: italic;">Aucune intervention.</p>`;
                 blocks.forEach(block => {
@@ -398,7 +428,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     let duree = block.querySelector('.int_duree').value || '-';
                     let etape = block.querySelector('.int_etape').value || '-';
                     
-                    // جمع أنواع الأعطال المحددة
                     let pannes = [];
                     block.querySelectorAll('.int_panne_chk:checked').forEach(chk => pannes.push(chk.value));
                     let panneType = pannes.length > 0 ? pannes.join(' + ') : '-';
@@ -421,19 +450,19 @@ document.addEventListener('DOMContentLoaded', () => {
                             </table>
                     `;
                     let photos = interventionPhotosMap[id];
-                    if((photos.avant && photos.avant.length > 0) || (photos.apres && photos.apres.length > 0)) {
+                    if((photos && photos.avant && photos.avant.length > 0) || (photos && photos.apres && photos.apres.length > 0)) {
                         contentHTML += `<div style="display:flex; justify-content:space-between; gap:15px; border-top:1px solid #e8eaed; padding-top:10px;">`;
                         contentHTML += `<div style="width:48%;"><h5 style="color:#d93025; font-size:11px; margin-bottom:5px;">AVANT</h5><div style="display:flex; gap:8px; flex-wrap:wrap;">`;
-                        (photos.avant || []).forEach(p => { contentHTML += `<img src="${p}" style="width:150px; height:110px; object-fit:cover; border-radius:6px; border:1px solid #ccc;">`; });
+                        (photos.avant || []).forEach(p => { contentHTML += `<img src="${p}" style="width:160px; height:120px; object-fit:cover; border-radius:6px; border:1px solid #ccc;">`; });
                         contentHTML += `</div></div>`;
                         contentHTML += `<div style="width:48%;"><h5 style="color:#2d8a35; font-size:11px; margin-bottom:5px;">APRÈS</h5><div style="display:flex; gap:8px; flex-wrap:wrap;">`;
-                        (photos.apres || []).forEach(p => { contentHTML += `<img src="${p}" style="width:150px; height:110px; object-fit:cover; border-radius:6px; border:1px solid #ccc;">`; });
+                        (photos.apres || []).forEach(p => { contentHTML += `<img src="${p}" style="width:160px; height:120px; object-fit:cover; border-radius:6px; border:1px solid #ccc;">`; });
                         contentHTML += `</div></div></div>`;
                     }
                     contentHTML += `</div>`;
                 });
             }
-            else if (cardNum === 4) { // Interventions sur Ouvrage
+            else if (cardNum === 4) {
                 const ouvBlocks = card.querySelectorAll('.ouvrage-block');
                 if(ouvBlocks.length === 0) contentHTML += `<p style="font-size:13px; color:#80868b; font-style: italic;">Aucune intervention sur ouvrage.</p>`;
                 ouvBlocks.forEach(block => {
@@ -459,13 +488,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     let oPhotos = ouvragePhotosMap[id];
                     if(oPhotos && oPhotos.length > 0) {
                         contentHTML += `<div style="border-top:1px solid #e8eaed; padding-top:10px;"><h5 style="color:#358898; font-size:11px; margin-bottom:5px;">PHOTOS OUVRAGE</h5><div style="display:flex; gap:10px; flex-wrap:wrap;">`;
-                        oPhotos.forEach(p => { contentHTML += `<img src="${p}" style="width:150px; height:110px; object-fit:cover; border-radius:6px; border:1px solid #ccc;">`; });
+                        oPhotos.forEach(p => { contentHTML += `<img src="${p}" style="width:160px; height:120px; object-fit:cover; border-radius:6px; border:1px solid #ccc;">`; });
                         contentHTML += `</div></div>`;
                     }
                     contentHTML += `</div>`;
                 });
             }
-            else if (cardNum === 12) { // Observations
+            else if (cardNum === 12) {
                 let obs = document.getElementById('obs_text').value || 'Aucune observation.';
                 contentHTML += `<div style="font-size:13px; color:#3c4043; line-height:1.6; background:#f8f9fa; border-left: 3px solid #fbbc04; padding:12px; border-radius:4px;">${obs.replace(/\n/g, '<br>')}</div>`;
             }
@@ -499,7 +528,7 @@ document.addEventListener('DOMContentLoaded', () => {
             contentHTML += `</div>`;
         });
 
-        // إضافة قسم التقارير الخاصة بـ Anomalies إن وجدت
+        // إضافة العيوب المسجلة إن وجدت
         let anomalyKeys = Object.keys(localStorage).filter(k => k.startsWith('Anomalie_'));
         if(anomalyKeys.length > 0 && cardsToInclude.includes(12)) {
             contentHTML += `<div style="page-break-before: always; padding-top: 20px;"><h2 style="font-size: 14px; color: #1c3d5a; border-bottom: 1px solid #1c3d5a; padding-bottom: 6px; margin-bottom: 15px; text-transform: uppercase;">SIGNALEMENTS D'ANOMALIES</h2>`;
@@ -518,8 +547,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(anom.rem) contentHTML += `<tr><td style="padding:4px 0;"><b>Remarques :</b> ${anom.rem}</td></tr>`;
                 contentHTML += `</table>`;
                 if(anom.photos && anom.photos.length > 0) {
-                    contentHTML += `<div style="margin-top:10px; border-top:1px dashed #ccc; padding-top:8px;"><div style="display:flex; gap:8px; flex-wrap:wrap;">`;
-                    anom.photos.forEach(p => { contentHTML += `<img src="${p}" style="width:150px; height:110px; object-fit:cover; border-radius:6px; border:1px solid #ccc;">`; });
+                    contentHTML += `<div style="margin-top:10px; border-top:1px dashed #ccc; padding-top:8px;"><div style="display:flex; gap:10px; flex-wrap:wrap;">`;
+                    anom.photos.forEach(p => { contentHTML += `<img src="${p}" style="width:160px; height:120px; object-fit:cover; border-radius:6px; border:1px solid #ccc;">`; });
                     contentHTML += `</div></div>`;
                 }
                 contentHTML += `</div>`;
@@ -534,6 +563,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function generatePDF(filename) {
         const container = document.getElementById('pdf-master-container');
         const element = document.getElementById('pdf-dynamic-content');
+        if(!container || !element) return;
         container.style.visibility = 'visible';
         const currentScroll = window.scrollY;
         window.scrollTo(0, 0); 
@@ -550,11 +580,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    document.getElementById('btnGenerateAllPDF').addEventListener('click', () => {
-        buildPdfContent([1,2,3,4,5,6,7,8,9,10,11,12]);
-        let d = document.getElementById('date_exp').value;
-        generatePDF(`Rapport_Complet_STEP_${d}.pdf`);
-    });
+    const btnGenerateAllPDF = document.getElementById('btnGenerateAllPDF');
+    if(btnGenerateAllPDF) {
+        btnGenerateAllPDF.addEventListener('click', () => {
+            buildPdfContent([1,2,3,4,5,6,7,8,9,10,11,12]);
+            let d = document.getElementById('date_exp').value;
+            generatePDF(`Rapport_Complet_STEP_${d}.pdf`);
+        });
+    }
 
     document.querySelectorAll('.btn-print-card').forEach(btn => {
         btn.addEventListener('click', function(e) {
@@ -567,85 +600,91 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // حفظ السجل اليومي
-    document.getElementById('stepForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const dateKey = document.getElementById('date_exp').value;
+    const stepForm = document.getElementById('stepForm');
+    if(stepForm) {
+        stepForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const dateKey = document.getElementById('date_exp').value;
 
-        let savedInterventions = [];
-        document.querySelectorAll('.intervention-block').forEach(block => {
-            let pannes = [];
-            block.querySelectorAll('.int_panne_chk:checked').forEach(chk => pannes.push(chk.value));
+            let savedInterventions = [];
+            document.querySelectorAll('.intervention-block').forEach(block => {
+                let pannes = [];
+                block.querySelectorAll('.int_panne_chk:checked').forEach(chk => pannes.push(chk.value));
 
-            savedInterventions.push({
-                equip: block.querySelector('.int_equip').value,
-                puiss: block.querySelector('.int_puiss').value,
-                role: block.querySelector('.int_role').value,
-                date: block.querySelector('.int_date').value,
-                duree: block.querySelector('.int_duree').value,
-                etape: block.querySelector('.int_etape').value,
-                panneTypes: pannes,
-                mat: block.querySelector('.int_materiel').value,
-                pdr: block.querySelector('.int_pdr').value
+                savedInterventions.push({
+                    equip: block.querySelector('.int_equip').value,
+                    puiss: block.querySelector('.int_puiss').value,
+                    role: block.querySelector('.int_role').value,
+                    date: block.querySelector('.int_date').value,
+                    duree: block.querySelector('.int_duree').value,
+                    etape: block.querySelector('.int_etape').value,
+                    panneTypes: pannes,
+                    mat: block.querySelector('.int_materiel').value,
+                    pdr: block.querySelector('.int_pdr').value
+                });
             });
-        });
 
-        let savedOuvrages = [];
-        document.querySelectorAll('.ouvrage-block').forEach(block => {
-            savedOuvrages.push({
-                quel: block.querySelector('.ouv_quel').value,
-                role: block.querySelector('.ouv_role').value,
-                type: block.querySelector('.ouv_type').value,
-                date: block.querySelector('.ouv_date').value,
-                ref: block.querySelector('.ouv_ref').value,
-                entreprise: block.querySelector('.ouv_entreprise').value,
-                remarques: block.querySelector('.ouv_remarques').value
+            let savedOuvrages = [];
+            document.querySelectorAll('.ouvrage-block').forEach(block => {
+                savedOuvrages.push({
+                    quel: block.querySelector('.ouv_quel').value,
+                    role: block.querySelector('.ouv_role').value,
+                    type: block.querySelector('.ouv_type').value,
+                    date: block.querySelector('.ouv_date').value,
+                    ref: block.querySelector('.ouv_ref').value,
+                    entreprise: block.querySelector('.ouv_entreprise').value,
+                    remarques: block.querySelector('.ouv_remarques').value
+                });
             });
+
+            const dataToSave = {
+                date: dateKey, meteo: document.getElementById('meteo').value, t_amb: document.getElementById('t_amb').value, pluvio: document.getElementById('pluvio').value,
+                interventions: savedInterventions,
+                ouvrages: savedOuvrages,
+                exploitation: { 
+                    idx_in: document.getElementById('idx_in').value, diff_in: document.getElementById('diff_in').value,
+                    idx_out: document.getElementById('idx_out').value, diff_out: document.getElementById('diff_out').value,
+                    idx_nrj: document.getElementById('idx_nrj').value, diff_nrj: document.getElementById('diff_nrj').value,
+                    ratio_1j: document.getElementById('ratio_1j').value
+                },
+                obs: document.getElementById('obs_text').value
+            };
+
+            localStorage.setItem(`STEP_${dateKey}`, JSON.stringify(dataToSave));
+            alert(`✔ Fiche du ${dateKey} enregistrée avec succès !`);
         });
-
-        const dataToSave = {
-            date: dateKey, meteo: document.getElementById('meteo').value, t_amb: document.getElementById('t_amb').value, pluvio: document.getElementById('pluvio').value,
-            interventions: savedInterventions,
-            ouvrages: savedOuvrages,
-            exploitation: { 
-                idx_in: document.getElementById('idx_in').value, diff_in: document.getElementById('diff_in').value,
-                idx_out: document.getElementById('idx_out').value, diff_out: document.getElementById('diff_out').value,
-                idx_nrj: document.getElementById('idx_nrj').value, diff_nrj: document.getElementById('diff_nrj').value,
-                ratio_1j: document.getElementById('ratio_1j').value
-            },
-            obs: document.getElementById('obs_text').value
-        };
-
-        localStorage.setItem(`STEP_${dateKey}`, JSON.stringify(dataToSave));
-        alert(`✔ Fiche du ${dateKey} enregistrée avec succès !`);
-    });
+    }
 
     // تصدير إكسيل
-    document.getElementById('btnExportExcel').addEventListener('click', () => {
-        const month = document.getElementById('exportMonth').value;
-        if(!month) return alert("Veuillez sélectionner un mois.");
-        
-        let wb = XLSX.utils.book_new();
-        let recapData = [
-            ["DATE", "Météo", "T(°C)", "Diff Vol In", "Diff Vol Out", "Diff Nrj", "Ratio 1j", "Nbr Interv.", "Nbr Ouvrages", "OBSERVATIONS"]
-        ];
+    const btnExportExcel = document.getElementById('btnExportExcel');
+    if(btnExportExcel) {
+        btnExportExcel.addEventListener('click', () => {
+            const month = document.getElementById('exportMonth').value;
+            if(!month) return alert("Veuillez sélectionner un mois.");
+            
+            let wb = XLSX.utils.book_new();
+            let recapData = [
+                ["DATE", "Météo", "T(°C)", "Diff Vol In", "Diff Vol Out", "Diff Nrj", "Ratio 1j", "Nbr Interv.", "Nbr Ouvrages", "OBSERVATIONS"]
+            ];
 
-        for(let d=1; d<=31; d++) {
-            let key = `STEP_${month}-${d.toString().padStart(2, '0')}`;
-            let item = localStorage.getItem(key);
-            if(item) {
-                let data = JSON.parse(item);
-                recapData.push([
-                    data.date, data.meteo, data.t_amb, 
-                    data.exploitation?.diff_in, data.exploitation?.diff_out, data.exploitation?.diff_nrj, data.exploitation?.ratio_1j,
-                    data.interventions ? data.interventions.length : 0,
-                    data.ouvrages ? data.ouvrages.length : 0,
-                    data.obs
-                ]);
+            for(let d=1; d<=31; d++) {
+                let key = `STEP_${month}-${d.toString().padStart(2, '0')}`;
+                let item = localStorage.getItem(key);
+                if(item) {
+                    let data = JSON.parse(item);
+                    recapData.push([
+                        data.date, data.meteo, data.t_amb, 
+                        data.exploitation?.diff_in, data.exploitation?.diff_out, data.exploitation?.diff_nrj, data.exploitation?.ratio_1j,
+                        data.interventions ? data.interventions.length : 0,
+                        data.ouvrages ? data.ouvrages.length : 0,
+                        data.obs
+                    ]);
+                }
             }
-        }
-        if(recapData.length === 1) return alert("Aucune donnée enregistrée pour ce mois.");
-        let ws = XLSX.utils.aoa_to_sheet(recapData);
-        XLSX.utils.book_append_sheet(wb, ws, "Rapport Mensuel");
-        XLSX.writeFile(wb, `Rapport_STEP_${month}.xlsx`);
-    });
+            if(recapData.length === 1) return alert("Aucune donnée enregistrée pour ce mois.");
+            let ws = XLSX.utils.aoa_to_sheet(recapData);
+            XLSX.utils.book_append_sheet(wb, ws, "Rapport Mensuel");
+            XLSX.writeFile(wb, `Rapport_STEP_${month}.xlsx`);
+        });
+    }
 });
